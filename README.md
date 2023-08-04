@@ -1,41 +1,41 @@
-## Алгоритм
+## Algorithm
 
-1. Якщо у обох користувачів в першій позиції однаковий аспект типології, тип відносин – "філія".
-2. Якщо у користувачів співпадають другий та третій аспекти типології, тип відносин – "агапе".
-3. Якщо перший аспект типології одного користувача співпадає з третім аспектом іншого (або навпаки), тип відносин – "ерос".
-4. Якщо другий аспект типології одного користувача співпадає з четвертим аспектом іншого (або навпаки), тип відносин – "ерос".
+1. If both users have the same aspect of typology in the first position, the type of relationship is "Philia".
+2. If the users' second and third aspects of typology match, or if the first and fourth aspects match, the type of relationship is "Agape".
+3. If the first aspect of typology of one user matches the third aspect of the other (or vice versa), the type of relationship is "Eros".
+4. If the second aspect of typology of one user matches the fourth aspect of the other (or vice versa), the type of relationship is "Eros".
 
-Після визначення типу відносин, обчислюємо комфортність відносин на основі типу:
+After determining the type of relationship, we calculate the comfort of the relationship based on the type:
 
-- Філія: комфортність = 2
-- Агапе: комфортність = 4
-- Ерос: комфортність = -2
+- Philia: comfort = 2
+- Agape: comfort = 4
+- Eros: comfort = -2
 
-## Приклад коду Python
+## Python Code Example
 
 ```python
-def relation_type(user1, user2):
+def determine_relationship_type(user1, user2):
     if user1[0] == user2[0]:
-        return "Філія"
-    if user1[1] == user2[1] and user1[2] == user2[2]:
-        return "Агапе"
+        return "Philia"
+    if (user1[1] == user2[1] and user1[2] == user2[2]) or (user1[0] == user2[3] and user1[3] == user2[0]):
+        return "Agape"
     if user1[0] == user2[2] or user1[2] == user2[0]:
-        return "Ерос"
+        return "Eros"
     if user1[1] == user2[3] or user1[3] == user2[1]:
-        return "Ерос"
+        return "Eros"
 
-def comfort_score(relation_type):
-    if relation_type == "Філія":
+def compute_comfort_score(relationship_type):
+    if relationship_type == "Philia":
         return 2
-    if relation_type == "Агапе":
+    if relationship_type == "Agape":
         return 4
-    if relation_type == "Ерос":
+    if relationship_type == "Eros":
         return -2
 
-# Приклад використання
+# Example Usage
 user1 = ['typologyAspect1', 'typologyAspect2', 'typologyAspect3', 'typologyAspect4']
 user2 = ['typologyAspect4', 'typologyAspect3', 'typologyAspect2', 'typologyAspect1']
 
-relation_type = relation_type(user1, user2)
-comfort_score = comfort_score(relation_type)
-print(relation_type, comfort_score)
+relationship_type = determine_relationship_type(user1, user2)
+comfort_score = compute_comfort_score(relationship_type)
+print(relationship_type, comfort_score)
