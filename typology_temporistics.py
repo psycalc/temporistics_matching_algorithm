@@ -101,3 +101,22 @@ class TypologyTemporistics(Typology):
                 period = "Current"
             time_periods_short.append(period[0])
         return time_periods_short
+    
+    INTER_TYPE_RELATIONSHIPS = {
+        # Fill this dictionary with the relationships between types
+        # Example: ('Game Master', 'Player'): "Rivalry"
+    }
+    
+    def get_intertype_relationship(self, type1: str, type2: str) -> str:
+        """
+        Returns the intertype relationship between two given types.
+
+        :param type1: A string representing the first type.
+        :param type2: A string representing the second type.
+        :return: A string representing the relationship between the two types.
+        :raises ValueError: If the types are invalid or if the relationship is not defined.
+        """
+        relationship = self.INTER_TYPE_RELATIONSHIPS.get((type1, type2), None)
+        if relationship is None:
+            raise ValueError(f"Intertype relationship between {type1} and {type2} is not defined.")
+        return relationship
