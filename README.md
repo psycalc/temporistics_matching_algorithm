@@ -15,7 +15,14 @@ After determining the type of relationship, we calculate the comfort of the rela
 
 ```python
 class RelationshipCalculator:
-    """A class to calculate the relationship type and comfort score between two users based on their typology aspects."""
+    """A class to calculate the relationship type between two users based on their typology aspects."""
+    RELATIONSHIP_PHILIA = "Philia"
+    RELATIONSHIP_PSEUDO_PHILIA = "Pseudo-Philia"
+    RELATIONSHIP_AGAPE = "Agape"
+    RELATIONSHIP_FULL_AGAPE = "Full Agape"
+    RELATIONSHIP_EROS = "Eros"
+    RELATIONSHIP_EROS_VARIANT = "Eros Variant"
+    RELATIONSHIP_FULL_EROS = "Full Eros"
 
     def __init__(self, user1, user2):
         """Initialize the class with two users."""
@@ -24,19 +31,34 @@ class RelationshipCalculator:
 
     def determine_relationship_type(self):
         """Determine the type of relationship between the two users."""
-        if self.user1[0] == self.user2[0]:
-            return "Philia"
-        if (self.user1[1] == self.user2[1] and self.user1[2] == self.user2[2]) or (self.user1[0] == self.user2[3] and self.user1[3] == self.user2[0]):
-            return "Agape"
+        if self.user1 == self.user2:
+            return self.RELATIONSHIP_PHILIA
+        
+        # Logic to determine Pseudo-Philia is not given, so skipping
+        
+        if self.user1[1] == self.user2[1] and self.user1[2] == self.user2[2]:
+            return self.RELATIONSHIP_AGAPE
+        
+        if (
+            (self.user1[1] == self.user2[1] and self.user1[2] == self.user2[2]) and 
+            (self.user1[0] == self.user2[3] and self.user1[3] == self.user2[0])
+        ):
+            return self.RELATIONSHIP_FULL_AGAPE
+        
         if self.user1[0] == self.user2[2] or self.user1[2] == self.user2[0]:
-            return "Eros"
-        if self.user1[1] == self.user2[3] or self.user1[3] == self.user2[1]:
-            return "Eros"
+            return self.RELATIONSHIP_EROS
 
-    def compute_comfort_score(self, relationship_type):
-        """Compute the comfort score based on the type of relationship."""
-        comfort_scores = {"Philia": 2, "Agape": 4, "Eros": -2}
-        return comfort_scores.get(relationship_type, 0)
+        if self.user1[1] == self.user2[3] or self.user1[3] == self.user2[1]:
+            return self.RELATIONSHIP_EROS_VARIANT
+
+        # Logic to determine Full Eros
+        if (
+            (self.user1[0] == self.user2[2] or self.user1[2] == self.user2[0]) and
+            (self.user1[1] == self.user2[3] or self.user1[3] == self.user2[1])
+        ):
+            return self.RELATIONSHIP_FULL_EROS
+
+        return "Unknown Relationship"
 
 # Example Usage
 user1 = ['typologyAspect1', 'typologyAspect2', 'typologyAspect3', 'typologyAspect4']
@@ -44,6 +66,6 @@ user2 = ['typologyAspect4', 'typologyAspect3', 'typologyAspect2', 'typologyAspec
 
 calculator = RelationshipCalculator(user1, user2)
 relationship_type = calculator.determine_relationship_type()
-comfort_score = calculator.compute_comfort_score(relationship_type)
 
-print(f"Relationship Type: {relationship_type}, Comfort Score: {comfort_score}")
+print(f"Relationship Type: {relationship_type}")
+```
