@@ -6,7 +6,7 @@ class TypologyTemporistics(Typology):
         """
         Initializes a new instance of the TypologyTemporistics class.
         """
-        super().__init__(["Past", "Present", "Future", "Eternity"])
+        super().__init__(["Past", "Current", "Future", "Eternity"])
 
     TETRADS = {
         '6-1-2': "Era of Individuality (P)",
@@ -120,3 +120,7 @@ class TypologyTemporistics(Typology):
         if relationship is None:
             raise ValueError(f"Intertype relationship between {type1} and {type2} is not defined.")
         return relationship
+    
+    # get aspects
+    def get_aspects(self):
+        return self.aspects

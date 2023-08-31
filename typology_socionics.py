@@ -1,4 +1,4 @@
-from typology import Typology
+from relationship_calculator import Typology
 # import permutations from itertools
 from itertools import permutations
 
