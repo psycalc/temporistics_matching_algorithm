@@ -1,6 +1,7 @@
 
 from itertools import permutations
 from typology_temporistics import TypologyTemporistics
+from typology_psychosophia import TypologyPsychosophia
 
 class RelationshipCalculator:
     """A class to calculate the relationship type and comfort score between two users based on their typology aspects."""
@@ -107,14 +108,24 @@ class RelationshipCalculator:
         return ["".join([aspect[0] for aspect in type_name.split(" ")]) for type_name in types]
 
 # create an instance of the RelationshipCalculator class
-calculator = RelationshipCalculator([], [], TypologyTemporistics())
+calculator1 = RelationshipCalculator([], [], TypologyTemporistics())
 
 # get all types
-all_types = calculator.get_all_types()
+all_types = calculator1.get_all_types()
 print(all_types)
 
 # shorten the type names
-shortened_types = calculator.shorten_type(all_types)
+shortened_types = calculator1.shorten_type(all_types)
 
 # print the shortened type names
+print(shortened_types)
+
+calculator2 = RelationshipCalculator([], [], TypologyPsychosophia())
+
+# get all types
+all_types = calculator2.get_all_types()
+print(all_types)
+
+# shorten the type names
+shortened_types = calculator2.shorten_type(all_types)
 print(shortened_types)

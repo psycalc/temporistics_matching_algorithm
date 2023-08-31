@@ -1,4 +1,4 @@
-from relationship_calculator import Typology
+from typology import Typology
 
 class TypologyPsychosophia(Typology):
     def __init__(self):
@@ -31,4 +31,8 @@ class TypologyPsychosophia(Typology):
         
         
         return quadras
+    
+    # get aspects
+    def get_aspects(self):
+        return self.aspects
 
