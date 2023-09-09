@@ -1,7 +1,9 @@
 
-from itertools import permutations
+
 from typology_temporistics import TypologyTemporistics
 from typology_psychosophia import TypologyPsychosophia
+from typology_amatoric import TypologyAmatoric
+from typology_socionics import TypologySocionics
 
 class RelationshipCalculator:
     """A class to calculate the relationship type and comfort score between two users based on their typology aspects."""
@@ -91,41 +93,19 @@ class RelationshipCalculator:
         """Return the comfort score for the given relationship type."""
         return self.COMFORT_SCORES.get(relationship_type, 0)  # Default to 0 if relationship type is not found
     
-    
-    def get_all_types(self):
-
-        # use typology aspects to get all types
-        aspects = self.typology.get_aspects()
-        # combinations of 4 aspects without repetition
-        return [", ".join([str(aspect) for aspect in perm]) for perm in permutations(aspects, 4)]
-    
-    def shorten_type(self, types):
-        """Shorten the type name to the first letter of each aspect."""
-        if isinstance(types, str):
-            # If types is a string, convert it to a list with one element
-            types = [types]
-        # Shorten each type name to the first letter of each aspect
-        return ["".join([aspect[0] for aspect in type_name.split(" ")]) for type_name in types]
 
 # create an instance of the RelationshipCalculator class
-calculator1 = RelationshipCalculator([], [], TypologyTemporistics())
+temporitics = TypologyTemporistics()
+# show all types
+print(temporitics.get_all_types())
+psychosophia = TypologyPsychosophia()
+# show all types
+print(psychosophia.get_all_types())
+amatoric = TypologyAmatoric()
+# show all types
+print(amatoric.get_all_types())
+socionics = TypologySocionics()
+# show all types
+print(socionics.get_all_types())
 
-# get all types
-all_types = calculator1.get_all_types()
-print(all_types)
 
-# shorten the type names
-shortened_types = calculator1.shorten_type(all_types)
-
-# print the shortened type names
-print(shortened_types)
-
-calculator2 = RelationshipCalculator([], [], TypologyPsychosophia())
-
-# get all types
-all_types = calculator2.get_all_types()
-print(all_types)
-
-# shorten the type names
-shortened_types = calculator2.shorten_type(all_types)
-print(shortened_types)

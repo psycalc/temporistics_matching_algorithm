@@ -1,24 +1,27 @@
-from relationship_calculator import Typology
+from typology import Typology
 # import permutations from itertools
-from itertools import permutations
+from itertools import permutations, combinations, product
+
 
 class TypologySocionics(Typology):
     def __init__(self):
         """
         Initializes a new instance of the TypologySocionics class.
         """
-        super().__init__(["Ethics", "Logic", "Sensation", "Intuition", "Introversion", "Extraversion"], [])
+        super().__init__(["Ethics", "Logic", "Sensation", "Intuition", "Introversion", "Extraversion"])
+
 
     def get_all_types(self):
         """
-        Returns all valid permutations of aspects.
+        Returns all valid combinations of aspects.
         
-        A permutation is valid if it does not contain both Ethics and Logic, Sensation and Intuition, or Introversion and Extraversion.
+        A combination is valid if it does not contain both Ethics and Logic, Sensation and Intuition, or Introversion and Extraversion.
         """
-        return [", ".join([str(aspect) for aspect in perm]) for perm in permutations(self.aspects, 4)
-                 if not (("Ethics" in perm and "Logic" in perm) or
-                         ("Sensation" in perm and "Intuition" in perm) or
-                         ("Introversion" in perm and "Extraversion" in perm))]
+        return ["".join([str(aspect[0]) for aspect in comb]) for comb in combinations(self.aspects, 3)
+                if not (("Ethics" in comb and "Logic" in comb) or
+                        ("Sensation" in comb and "Intuition" in comb) or
+                        ("Introversion" in comb and "Extraversion" in comb))]
+
     
     def get_all_quadras(self):
         """
@@ -46,3 +49,28 @@ class TypologySocionics(Typology):
         }
         
         return quadras
+    
+    # get aspects
+    def get_aspects(self):
+        return self.aspects
+    
+    def get_all_types(self):
+        """
+        Returns all 16 Socionics types.
+        """
+        dichotomies = [
+            ['I', 'E'],
+            ['S', 'N'],
+            ['T', 'F'],
+            ['J', 'P']
+        ]
+        return ["".join(combination) for combination in product(*dichotomies)]
+
+    
+    def shorten_type(self, typology_type):
+        """
+        Implement the logic for shortening the type if necessary.
+        For now, it simply returns the original type, but you can
+        add logic to shorten it in the future if needed.
+        """
+        return typology_type  # Placeholder. Modify based on actual requirements
