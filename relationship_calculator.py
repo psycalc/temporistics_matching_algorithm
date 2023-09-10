@@ -108,15 +108,19 @@ def main():
     def get_user_type(typology_instance, person="you"):
         # Display available types for the selected typology
         available_types = typology_instance.get_all_types()
-        for idx, t in enumerate(available_types, 1):
-            print(f"{idx}. {t}")
+        max_type_length = max(len(t) for t in available_types)
+
+        # Printing the types in 4-column layout
+        for i in range(0, len(available_types), 4):
+            print("    ".join(f"{j+1}. {available_types[j]:<{max_type_length}}" for j in range(i, min(i+4, len(available_types)))))
 
         # Get type based on user selection
-        user_input = input(f"What's {person} type number from the above list? ")
+        user_input = input(f"\nWhat's {person} type number from the above list? ")
         while not user_input.isdigit() or int(user_input) not in range(1, len(available_types) + 1):
             print("Invalid choice. Please select a valid number.")
             user_input = input(f"What's {person} type number from the above list? ")
         return available_types[int(user_input) - 1]
+
 
     # Gather user and partner types for each selected typology
     user_types = {}
