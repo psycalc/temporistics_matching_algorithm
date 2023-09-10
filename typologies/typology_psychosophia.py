@@ -1,4 +1,4 @@
-from typology import Typology
+from .typology import Typology
 from itertools import permutations
 
 class TypologyPsychosophia(Typology):

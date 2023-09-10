@@ -1,5 +1,6 @@
 from typing import List
-from typology import Typology
+from .typology import Typology
+
 from itertools import permutations
 
 class TypologyTemporistics(Typology):
