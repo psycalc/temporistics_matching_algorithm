@@ -43,23 +43,23 @@
     <form method="post" action="/">
         <label for="typology">Select Typology:</label>
         <select name="typology" id="typology" onchange="updateTypes()">
-            <option value="Temporistics">Temporistics</option>
-            <option value="Psychosophia">Psychosophia</option>
-            <option value="Amatoric">Amatoric</option>
-            <option value="Socionics">Socionics</option>
+            <option value="Temporistics">1. Temporistics</option>
+            <option value="Psychosophia">2. Psychosophia</option>
+            <option value="Amatoric">3. Amatoric</option>
+            <option value="Socionics">4. Socionics</option>
         </select>
         <br>
         <label for="user1">User 1 Type:</label>
         <select name="user1" id="user1" required>
             {% for type in types %}
-            <option value="{{ type }}">{{ type }}</option>
+            <option value="{{ type }}">{{ loop.index }} {{ type }}</option>
             {% endfor %}
         </select>
         <br>
         <label for="user2">User 2 Type:</label>
         <select name="user2" id="user2" required>
             {% for type in types %}
-            <option value="{{ type }}">{{ type }}</option>
+            <option value="{{ type }}">{{ loop.index }} {{ type }}</option>
             {% endfor %}
         </select>
         <br>
