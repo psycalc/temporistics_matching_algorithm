@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Relationship Calculator</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        input[type="submit"] {
+            background-color: #008CBA;
+            color: white;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #005f5f;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Relationship Calculator</h1>
+    <form method="post" action="/calculate">
+        <label for="typology">Select Typology:</label>
+        <select name="typology" id="typology" onchange="updateTypes()">
+            <option value="Temporistics">Temporistics</option>
+            <option value="Psychosophia">Psychosophia</option>
+            <option value="Amatoric">Amatoric</option>
+            <option value="Socionics">Socionics</option>
+        </select>
+        <br>
+        <label for="user1">User 1 Type:</label>
+        <select name="user1" id="user1" required>
+            {% for type in types %}
+            <option value="{{ type }}">{{ type }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="user2">User 2 Type:</label>
+        <select name="user2" id="user2" required>
+            {% for type in types %}
+            <option value="{{ type }}">{{ type }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <input type="submit" value="Calculate">
+    </form>
+
+    <script type="text/javascript">
+        function updateTypes() {
+            var typologyName = $('#typology').val();
+            $.getJSON('/get_types', {typology: typologyName}, function(data) {
+                var user1Select = $('#user1');
+                var user2Select = $('#user2');
+                user1Select.empty();
+                user2Select.empty();
+                $.each(data.types, function(key, value) {
+                    user1Select.append($("<option></option>").attr("value", value).text(value));
+                    user2Select.append($("<option></option>").attr("value", value).text(value));
+                });
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,8 +1,8 @@
-from typologies.typology_temporistics import TypologyTemporistics
+from app.typologies.typology_temporistics import TypologyTemporistics
+from app.typologies.typology_psychosophia import TypologyPsychosophia
+from app.typologies.typology_amatoric import TypologyAmatoric
+from app.typologies.typology_socionics import TypologySocionics
 
-from typologies.typology_psychosophia import TypologyPsychosophia
-from typologies.typology_amatoric import TypologyAmatoric
-from typologies.typology_socionics import TypologySocionics
 from enum import Enum
 
 class RelationshipType(Enum):
