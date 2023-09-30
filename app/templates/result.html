@@ -2,11 +2,29 @@
 <html>
 <head>
     <title>Relationship Calculator Result</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .result-container {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
 <body>
-    <h1>Result</h1>
-    <p>Relationship Type: {{ relationship_type }}</p>
-    <p>Comfort Score: {{ comfort_score }}</p>
-    <a href="{{ url_for('index') }}">Go Back</a>
+    <div class="result-container">
+        <h1>Result</h1>
+        <p>Relationship Type: {{ relationship_type }}</p>
+        <p>Comfort Score: {{ comfort_score }}</p>
+        <a href="{{ url_for('index') }}">Go Back</a>
+    </div>
 </body>
 </html>
