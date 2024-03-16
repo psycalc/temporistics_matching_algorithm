@@ -28,7 +28,7 @@ class TypologyTemporistics(Typology):
         },
         'Old-timers and Founders': {
             'types': ["Theorist", "Oracle", "Conqueror", "Star"],
-            'description': 'Old-timers and founders of the “face” world are one-plane N and V. The way to exist is fixed. The place in the world is fixed. The direction of development and everything personal + self-image are subject to manipulation.'
+            'description': 'Old-timers and founders of the "face" world are one-plane N and V. The way to exist is fixed. The place in the world is fixed. The direction of development and everything personal + self-image are subject to manipulation.'
         },
         'Conductors': {
             'types': ["Ideologist", "Samurai", "Colonist", "Pioneer"],
@@ -42,6 +42,14 @@ class TypologyTemporistics(Typology):
             'types': ["Tamada", "Pathfinder", "Robinson", "Initiator"],
             'description': 'Nomads and tramps are one-plane P and B. Everything personal, self-image, and direction of development are fixed. Place in the world and way of existence are subject to manipulation.'
         }
+    }
+
+    QUADRAS = {
+        quadra_name: data['types'] for quadra_name, data in QUADRAS_AND_DESCRIPTIONS.items()
+    }
+
+    QUADRA_DESCRIPTIONS = {
+        quadra_name: data['description'] for quadra_name, data in QUADRAS_AND_DESCRIPTIONS.items()
     }
 
     def validate_tetrad_sequence(self, tetrad_sequence: str) -> None:
@@ -67,10 +75,10 @@ class TypologyTemporistics(Typology):
 
     def get_quadras(self, quadra_name: str) -> List[str]:
       """
-      Returns the list of descriptions for a given quadra.
+      Returns the list of types for a given quadra.
 
       :param quadra_name: A string representing a quadra name.
-      :return: A list of strings representing the descriptions for the given quadra.
+      :return: A list of strings representing the types for the given quadra.
       :raises ValueError: If the quadra name is invalid.
       """
       if quadra_name not in self.QUADRAS:
