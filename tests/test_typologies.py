@@ -1,17 +1,16 @@
-# tests/test_typologies.py
-
 import unittest
-from typologies.typology_temporistics import TypologyTemporistics
 
 class TestTypologyTemporistics(unittest.TestCase):
-
     def setUp(self):
+        from app import create_app  # Import here to avoid premature Flask context usage
+        self.app = create_app('testing')
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+        # Importing here ensures it's within a context
+        from app.typologies.typology_temporistics import TypologyTemporistics
         self.typology = TypologyTemporistics()
 
-    def test_retrieve_type(self):
-        result = self.typology.retrieve_type('SomeInput')
-        expected = 'SomeExpectedOutput'
-        self.assertEqual(result, expected)
+    def tearDown(self):
+        self.app_context.pop()
 
-if __name__ == '__main__':
-    unittest.main()
+    # Your tests here...

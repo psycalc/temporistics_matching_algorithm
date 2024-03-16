@@ -1,0 +1,11 @@
+msgid "1. Temporistics"
+msgstr ""
+
+msgid "2. Psychosophia"
+msgstr ""
+
+msgid "3. Amatoric"
+msgstr ""
+
+msgid "4. Socionics"
+msgstr ""

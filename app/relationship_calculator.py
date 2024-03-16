@@ -1,143 +1,180 @@
+import json
+import os
+from enum import Enum
 from app.typologies.typology_temporistics import TypologyTemporistics
 from app.typologies.typology_psychosophia import TypologyPsychosophia
 from app.typologies.typology_amatoric import TypologyAmatoric
 from app.typologies.typology_socionics import TypologySocionics
 
-from enum import Enum
+# Function to load relationship data from a JSON file
+def load_relationship_data(file_path):
+    """Load relationship data from a JSON file.
+    
+    Args:
+        file_path (str): The path to the JSON file containing the relationship data.
+    
+    Returns:
+        dict: The loaded relationship data.
+    """
+    # Adjust the path according to the placement of your JSON file within your project structure
+    base_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))  # This navigates up to the project root
+    full_path = os.path.join(base_dir, 'data', file_path)  # Assumes the JSON is under the 'data' directory
+    with open(full_path, 'r') as file:
+        data = json.load(file)
+    return data
 
 class RelationshipType(Enum):
+    # Socionics Relationships
+    IDENTITY = "Identity"
+    DUALITY = "Duality"
+    ACTIVITY = "Activity"
+    MIRROR = "Mirror"
+    KINDRED = "Kindred"
+    SEMI_DUALITY = "Semi-duality"
+    BUSINESS = "Business"
+    ILLUSIONARY = "Illusionary"
+    SUPER_EGO = "Super-ego"
+    CONTRARY = "Contrary"
+    QUASI_IDENTITY = "Quasi-identity"
+    EXTINGUISHMENT = "Extinguishment"
+    CONFLICT = "Conflict"
+    BENEFIT = "Benefit"
+
+    # Temporistics Relationships
+    HOMOCHRONY = "Homochrony"
+    HETEROCHRONY = "Heterochrony"
+
+    # Psychosophia Relationships
+    AFFINITY = "Affinity"
+    COMPLEMENTARY = "Complementary"
+    ANTAGONISTIC = "Antagonistic"
+
+    # Amatoric Relationships
     PHILIA = "Philia"
-    PSEUDO_PHILIA = "Pseudo-Philia"
-    AGAPE = "Agape"
-    FULL_AGAPE = "Full Agape"
+    STORGE = "Storge"
     EROS = "Eros"
-    EROS_VARIANT = "Eros Variant"
-    FULL_EROS = "Full Eros"
+    AGAPE = "Agape"
+
     UNKNOWN = "Unknown Relationship"
 
 class RelationshipCalculator:
-    """A class to calculate the relationship type and comfort score between two users based on their typology aspects."""
-
-    COMFORT_SCORES = {
-        RelationshipType.PHILIA: 5,
-        RelationshipType.PSEUDO_PHILIA: 3,
-        RelationshipType.AGAPE: 8,
-        RelationshipType.FULL_AGAPE: 10,
-        RelationshipType.EROS: -2,
-        RelationshipType.EROS_VARIANT: -1,
-        RelationshipType.FULL_EROS: -5
-    }
-
-    # Terminal color codes
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RED = '\033[91m'
-    END = '\033[0m'
+    """Class to calculate the relationship type and comfort score based on typology aspects."""
 
     def __init__(self, user1, user2, typology):
-        """Initialize the class with two users."""
         self.user1 = user1
         self.user2 = user2
         self.typology = typology
+        self.load_comfort_scores()
+
+    def load_comfort_scores(self):
+        """Load comfort scores from a JSON file."""
+        self.COMFORT_SCORES = load_relationship_data(f'{self.typology.lower()}_comfort_scores.json')
 
     def get_relationship_color(self, comfort_score):
         """Return the color code based on comfort score."""
         if comfort_score > 0:
-            return self.GREEN
+            return '\033[92m'  # Green
         elif comfort_score < 0:
-            return self.RED
-        else:
-            return self.YELLOW
+            return '\033[91m'  # Red
+        return '\033[93m'  # Yellow
 
     def determine_relationship_type(self):
-        """Determine the type of relationship between the two users."""
-        if self.user1 == self.user2:
-            return RelationshipType.PHILIA
+        """Determine the relationship type based on user types and typology.
+        
+        Returns:
+            RelationshipType: The determined relationship type.
+        """
+        user1_type = self.user1.type
+        user2_type = self.user2.type
 
-        if (
-            (self.user1[1] == self.user2[2] and self.user1[2] == self.user2[1]) and 
-            (self.user1[0] == self.user2[3] and self.user1[3] == self.user2[0])
-        ):
-            return RelationshipType.FULL_AGAPE
+        if self.typology == 'Socionics':
+            # Socionics relationship determination logic
+            if user1_type == user2_type:
+                return RelationshipType.IDENTITY
+            elif user1_type == TypologySocionics.get_dual_type(user2_type):
+                return RelationshipType.DUALITY
+            elif user1_type == TypologySocionics.get_activity_type(user2_type):
+                return RelationshipType.ACTIVITY
+            # Add more conditions for other Socionics relationship types
+            else:
+                return RelationshipType.UNKNOWN
 
-        if (
-            (self.user1[0] == self.user2[2] or self.user1[2] == self.user2[0]) and
-            (self.user1[1] == self.user2[3] or self.user1[3] == self.user2[1])
-        ):
-            return RelationshipType.FULL_EROS
+        elif self.typology == 'Temporistics':
+            # Temporistics relationship determination logic
+            if TypologyTemporistics.are_types_homochronous(user1_type, user2_type):
+                return RelationshipType.HOMOCHRONY
+            else:
+                return RelationshipType.HETEROCHRONY
 
-        if self.user1[0] == self.user2[0] and self.user1[1] == self.user2[2]:
-            return RelationshipType.AGAPE
+        elif self.typology == 'Psychosophia':
+            # Psychosophia relationship determination logic
+            if TypologyPsychosophia.are_types_affine(user1_type, user2_type):
+                return RelationshipType.AFFINITY
+            elif TypologyPsychosophia.are_types_complementary(user1_type, user2_type):
+                return RelationshipType.COMPLEMENTARY
+            elif TypologyPsychosophia.are_types_antagonistic(user1_type, user2_type):
+                return RelationshipType.ANTAGONISTIC
+            else:
+                return RelationshipType.UNKNOWN
 
-        if self.user1[0] == self.user2[2] or self.user1[2] == self.user2[0]:
-            return RelationshipType.EROS
+        elif self.typology == 'Amatoric':
+            # Amatoric relationship determination logic
+            if TypologyAmatoric.are_types_philia(user1_type, user2_type):
+                return RelationshipType.PHILIA
+            elif TypologyAmatoric.are_types_storge(user1_type, user2_type):
+                return RelationshipType.STORGE
+            elif TypologyAmatoric.are_types_eros(user1_type, user2_type):
+                return RelationshipType.EROS
+            elif TypologyAmatoric.are_types_agape(user1_type, user2_type):
+                return RelationshipType.AGAPE
+            else:
+                return RelationshipType.UNKNOWN
 
-        if self.user1[1] == self.user2[3] or self.user1[3] == self.user2[1]:
-            return RelationshipType.EROS_VARIANT
-
-        if (
-            (self.user1[0] == self.user2[0] and self.user1[3] == self.user2[3]) or
-            (self.user1[1] == self.user2[1] and self.user1[2] == self.user2[2])
-        ):
-            return RelationshipType.PSEUDO_PHILIA
-
-        return RelationshipType.UNKNOWN
+        else:
+            return RelationshipType.UNKNOWN
 
     def get_comfort_score(self, relationship_type):
-        """Return the comfort score for the given relationship type."""
-        return self.COMFORT_SCORES.get(relationship_type, 0)  # Default to 0 if relationship type is not found
+        """Retrieve the comfort score and description for a given relationship type.
+        
+        Args:
+            relationship_type (RelationshipType): The type of relationship.
+        
+        Returns:
+            tuple: The score and description for the relationship type.
+        """
+        # Fetches the relationship data, defaulting to (0, "Unknown Relationship") if not found
+        relationship_data = self.COMFORT_SCORES.get(relationship_type.value, {"score": 0, "description": "Unknown Relationship"})
+        return (relationship_data['score'], relationship_data['description'])
 
 def main():
+    # Example usage
     available_typologies = {
-        "Temporistics": TypologyTemporistics,
-        "Psychosophia": TypologyPsychosophia,
-        "Amatoric": TypologyAmatoric,
-        "Socionics": TypologySocionics
+        "Temporistics": TypologyTemporistics(),
+        "Psychosophia": TypologyPsychosophia(),
+        "Amatoric": TypologyAmatoric(),
+        "Socionics": TypologySocionics()
     }
-
     print("Available typologies:")
-    for idx, typology_name in enumerate(available_typologies.keys(), 1):
+    for idx, typology_name in enumerate(available_typologies.keys(), start=1):
         print(f"{idx}. {typology_name}")
 
-    selected_typologies_numbers = input("Which typologies do you want to use for compatibility calculation? (e.g., '1,2,3,4' for all): ")
-    chosen_numbers = [int(num) for num in selected_typologies_numbers.split(",")]
+    # Prompt user for input
+    typology_choice = int(input("Enter the number of the desired typology: "))
+    typology_name = list(available_typologies.keys())[typology_choice - 1]
+    user1_type = input("Enter User 1 Type: ")
+    user2_type = input("Enter User 2 Type: ")
 
-    # Get the selected typologies based on the chosen numbers
-    selected_typologies = [available_typologies[list(available_typologies.keys())[num-1]] for num in chosen_numbers]
+    # Create RelationshipCalculator instance and determine relationship type
+    user1 = type('User1', (), {'type': user1_type})
+    user2 = type('User2', (), {'type': user2_type})
+    calculator = RelationshipCalculator(user1, user2, typology_name)
+    relationship_type = calculator.determine_relationship_type()
+    comfort_score = calculator.get_comfort_score(relationship_type)
 
-    def get_user_type(typology_instance, person="you"):
-        # Display available types for the selected typology
-        available_types = typology_instance.get_all_types()
-        max_type_length = max(len(t) for t in available_types)
-
-        # Printing the types in 4-column layout
-        for i in range(0, len(available_types), 4):
-            print("    ".join(f"{j+1}. {available_types[j]:<{max_type_length}}" for j in range(i, min(i+4, len(available_types)))))
-
-        # Get type based on user selection
-        user_input = input(f"\nWhat's {person} type number from the above list? ")
-        while not user_input.isdigit() or int(user_input) not in range(1, len(available_types) + 1):
-            print("Invalid choice. Please select a valid number.")
-            user_input = input(f"What's {person} type number from the above list? ")
-        return available_types[int(user_input) - 1]
-
-
-    # Gather user and partner types for each selected typology
-    user_types = {}
-    partner_types = {}
-    for typology_class in selected_typologies:
-        typology_name = typology_class.__name__
-        typology_instance = typology_class()
-
-        print(f"\nAvailable types for {typology_name}:")
-        user_types[typology_name] = get_user_type(typology_instance, person="you")
-        partner_types[typology_name] = get_user_type(typology_instance, person="your partner")
-
-    print("\nYour selected types are:")
-    for typology, user_type in user_types.items():
-        print(f"{typology} - You: {user_type} | Partner: {partner_types[typology]}")
+    # Display the results
+    print(f"Relationship Type: {relationship_type.value}")
+    print(f"Comfort Score: {comfort_score[0]}")
+    print(f"Description: {comfort_score[1]}")
 
 if __name__ == "__main__":
     main()
-
-
