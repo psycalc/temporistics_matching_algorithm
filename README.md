@@ -1,4 +1,4 @@
-Sure, here's the full `README.md` with the updated "Supported Relationship Types" section:
+Here's the full README.md with all the typologies in code blocks:
 
 ```markdown
 # Relationship Calculator
@@ -41,21 +41,43 @@ The tool evaluates multiple relationship dynamics across the following typologie
 
 ### Temporistics
 
-Temporistics is a psychological typology that categorizes people based on their relationship with time and temporal perspectives. It focuses on how individuals perceive and interact with the past, present, future, and eternity.
+```
+Temporistics is a psychological typology developed by Alexander Kronengold that categorizes people based on their relationship with time and temporal perspectives. It focuses on how individuals perceive and interact with the past, present, future, and eternity. Temporistics proposes that each person has a dominant time perspective that shapes their worldview, values, and behavior.
+
+In Temporistics, individuals are classified into 16 types based on their combination of four temporal aspects: Past, Present, Future, and Eternity. These types are organized into six quadras (groups of four types) and four tetrads (groups of three types). The quadras describe the shared values and characteristics of the types within each group, while the tetrads represent specific eras or periods.
+
+The Relationship Calculator tool evaluates various relationship types, such as Homochrony (similar temporal perspectives) and Heterochrony (different temporal perspectives), across the Temporistics typology, providing insights into interpersonal dynamics and compatibility based on individuals' temporal orientations.
+```
 
 ### Psychosophia
 
-Psychosophia, also known as the Philosophical Typology, is a system that classifies individuals based on their core psychological aspects: Emotion, Logic, Will, and Power. It explores the interplay between these aspects and their influence on behavior and decision-making.
+```
+Psychosophia, also known as the Philosophical Typology or Psyche-Yoga, is a system developed by Alexey Afanasiev that classifies individuals based on their core psychological aspects: Emotion, Logic, Will, and Power. It explores the interplay between these aspects and their influence on behavior, decision-making, and personal development.
+
+Psychosophia proposes that each individual has a unique combination of these four aspects, with one aspect being dominant (the "leading" or "Program" function), one auxiliary (the "Creative" function), and two weaker functions. This combination determines an individual's psychological type, which shapes their values, motivations, and patterns of thought and behavior.
+
+The Relationship Calculator evaluates multiple relationship dynamics across the Psychosophia typology, such as Identity/Philia, Full Eros, Full Agape, Extinguishment, Neutrality, Mirage, Order/Full Order, Revision, Therapy-Misunderstanding, Therapy-Attraction, and Conflict Submission/Dominance, providing insights into interpersonal dynamics and compatibility based on the interplay of psychological aspects.
+```
 
 ### Amatoric
 
-The Amatoric Typology is centered around the concepts of love, passion, friendship, and romance. It aims to understand and categorize individuals based on their attitudes, values, and approaches to interpersonal relationships and emotional connections.
+```
+The Amatoric Typology, developed by John Alan Lee, is centered around the concepts of love, passion, friendship, and romance. It aims to understand and categorize individuals based on their attitudes, values, and approaches to interpersonal relationships and emotional connections.
+
+The Amatoric Typology identifies six distinct types of love: Eros (romantic love), Ludus (playful love), Storge (friendship love), Pragma (practical love), Mania (possessive love), and Agape (selfless love). Each type of love is characterized by specific behaviors, attitudes, and motivations in interpersonal relationships.
+
+The Relationship Calculator tool evaluates relationship types like Philia, Storge, Eros, and Agape across the Amatoric Typology, providing insights into interpersonal dynamics and compatibility based on individuals' attitudes and approaches to love and relationships.
+```
 
 ### Socionics
 
-Socionics is a pseudoscientific theory that describes personality types based on a combination of different psychological traits, such as introversion/extraversion, logic/ethics, intuition/sensing, and rationality/irrationality. It provides insights into interpersonal dynamics and compatibility between types.
+```
+Socionics is a pseudoscientific theory developed by Aušra Augustinavičiūtė that describes personality types based on a combination of different psychological traits, such as introversion/extraversion, logic/ethics, intuition/sensing, and rationality/irrationality. It provides insights into interpersonal dynamics and compatibility between types.
 
-The tool evaluates relationship types like Philia, Eros, Dual, Conflict, and Mirror across these typologies, providing a unique perspective on interpersonal dynamics and compatibility.
+In Socionics, individuals are classified into 16 types based on the combination of four dichotomies: Extraversion/Introversion, Intuition/Sensing, Thinking/Feeling, and Judging/Perceiving. These types are further organized into quadras (groups of four types) based on shared values and characteristics.
+
+The Relationship Calculator tool evaluates various relationship types like Philia (friendship), Eros (romantic love), Duality (complementary relationship), Conflict (clashing relationship), and Mirror (reflective relationship) across the Socionics typology, providing a unique perspective on interpersonal dynamics and compatibility.
+```
 
 ## Prerequisites
 
