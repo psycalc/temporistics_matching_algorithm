@@ -1,0 +1,46 @@
+{
+  "Identity/Philia": {
+    "score": 10,
+    "description": "Interaction is easy, comfortable, and friendly"
+  },
+  "Full Eros": {
+    "score": 8,
+    "description": "Interaction is dynamic, stimulating, and full of mutual interest"
+  },
+  "Full Agape": {
+    "score": 9,
+    "description": "Interaction is comfortable, harmonious, and mutually beneficial"
+  },
+  "Psychosophia Extinguishment": {
+    "score": -5,
+    "description": "Interaction is distant, formal, and characterized by mutual respect"
+  },
+  "Neutrality": {
+    "score": 0,
+    "description": "Interaction is neutral and polite but lacks deep understanding or connection"
+  },
+  "Mirage": {
+    "score": 3,
+    "description": "Interaction is unpredictable, intense, and emotionally charged"
+  },
+  "Order/Full Order": {
+    "score": 6,
+    "description": "Interaction is asymmetrical, with one partner taking a more active and dominant role"
+  },
+  "Revision": {
+    "score": -3,
+    "description": "Interaction is challenging and confrontational, but can lead to growth"
+  },
+  "Therapy-Misunderstanding": {
+    "score": 2,
+    "description": "Interaction is comfortable and easy due to shared values and worldviews"
+  },
+  "Therapy-Attraction": {
+    "score": 4,
+    "description": "Interaction is asymmetrical, with one partner taking a more active and dominant role"
+  },
+  "Conflict Submission/Dominance": {
+    "score": -4,
+    "description": "Interaction is characterized by power struggles and conflicts"
+  }
+}
