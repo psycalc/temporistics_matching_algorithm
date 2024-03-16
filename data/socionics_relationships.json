@@ -1,0 +1,58 @@
+{
+  "Dual": {
+      "score": 10,
+      "description": "Most favorable and comfortable interactions"
+  },
+  "Conflict": {
+      "score": -10,
+      "description": "Most difficult and challenging interactions"
+  },
+  "Benefit": {
+      "score": 5,
+      "description": "One partner benefits more than the other"
+  },
+  "Supervision": {
+      "score": -5,
+      "description": "One partner supervises the other"
+  },
+  "Mirror": {
+      "score": 8,
+      "description": "Filled with interesting discussions and understanding"
+  },
+  "Identity": {
+      "score": 7,
+      "description": "Interaction with a person of the same type"
+  },
+  "Activity": {
+      "score": 8,
+      "description": "Active and enjoyable, but can tire both partners"
+  },
+  "Comparative": {
+      "score": 6,
+      "description": "Relationships of mutual respect but potential misunderstanding"
+  },
+  "Semi-conflict": {
+      "score": -6,
+      "description": "Tensions and disagreements, less intense than full conflict"
+  },
+  "Quasi-identity": {
+      "score": 4,
+      "description": "Similar but not compatible, leading to misunderstandings"
+  },
+  "Request": {
+      "score": 5,
+      "description": "Asymmetric relationship with unidirectional demands"
+  },
+  "Super-ego": {
+      "score": -7,
+      "description": "Potential for irritation and misunderstanding"
+  },
+  "Kindred": {
+      "score": 7,
+      "description": "Similar worldview but different focus, leading to respect with minor conflicts"
+  },
+  "Semi-dual": {
+      "score": 9,
+      "description": "Very comfortable with slight differences for growth"
+  }
+}

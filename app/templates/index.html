@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Psychological Calculator</title>
     <style>
         body {
@@ -11,6 +12,11 @@
             height: 100vh;
             background-color: #f0f0f0;
             font-size: 2em; /* Double the font size */
+        }
+        .language-switcher {
+            position: absolute;
+            top: 10px;
+            right: 10px;
         }
         h1 {
             margin-bottom: 40px; /* Double the margin */
@@ -46,6 +52,14 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
+    <div class="language-switcher">
+        <label for="language">Language:</label>
+        <select id="language">
+            <option value="en" {% if g.language == 'en' %}selected{% endif %}>English</option>
+            <option value="ua" {% if g.language == 'ua' %}selected{% endif %}>Українська</option>
+            <!-- Додайте інші мови за потреби -->
+        </select>
+    </div>
     <h1>Psychological Calculator</h1>
     <form method="post" action="/">
         <label for="typology">Select Typology:</label>
@@ -58,22 +72,38 @@
         <br>
         <label for="user1">User 1 Type:</label>
         <select name="user1" id="user1" required>
-            {% for type in types %}
-            <option value="{{ type }}">{{ loop.index }} {{ type }}</option>
-            {% endfor %}
+            <!-- Options will be populated by JavaScript -->
         </select>
         <br>
         <label for="user2">User 2 Type:</label>
         <select name="user2" id="user2" required>
-            {% for type in types %}
-            <option value="{{ type }}">{{ loop.index }} {{ type }}</option>
-            {% endfor %}
+            <!-- Options will be populated by JavaScript -->
         </select>
         <br>
         <input type="submit" value="Calculate">
     </form>
 
     <script type="text/javascript">
+        // JavaScript for language switcher
+        document.getElementById('language').addEventListener('change', function() {
+            var language = this.value;
+            $.ajax({
+                url: '/change-language',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ language: language }),
+                success: function(response) {
+                    if (response.success) {
+                        location.reload();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Change language failed:', status, error);
+                }
+            });
+        });
+
+        // JavaScript to update user type options based on selected typology
         function updateTypes() {
             var typologyName = $('#typology').val();
             $.getJSON('/get_types', {typology: typologyName}, function(data) {
@@ -81,9 +111,9 @@
                 var user2Select = $('#user2');
                 user1Select.empty();
                 user2Select.empty();
-                $.each(data.types, function(key, value) {
-                    user1Select.append($("<option></option>").attr("value", value).text(value));
-                    user2Select.append($("<option></option>").attr("value", value).text(value));
+                $.each(data.types, function(index, type) {
+                    user1Select.append($("<option></option>").attr("value", type).text(type));
+                    user2Select.append($("<option></option>").attr("value", type).text(type));
                 });
             });
         }
