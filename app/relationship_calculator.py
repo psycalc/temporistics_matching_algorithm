@@ -1,10 +1,10 @@
 import json
 import os
 from enum import Enum
-from app.typologies.typology_temporistics import TypologyTemporistics
-from app.typologies.typology_psychosophia import TypologyPsychosophia
-from app.typologies.typology_amatoric import TypologyAmatoric
-from app.typologies.typology_socionics import TypologySocionics
+from .typologies.typology_temporistics import TypologyTemporistics
+from .typologies.typology_psychosophia import TypologyPsychosophia
+from .typologies.typology_amatoric import TypologyAmatoric
+from .typologies.typology_socionics import TypologySocionics
 
 # Function to load relationship data from a JSON file
 def load_relationship_data(file_path):
@@ -48,7 +48,7 @@ class RelationshipType(Enum):
     IDENTITY_PHILIA = "Identity/Philia"
     FULL_EROS = "Full Eros"
     FULL_AGAPE = "Full Agape"
-    EXTINGUISHMENT = "Extinguishment"
+    PSYCHOSOPHIA_EXTINGUISHMENT = "Psychosophia Extinguishment"  # Renamed
     NEUTRALITY = "Neutrality"
     MIRAGE = "Mirage"
     ORDER_FULL_ORDER = "Order/Full Order"
@@ -123,7 +123,7 @@ class RelationshipCalculator:
             elif TypologyPsychosophia.are_types_full_agape(user1_type, user2_type):
                 return RelationshipType.FULL_AGAPE
             elif TypologyPsychosophia.are_types_extinguishment(user1_type, user2_type):
-                return RelationshipType.EXTINGUISHMENT
+                return RelationshipType.PSYCHOSOPHIA_EXTINGUISHMENT  # Updated
             elif TypologyPsychosophia.are_types_neutrality(user1_type, user2_type):
                 return RelationshipType.NEUTRALITY
             elif TypologyPsychosophia.are_types_mirage(user1_type, user2_type):
