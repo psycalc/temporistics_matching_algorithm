@@ -45,9 +45,17 @@ class RelationshipType(Enum):
     HETEROCHRONY = "Heterochrony"
 
     # Psychosophia Relationships
-    AFFINITY = "Affinity"
-    COMPLEMENTARY = "Complementary"
-    ANTAGONISTIC = "Antagonistic"
+    IDENTITY_PHILIA = "Identity/Philia"
+    FULL_EROS = "Full Eros"
+    FULL_AGAPE = "Full Agape"
+    EXTINGUISHMENT = "Extinguishment"
+    NEUTRALITY = "Neutrality"
+    MIRAGE = "Mirage"
+    ORDER_FULL_ORDER = "Order/Full Order"
+    REVISION = "Revision"
+    THERAPY_MISUNDERSTANDING = "Therapy-Misunderstanding"
+    THERAPY_ATTRACTION = "Therapy-Attraction"
+    CONFLICT_SUBMISSION_DOMINANCE = "Conflict Submission/Dominance"
 
     # Amatoric Relationships
     PHILIA = "Philia"
@@ -108,12 +116,28 @@ class RelationshipCalculator:
 
         elif self.typology == 'Psychosophia':
             # Psychosophia relationship determination logic
-            if TypologyPsychosophia.are_types_affine(user1_type, user2_type):
-                return RelationshipType.AFFINITY
-            elif TypologyPsychosophia.are_types_complementary(user1_type, user2_type):
-                return RelationshipType.COMPLEMENTARY
-            elif TypologyPsychosophia.are_types_antagonistic(user1_type, user2_type):
-                return RelationshipType.ANTAGONISTIC
+            if TypologyPsychosophia.are_types_identity_philia(user1_type, user2_type):
+                return RelationshipType.IDENTITY_PHILIA
+            elif TypologyPsychosophia.are_types_full_eros(user1_type, user2_type):
+                return RelationshipType.FULL_EROS
+            elif TypologyPsychosophia.are_types_full_agape(user1_type, user2_type):
+                return RelationshipType.FULL_AGAPE
+            elif TypologyPsychosophia.are_types_extinguishment(user1_type, user2_type):
+                return RelationshipType.EXTINGUISHMENT
+            elif TypologyPsychosophia.are_types_neutrality(user1_type, user2_type):
+                return RelationshipType.NEUTRALITY
+            elif TypologyPsychosophia.are_types_mirage(user1_type, user2_type):
+                return RelationshipType.MIRAGE
+            elif TypologyPsychosophia.are_types_order_full_order(user1_type, user2_type):
+                return RelationshipType.ORDER_FULL_ORDER
+            elif TypologyPsychosophia.are_types_revision(user1_type, user2_type):
+                return RelationshipType.REVISION
+            elif TypologyPsychosophia.are_types_therapy_misunderstanding(user1_type, user2_type):
+                return RelationshipType.THERAPY_MISUNDERSTANDING
+            elif TypologyPsychosophia.are_types_therapy_attraction(user1_type, user2_type):
+                return RelationshipType.THERAPY_ATTRACTION
+            elif TypologyPsychosophia.are_types_conflict_submission_dominance(user1_type, user2_type):
+                return RelationshipType.CONFLICT_SUBMISSION_DOMINANCE
             else:
                 return RelationshipType.UNKNOWN
 
