@@ -116,40 +116,42 @@ class RelationshipCalculator:
 
         elif self.typology == 'Psychosophia':
             # Psychosophia relationship determination logic
-            if TypologyPsychosophia.are_types_identity_philia(user1_type, user2_type):
+            psychosophia_typology = TypologyPsychosophia()
+            if psychosophia_typology.are_types_identity_philia(user1_type, user2_type):
                 return RelationshipType.IDENTITY_PHILIA
-            elif TypologyPsychosophia.are_types_full_eros(user1_type, user2_type):
+            elif psychosophia_typology.are_types_full_eros(user1_type, user2_type):
                 return RelationshipType.FULL_EROS
-            elif TypologyPsychosophia.are_types_full_agape(user1_type, user2_type):
+            elif psychosophia_typology.are_types_full_agape(user1_type, user2_type):
                 return RelationshipType.FULL_AGAPE
-            elif TypologyPsychosophia.are_types_extinguishment(user1_type, user2_type):
-                return RelationshipType.PSYCHOSOPHIA_EXTINGUISHMENT  # Updated
-            elif TypologyPsychosophia.are_types_neutrality(user1_type, user2_type):
+            elif psychosophia_typology.are_types_extinguishment(user1_type, user2_type):
+                return RelationshipType.PSYCHOSOPHIA_EXTINGUISHMENT
+            elif psychosophia_typology.are_types_neutrality(user1_type, user2_type):
                 return RelationshipType.NEUTRALITY
-            elif TypologyPsychosophia.are_types_mirage(user1_type, user2_type):
+            elif psychosophia_typology.are_types_mirage(user1_type, user2_type):
                 return RelationshipType.MIRAGE
-            elif TypologyPsychosophia.are_types_order_full_order(user1_type, user2_type):
+            elif psychosophia_typology.are_types_order_full_order(user1_type, user2_type):
                 return RelationshipType.ORDER_FULL_ORDER
-            elif TypologyPsychosophia.are_types_revision(user1_type, user2_type):
+            elif psychosophia_typology.are_types_revision(user1_type, user2_type):
                 return RelationshipType.REVISION
-            elif TypologyPsychosophia.are_types_therapy_misunderstanding(user1_type, user2_type):
+            elif psychosophia_typology.are_types_therapy_misunderstanding(user1_type, user2_type):
                 return RelationshipType.THERAPY_MISUNDERSTANDING
-            elif TypologyPsychosophia.are_types_therapy_attraction(user1_type, user2_type):
+            elif psychosophia_typology.are_types_therapy_attraction(user1_type, user2_type):
                 return RelationshipType.THERAPY_ATTRACTION
-            elif TypologyPsychosophia.are_types_conflict_submission_dominance(user1_type, user2_type):
+            elif psychosophia_typology.are_types_conflict_submission_dominance(user1_type, user2_type):
                 return RelationshipType.CONFLICT_SUBMISSION_DOMINANCE
             else:
                 return RelationshipType.UNKNOWN
 
         elif self.typology == 'Amatoric':
             # Amatoric relationship determination logic
-            if TypologyAmatoric.are_types_philia(user1_type, user2_type):
+            amatoric_typology = TypologyAmatoric()
+            if amatoric_typology.are_types_philia(user1_type, user2_type):
                 return RelationshipType.PHILIA
-            elif TypologyAmatoric.are_types_storge(user1_type, user2_type):
+            elif amatoric_typology.are_types_storge(user1_type, user2_type):
                 return RelationshipType.STORGE
-            elif TypologyAmatoric.are_types_eros(user1_type, user2_type):
+            elif amatoric_typology.are_types_eros(user1_type, user2_type):
                 return RelationshipType.EROS
-            elif TypologyAmatoric.are_types_agape(user1_type, user2_type):
+            elif amatoric_typology.are_types_agape(user1_type, user2_type):
                 return RelationshipType.AGAPE
             else:
                 return RelationshipType.UNKNOWN
