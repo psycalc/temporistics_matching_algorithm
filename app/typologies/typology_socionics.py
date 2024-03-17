@@ -27,10 +27,20 @@ class TypologySocionics(Typology):
             _ = gettext.gettext
 
     def get_all_types(self):
-        return ["".join([str(aspect[0]) for aspect in comb]) for comb in product(self.aspects, repeat=2)
-                if not (("Ethical" in comb and "Logical" in comb) or
-                        ("Sensory" in comb and "Intuitive" in comb) or
-                        ("Introtim" in comb and "Extratim" in comb))]
+        valid_types = []
+        aspects = ["Intuitive", "Sensory", "Ethical", "Logical"]
+        traits = ["Extratim", "Introtim"]
+        
+        for aspect1 in aspects:
+            for aspect2 in aspects:
+                if aspect1 != aspect2:
+                    for trait1 in traits:
+                        for trait2 in traits:
+                            if trait1 != trait2:
+                                type_name = f"{aspect1} {aspect2} {trait1}"
+                                valid_types.append(type_name)
+        
+        return valid_types
 
     def get_all_quadras(self):
         quadras = {
