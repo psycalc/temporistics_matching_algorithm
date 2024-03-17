@@ -23,8 +23,11 @@ class TypologySocionics(Typology):
             lang_translation = gettext.translation('messages', localedir='locales', languages=[language])
             lang_translation.install()
             _ = lang_translation.gettext
-        except FileNotFoundError:
+        except Exception as e:
+            # Fallback to default language or log error
             _ = gettext.gettext
+            print(f"Error loading translation: {e}")  # Or use logging
+
 
     def get_all_types(self):
         valid_types = []
