@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, current_app
+from flask import Blueprint, render_template, request, jsonify, current_app, redirect, url_for
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from .services import get_types_by_typology, cache
@@ -8,6 +8,8 @@ from .typologies import TypologyTemporistics, TypologyPsychosophia, TypologyAmat
 from flask_wtf import FlaskForm
 from wtforms import HiddenField
 from .services import calculate_relationship
+from flask_babel import _
+from flask import make_response
 
 
 main = Blueprint('main', __name__)
@@ -38,7 +40,7 @@ def index():
 
             # Input validation and sanitization
             if not typology_name or not user1 or not user2:
-                return render_template('error.html', error_message="Invalid input")
+                return render_template('error.html', error_message=_("Invalid input"))
 
             typology_class = {
                 "Temporistics": TypologyTemporistics,
@@ -48,7 +50,7 @@ def index():
             }.get(typology_name)
 
             if not typology_class:
-                return render_template('error.html', error_message="Invalid typology name")
+                return render_template('error.html', error_message=_("Invalid typology name"))
 
             relationship_type, comfort_score = calculate_relationship(user1, user2, typology_class)
             return render_template('result.html', relationship_type=relationship_type, comfort_score=comfort_score)
@@ -57,15 +59,16 @@ def index():
 
     except Exception as e:
         current_app.logger.error(f"An error occurred: {str(e)}")
-        return render_template('error.html', error_message="An internal server error occurred"), 500
+        return render_template('error.html', error_message=_("An internal server error occurred")), 500
 
 @main.route('/change_language', methods=['POST'])
-@limiter.limit("10/minute")
 def change_language():
-    try:
-        # Remove Flask-Babel code
-        return jsonify({"success": False, "error": "Language change functionality not implemented"}), 400
-
-    except Exception as e:
-        current_app.logger.error(f"An error occurred: {str(e)}")
-        return jsonify({"success": False, "error": "An internal server error occurred"}), 500
+    language = request.form.get('language')
+    print(f"Changing language to: {language}")  # Debug print
+    if language and language in current_app.config['LANGUAGES']:  # Use current_app here
+        response = make_response(redirect(url_for('main.index')))
+        response.set_cookie('locale', language, max_age=60*60*24*30)
+        return response
+    else:
+        print(f"Failed to change language. Supported languages: {current_app.config['LANGUAGES']}")  # Use current_app here
+        return jsonify({"success": False, "error": "Language change failed"}), 400
