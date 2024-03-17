@@ -2,6 +2,7 @@ from flask import Flask
 from config import config_dict
 import logging
 from logging.handlers import RotatingFileHandler
+from .services import cache
 
 def create_app(config_name=None):
     """
@@ -27,6 +28,9 @@ def create_app(config_name=None):
         app.logger.setLevel(logging.DEBUG)
     else:
         app.logger.setLevel(logging.INFO)
+
+    # Initialize the Cache instance with the app
+    cache.init_app(app)
 
     # Register Blueprints
     from .routes import main as main_blueprint

@@ -1,22 +1,9 @@
-# services.py
+from flask_caching import Cache
+from .typologies import TypologyTemporistics, TypologyPsychosophia, TypologyAmatoric, TypologySocionics
 
-from app.typologies import TypologyTemporistics, TypologyPsychosophia, TypologyAmatoric, TypologySocionics
-from flask import jsonify, request
+cache = Cache()  # Initialize Cache without passing the app instance
 
-def register_api_routes(app):
-    @app.route('/get_types', methods=['GET'])
-    def get_types():
-        typology_name = request.args.get('typology')
-        if not typology_name:
-            return jsonify({"error": "Typology name is required"}), 400
-
-        types = get_types_by_typology(typology_name)
-        if types is None:
-            return jsonify({"error": "Invalid typology name"}), 404
-
-        return jsonify(types=types)
-
-# Keep the function definition as it is
+@cache.memoize(timeout=3600)  # Cache the result for 1 hour
 def get_types_by_typology(typology_name):
     typology_classes = {
         "Temporistics": TypologyTemporistics,
