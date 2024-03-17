@@ -15,3 +15,10 @@ def get_types_by_typology(typology_name):
     if not typology_class:
         return None
     return typology_class().get_all_types()
+
+def calculate_relationship(user1, user2, typology):
+    # Placeholder function logic
+    # Replace with actual logic appropriate to your application
+    relationship_type = 'SomeType'  # Example placeholder value
+    comfort_score = 0  # Example placeholder value
+    return relationship_type, comfort_score
