@@ -17,8 +17,24 @@ def get_types_by_typology(typology_name):
     return typology_class().get_all_types()
 
 def calculate_relationship(user1, user2, typology):
-    # Placeholder function logic
-    # Replace with actual logic appropriate to your application
-    relationship_type = 'SomeType'  # Example placeholder value
-    comfort_score = 0  # Example placeholder value
+    # Dynamically select the typology class based on the input
+    typology_classes = {
+        "Temporistics": TypologyTemporistics,
+        "Psychosophia": TypologyPsychosophia,
+        "Amatoric": TypologyAmatoric,
+        "Socionics": TypologySocionics
+    }
+    
+    # Instantiate the typology class
+    typology_instance = typology_classes.get(typology)()
+    if not typology_instance:
+        raise ValueError(f"Invalid typology: {typology}")
+    
+    # Determine the relationship type using the selected typology class
+    relationship_type = typology_instance.determine_relationship_type(user1, user2)
+    
+    # Calculate the comfort score for the determined relationship type
+    comfort_score, _ = typology_instance.get_comfort_score(relationship_type)
+    
     return relationship_type, comfort_score
+
