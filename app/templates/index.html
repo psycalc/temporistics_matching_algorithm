@@ -1,79 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Psychological Calculator</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-</head>
-<body>
-    <div class="language-switcher">
-        <label for="language">Language:</label>
-        <select id="language">
-            {% for language_code, language_name in available_languages.items() %}
-                <option value="{{ language_code }}" {% if language_code == current_language %}selected{% endif %}>
-                    {{ language_name }}
-                </option>
-            {% endfor %}
-        </select>
-    </div>
-    <h1>Psychological Calculator</h1>
-    <form method="post" action="/">
-        <label for="typology">Select Typology:</label>
-        <select name="typology" id="typology" onchange="updateTypes()">
-            <option value="Temporistics">1. Temporistics</option>
-            <option value="Psychosophia">2. Psychosophia</option>
-            <option value="Amatoric">3. Amatoric</option>
-            <option value="Socionics">4. Socionics</option>
-        </select>
-        <br>
-        <label for="user1">User 1 Type:</label>
-        <select name="user1" id="user1" required>
-            <!-- Options will be populated by JavaScript -->
-        </select>
-        <br>
-        <label for="user2">User 2 Type:</label>
-        <select name="user2" id="user2" required>
-            <!-- Options will be populated by JavaScript -->
-        </select>
-        <br>
-        <input type="submit" value="Calculate">
-    </form>
+{% extends 'base.html' %}
 
-    <script type="text/javascript">
-        // JavaScript for language switcher
-        document.getElementById('language').addEventListener('change', function() {
-            var language = this.value;
-            $.ajax({
-                url: '/change-language',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({ language: language }),
-                success: function(response) {
-                    if (response.success) {
-                        location.reload();
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Change language failed:', status, error);
-                }
-            });
+{% block content %}
+  <h1>Psychological Calculator</h1>
+  <form method="post" action="/">
+    {{ form.csrf_token }}
+    <label for="typology">Select Typology:</label>
+    <select name="typology" id="typology" onchange="updateTypes()" required>
+      <option value="Temporistics">1. Temporistics</option>
+      <option value="Psychosophia">2. Psychosophia</option>
+      <option value="Amatoric">3. Amatoric</option>
+      <option value="Socionics">4. Socionics</option>
+    </select>
+    <br>
+    <label for="user1">User 1 Type:</label>
+    <select name="user1" id="user1" required>
+      <!-- Options will be populated by JavaScript -->
+    </select>
+    <br>
+    <label for="user2">User 2 Type:</label>
+    <select name="user2" id="user2" required>
+      <!-- Options will be populated by JavaScript -->
+    </select>
+    <br>
+    <input type="submit" value="Calculate">
+  </form>
+
+  <script type="text/javascript">
+    // JavaScript to update user type options based on selected typology
+    function updateTypes() {
+      var typologyName = $('#typology').val();
+      $.getJSON('/get_types', {typology: typologyName}, function(data) {
+        var user1Select = $('#user1');
+        var user2Select = $('#user2');
+        user1Select.empty();
+        user2Select.empty();
+        $.each(data.types, function(index, type) {
+          user1Select.append($("<option></option>").attr("value", type).text(type));
+          user2Select.append($("<option></option>").attr("value", type).text(type));
         });
+      });
+    }
 
-        // JavaScript to update user type options based on selected typology
-        function updateTypes() {
-            var typologyName = $('#typology').val();
-            $.getJSON('/get_types', {typology: typologyName}, function(data) {
-                var user1Select = $('#user1');
-                var user2Select = $('#user2');
-                user1Select.empty();
-                user2Select.empty();
-                $.each(data.types, function(index, type) {
-                    user1Select.append($("<option></option>").attr("value", type).text(type));
-                    user2Select.append($("<option></option>").attr("value", type).text(type));
-                });
-            });
-        }
-    </script>
-</body>
-</html>
+    // Call updateTypes() when the page loads
+    $(document).ready(function() {
+      updateTypes();
+    });
+  </script>
+{% endblock %}
