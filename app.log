@@ -1,0 +1,2 @@
+[2024-03-17 16:06:45,698] {/home/raziel/projects/psycalc/temporistics_matching_algorithm/app/routes.py:57} ERROR - An error occurred: name 'calculate_relationship' is not defined
+[2024-03-17 16:10:15,765] {/home/raziel/projects/psycalc/temporistics_matching_algorithm/app/routes.py:59} ERROR - An error occurred: Could not build url for endpoint 'index'. Did you mean 'main.index' instead?

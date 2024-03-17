@@ -7,6 +7,8 @@ from .socionics_relationship_calculator import SocionicsRelationshipCalculator
 from .typologies import TypologyTemporistics, TypologyPsychosophia, TypologyAmatoric, TypologySocionics
 from flask_wtf import FlaskForm
 from wtforms import HiddenField
+from .services import calculate_relationship
+
 
 main = Blueprint('main', __name__)
 limiter = Limiter(key_func=get_remote_address)
