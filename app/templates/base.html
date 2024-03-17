@@ -6,17 +6,19 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-  <div class="language-switcher">
-    <form action="{{ url_for('main.change_language') }}" method="post">
-      {{ form.csrf_token }}
-      <select name="language" onchange="this.form.submit()">
-        <option value="en">English</option>
-        <option value="fr">Français</option>
-        <option value="es">Español</option>
-        <!-- Add other languages as needed -->
-      </select>
-    </form>
-  </div>
+  {% if form %}
+    <div class="language-switcher">
+      <form action="{{ url_for('main.change_language') }}" method="post">
+        {{ form.csrf_token }}
+        <select name="language" onchange="this.form.submit()">
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+          <option value="es">Español</option>
+          <!-- Add other languages as needed -->
+        </select>
+      </form>
+    </div>
+  {% endif %}
   <div class="container">
     {% block content %}{% endblock %}
   </div>
