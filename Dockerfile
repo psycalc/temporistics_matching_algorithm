@@ -1,6 +1,6 @@
 # Use a specific version of the Python image to ensure consistency.
 # slim-buster version is smaller and more secure than the full image.
-FROM python:3.8-slim-buster
+FROM python:3.8-slim-buster AS base
 
 # Set environment variables to:
 # 1. Force Python stdout and stderr streams to be unbuffered.
@@ -14,10 +14,13 @@ WORKDIR /app
 # Install dependencies:
 # Copy only the requirements.txt file to leverage Docker cache,
 # install the Python dependencies, then copy the rest of the app.
+FROM base AS dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of your application's code
+# Final stage
+FROM base
+COPY --from=dependencies /usr/local/lib/python3.8/site-packages /usr/local/lib/python3.8/site-packages
 COPY . .
 
 # Non-root User:
