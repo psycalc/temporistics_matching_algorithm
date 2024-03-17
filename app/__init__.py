@@ -1,15 +1,14 @@
-from flask import Flask
+from flask import Flask, request
 from config import config_dict
 import logging
 from logging.handlers import RotatingFileHandler
 from .services import cache
+from flask_babel import Babel  # Add this for Babel
+from flask import current_app  # Add this import at the beginning of your routes.py
 
 def create_app(config_name=None):
     """
     Create a Flask application using the app factory pattern.
-
-    :param config_name: Configuration name (str)
-    :return: Flask app
     """
     app = Flask(__name__)
 
@@ -32,9 +31,16 @@ def create_app(config_name=None):
     # Initialize the Cache instance with the app
     cache.init_app(app)
 
+    # Initialize Babel for internationalization
+    babel = Babel(app)
+
+    @babel.localeselector
+    def get_locale():
+        # Select a language translation that best fits the user's preferences
+        return request.accept_languages.best_match(app.config['LANGUAGES'])
+
     # Register Blueprints
     from .routes import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    # Return the application instance
     return app
