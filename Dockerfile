@@ -27,7 +27,10 @@ COPY . .
 # Create a user to run the application safely (not as root).
 # This is a security best practice in Docker containers.
 RUN adduser --disabled-password --gecos '' myuser
+# Create a directory for log files
+RUN mkdir /app/logs && chown -R myuser:myuser /app/logs
 USER myuser
+
 
 # Make port 5000 available to the world outside this container.
 EXPOSE 5000
