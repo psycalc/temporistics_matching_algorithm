@@ -1,0 +1,35 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    env_file:
+      - .env  # Use an environment file for secrets
+    volumes:
+      - .:/app
+    networks:
+      - webnet
+
+  db:
+    image: postgres:12
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - webnet
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+
+volumes:
+  pgdata:
+
+networks:
+  webnet:
