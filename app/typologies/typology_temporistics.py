@@ -9,7 +9,7 @@ class Typology:
 class TypologyTemporistics(Typology):
     """
     TypologyTemporistics class represents a typology based on four temporal aspects:
-    Past, Present, Future, and Eternity. It provides methods to work with tetrads,
+    Past, Current, Future, and Eternity. It provides methods to work with tetrads,
     quadras, and intertype relationships based on these temporal perspectives.
     """
 
@@ -17,41 +17,42 @@ class TypologyTemporistics(Typology):
         """
         Initializes a new instance of the TypologyTemporistics class with four temporal aspects.
         """
-        super().__init__(["Past", "Present", "Future", "Eternity"])
+        # Renamed 'Present' to 'Current' to avoid confusion when shortened (both Past and Present start with 'P').
+        super().__init__(["Past", "Current", "Future", "Eternity"])
 
     # Dictionary mapping tetrad sequences to their descriptions.
     TETRADS: Dict[str, str] = {
         '6-1-2': "Era of Individuality (P)",
         '2-3-4': "Era of Order (E)",
         '4-5-6': "Era of Movement (F)",
-        '1-5-3': "Golden Age of Every Era (N)"
+        '1-5-3': "Golden Age of Each Era (C)"
     }
 
     # Dictionary containing quadras with their types and descriptions.
     QUADRAS_AND_DESCRIPTIONS: Dict[str, Dict[str, List[str]]] = {
         'Antipodes': {
             'types': ["Game Master", "Maestro", "Player", "Politician"],
-            'description': 'Antipodes are one-plane N and P. Fixed position in all senses, focused on self-image and manipulation.'
+            'description': 'Antipodes are one-plane C and P. Fixed position in all senses, focused on self-image and manipulation.'
         },
         'Guardians and Border Guards': {
             'types': ["Missionary", "Standard Bearer", "Rescuer", "Knight"],
-            'description': 'Guardians and Border Guards are one-plane V and P. Focused on self-image and the search for place, with manipulation.'
+            'description': 'Guardians and Border Guards are one-plane F and P. Focused on self-image and the search for place, with manipulation.'
         },
         'Old-timers and Founders': {
             'types': ["Theorist", "Oracle", "Conqueror", "Star"],
-            'description': 'Old-timers and founders are one-plane N and V. Fixed place and existence with manipulation.'
+            'description': 'Old-timers and Founders are one-plane C and F. Fixed place and existence with manipulation.'
         },
         'Conductors': {
             'types': ["Ideologist", "Samurai", "Colonist", "Pioneer"],
-            'description': 'Conductors are one-plane B and V. Fixed direction and existence, with manipulation.'
+            'description': 'Conductors are one-plane E and F. Fixed direction and existence, with manipulation.'
         },
-        'Scouts and Scouts': {
+        'Scouts': {
             'types': ["Scout", "Hacker", "Gray Cardinal", "Taster"],
-            'description': 'Scouts are one-plane N and B. Fixed place and development with manipulation.'
+            'description': 'Scouts are one-plane C and E. Fixed place and development with manipulation.'
         },
         'Nomads and Tramps': {
             'types': ["Tamada", "Pathfinder", "Robinson", "Initiator"],
-            'description': 'Nomads and Tramps are one-plane P and B. Self-image and development are fixed; existence is manipulated.'
+            'description': 'Nomads and Tramps are one-plane P and E. Self-image and development are fixed; existence is manipulated.'
         }
     }
 
@@ -140,13 +141,11 @@ class TypologyTemporistics(Typology):
         """
         time_periods_short = []
         for period in time_periods:
-            if period == "Present":
-                period = "Current"  # Adjusting for initial 'C' instead of 'P' to avoid confusion
             time_periods_short.append(period[0])
         return time_periods_short
 
     # Generating all possible pairs of aspects for inter-type relationships
-    ASPECTS = ["Past", "Present", "Future", "Eternity"]
+    ASPECTS = ["Past", "Current", "Future", "Eternity"]
 
     # Generating all possible inter-type relationships
     INTER_TYPE_RELATIONSHIPS: Dict[Tuple[str, str], str] = {}
