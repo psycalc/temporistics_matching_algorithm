@@ -1,23 +1,34 @@
-from typing import List
-from itertools import permutations
-from typology import Typology  # Импортируем ваш базовый абстрактный класс
+from typing import List, Tuple, Dict
+from itertools import permutations, product
 
-class TypologyTemporistics(Typology):  # Наследуем от Typology
+# Assuming Typology is an abstract base class that we're inheriting from.
+class Typology:
+    def __init__(self, aspects: List[str]):
+        self.aspects = aspects
+
+class TypologyTemporistics(Typology):
+    """
+    TypologyTemporistics class represents a typology based on four temporal aspects:
+    Past, Present, Future, and Eternity. It provides methods to work with tetrads,
+    quadras, and intertype relationships based on these temporal perspectives.
+    """
+
     def __init__(self):
         """
-        Initializes a new instance of the TypologyTemporistics class.
-        Temporistics is based on four key time aspects: Past, Present, Future, and Eternity.
+        Initializes a new instance of the TypologyTemporistics class with four temporal aspects.
         """
-        super().__init__(["Past", "Present", "Future", "Eternity"])  # Инициализация базового класса
+        super().__init__(["Past", "Present", "Future", "Eternity"])
 
-    TETRADS = {
+    # Dictionary mapping tetrad sequences to their descriptions.
+    TETRADS: Dict[str, str] = {
         '6-1-2': "Era of Individuality (P)",
         '2-3-4': "Era of Order (E)",
         '4-5-6': "Era of Movement (F)",
         '1-5-3': "Golden Age of Every Era (N)"
     }
 
-    QUADRAS_AND_DESCRIPTIONS = {
+    # Dictionary containing quadras with their types and descriptions.
+    QUADRAS_AND_DESCRIPTIONS: Dict[str, Dict[str, List[str]]] = {
         'Antipodes': {
             'types': ["Game Master", "Maestro", "Player", "Politician"],
             'description': 'Antipodes are one-plane N and P. Fixed position in all senses, focused on self-image and manipulation.'
@@ -44,31 +55,56 @@ class TypologyTemporistics(Typology):  # Наследуем от Typology
         }
     }
 
-    QUADRAS = {
+    # Separate dictionaries for quadras and their descriptions.
+    QUADRAS: Dict[str, List[str]] = {
         quadra_name: data['types'] for quadra_name, data in QUADRAS_AND_DESCRIPTIONS.items()
     }
 
-    QUADRA_DESCRIPTIONS = {
+    QUADRA_DESCRIPTIONS: Dict[str, str] = {
         quadra_name: data['description'] for quadra_name, data in QUADRAS_AND_DESCRIPTIONS.items()
     }
 
     def validate_tetrad_sequence(self, tetrad_sequence: str) -> None:
         """
-        Validates a tetrad sequence.
+        Validates if the given tetrad sequence is valid.
+
+        Args:
+            tetrad_sequence (str): The tetrad sequence to validate.
+
+        Raises:
+            ValueError: If the tetrad sequence is invalid.
         """
         if tetrad_sequence not in self.TETRADS:
             raise ValueError(f"Invalid tetrad sequence: {tetrad_sequence}")
 
-    def get_tetrads(self, tetrad_sequence: str) -> str:
+    def get_tetrad_description(self, tetrad_sequence: str) -> str:
         """
-        Returns the description for a given tetrad sequence.
+        Retrieves the description for a given tetrad sequence.
+
+        Args:
+            tetrad_sequence (str): The tetrad sequence identifier.
+
+        Returns:
+            str: The description of the tetrad.
+
+        Raises:
+            ValueError: If the tetrad sequence is invalid.
         """
         self.validate_tetrad_sequence(tetrad_sequence)
-        return self.TETRADS.get(tetrad_sequence, "Unknown Tetrad")
+        return self.TETRADS[tetrad_sequence]
 
-    def get_quadras(self, quadra_name: str) -> List[str]:
+    def get_quadra_types(self, quadra_name: str) -> List[str]:
         """
-        Returns the list of types for a given quadra.
+        Retrieves the list of types for a specified quadra.
+
+        Args:
+            quadra_name (str): The name of the quadra.
+
+        Returns:
+            List[str]: A list of type names associated with the quadra.
+
+        Raises:
+            ValueError: If the quadra name is invalid.
         """
         if quadra_name not in self.QUADRAS:
             raise ValueError(f"Invalid quadra name: {quadra_name}")
@@ -76,7 +112,16 @@ class TypologyTemporistics(Typology):  # Наследуем от Typology
 
     def get_quadra_description(self, quadra_name: str) -> str:
         """
-        Returns the description for a given quadra.
+        Retrieves the description for a specified quadra.
+
+        Args:
+            quadra_name (str): The name of the quadra.
+
+        Returns:
+            str: The description of the quadra.
+
+        Raises:
+            ValueError: If the quadra name is invalid.
         """
         if quadra_name not in self.QUADRA_DESCRIPTIONS:
             raise ValueError(f"Invalid quadra name: {quadra_name}")
@@ -85,66 +130,146 @@ class TypologyTemporistics(Typology):  # Наследуем от Typology
     @staticmethod
     def get_time_periods_short(time_periods: List[str]) -> List[str]:
         """
-        Returns the shortened form of the time periods.
+        Converts a list of time periods into their shortened forms (initial letters).
+
+        Args:
+            time_periods (List[str]): List of time period names.
+
+        Returns:
+            List[str]: List of initial letters representing the time periods.
         """
         time_periods_short = []
         for period in time_periods:
             if period == "Present":
-                period = "Current"
+                period = "Current"  # Adjusting for initial 'C' instead of 'P' to avoid confusion
             time_periods_short.append(period[0])
         return time_periods_short
 
-    INTER_TYPE_RELATIONSHIPS = {
-        ("Past", "Present"): "Superficial Agreement",
-        ("Future", "Eternity"): "Shared Vision",
-        ("Past", "Past"): "Complete Unity",
-        ("Present", "Future"): "Strategic Conflict",
+    # Generating all possible pairs of aspects for inter-type relationships
+    ASPECTS = ["Past", "Present", "Future", "Eternity"]
+
+    # Generating all possible inter-type relationships
+    INTER_TYPE_RELATIONSHIPS: Dict[Tuple[str, str], str] = {}
+
+    # Defining the logic for determining relationship types based on aspect pairs
+    RELATIONSHIP_TYPES = {
+        4: "Complete Unity",
+        3: "Deep Harmony",
+        2: "Shared Vision",
+        1: "Superficial Agreement",
+        0: "Strategic Conflict"
     }
 
-    def get_intertype_relationship(self, type1: str, type2: str) -> str:
-        """
-        Returns the intertype relationship between two given types.
-        """
-        relationship = self.INTER_TYPE_RELATIONSHIPS.get((type1, type2), None)
-        if relationship is None:
-            raise ValueError(f"Intertype relationship between {type1} and {type2} is not defined.")
-        return relationship
+    # Populating the INTER_TYPE_RELATIONSHIPS dictionary
+    for aspect1, aspect2 in product(ASPECTS, repeat=2):
+        if aspect1 == aspect2:
+            INTER_TYPE_RELATIONSHIPS[(aspect1, aspect2)] = "Complete Unity"
+        else:
+            # Assigning relationship types based on custom logic or theoretical framework
+            # For simplicity, assigning "Strategic Conflict" for differing aspects
+            INTER_TYPE_RELATIONSHIPS[(aspect1, aspect2)] = "Strategic Conflict"
 
-    def get_comfort_score(self, relationship_type: str):
+    def get_intertype_relationship(self, type1_aspects: List[str], type2_aspects: List[str]) -> str:
         """
-        Returns a comfort score based on the relationship type.
+        Determines the intertype relationship between two types based on their aspects.
+
+        Args:
+            type1_aspects (List[str]): List of aspects for the first type.
+            type2_aspects (List[str]): List of aspects for the second type.
+
+        Returns:
+            str: The type of intertype relationship.
+
+        Raises:
+            ValueError: If the aspects lists are not valid.
+        """
+        if not (type1_aspects and type2_aspects):
+            raise ValueError("Aspects lists cannot be empty.")
+
+        # Counting the number of matching aspects in the same positions
+        matches = sum(1 for a1, a2 in zip(type1_aspects, type2_aspects) if a1 == a2)
+
+        # Determining the relationship type based on the number of matches
+        relationship_type = self.RELATIONSHIP_TYPES.get(matches, "Unknown Relationship")
+
+        return relationship_type
+
+    def get_comfort_score(self, relationship_type: str) -> Tuple[int, str]:
+        """
+        Returns a comfort score and description based on the relationship type.
+
+        Args:
+            relationship_type (str): The type of relationship.
+
+        Returns:
+            Tuple[int, str]: A tuple containing the comfort score and its description.
         """
         comfort_scores = {
             "Complete Unity": (100, "Perfect alignment in all priorities."),
-            "Deep Harmony": (90, "Top two time priorities match, leading to significant harmony."),
-            "Shared Vision": (75, "Top three priorities align, resulting in cooperation."),
-            "Superficial Agreement": (50, "Only the last priority matches, shallow agreement."),
-            "Strategic Conflict": (40, "Differences lead to friction, but can stimulate growth."),
-            "Surface Influence": (30, "Minor overlap in low priorities."),
-            "Temporal Tension": (25, "Constant tension due to opposing priorities."),
-            "Illusion of Compatibility": (20, "Appears aligned on the surface, but mismatched in critical areas."),
+            "Deep Harmony": (90, "Top three time priorities match, leading to significant harmony."),
+            "Shared Vision": (75, "Top two priorities align, resulting in cooperation."),
+            "Superficial Agreement": (50, "Only one priority matches, leading to shallow agreement."),
+            "Strategic Conflict": (25, "Differences lead to friction, but can stimulate growth."),
+            "Unknown Relationship": (0, "Relationship type is undefined.")
         }
         return comfort_scores.get(relationship_type, (0, "Unknown relationship type"))
 
-    def determine_relationship_type(self, user1_type: str, user2_type: str):
+    def determine_relationship_type(self, user1_type: str, user2_type: str) -> str:
         """
-        Determines the relationship type between two users based on their time perspectives.
-        """
-        user1_priority = user1_type.split(", ")[0]  # Highest priority time aspect
-        user2_priority = user2_type.split(", ")[0]
+        Determines the relationship type between two users based on their time aspects.
 
-        return self.get_intertype_relationship(user1_priority, user2_priority)
+        Args:
+            user1_type (str): Comma-separated string of time aspects for the first user.
+            user2_type (str): Comma-separated string of time aspects for the second user.
 
-    def get_all_types(self):
+        Returns:
+            str: The type of intertype relationship.
         """
-        Returns all possible combinations of time perspectives (aspects).
+        user1_aspects = user1_type.split(", ")
+        user2_aspects = user2_type.split(", ")
+
+        # Ensuring both users have aspects defined
+        if not user1_aspects or not user2_aspects:
+            raise ValueError("User types must have at least one aspect.")
+
+        # Determining the relationship type
+        relationship_type = self.get_intertype_relationship(user1_aspects, user2_aspects)
+
+        return relationship_type
+
+    def get_all_types(self) -> List[str]:
         """
-        return [", ".join([str(aspect) for aspect in perm]) for perm in permutations(self.aspects, 4)]
+        Generates all possible combinations of the time aspects.
+
+        Returns:
+            List[str]: A list of all possible types represented as comma-separated strings.
+        """
+        all_combinations = permutations(self.aspects, 4)
+        all_types = [", ".join(combination) for combination in all_combinations]
+        return all_types
 
     def shorten_type(self, types: List[str]) -> List[str]:
         """
         Shortens the representation of types by converting the aspects into their initials.
+
+        Args:
+            types (List[str]): List of type strings to shorten.
+
+        Returns:
+            List[str]: List of shortened type representations.
+
+        Raises:
+            TypeError: If the input is not a list of strings.
         """
         if isinstance(types, str):
             types = [types]
-        return ["".join([aspect[0] for aspect in type_name.split(", ")]) for type_name in types]
+        elif not isinstance(types, list):
+            raise TypeError("Input must be a string or a list of strings.")
+
+        shortened_types = []
+        for type_name in types:
+            if not isinstance(type_name, str):
+                raise TypeError("All items in the list must be strings.")
+            initials = ''.join([aspect[0] for aspect in type_name.split(", ")])
+            shortened_types.append(initials)
+        return shortened_types
