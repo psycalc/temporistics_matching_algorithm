@@ -10,17 +10,7 @@ class TypologyAspect:
         self.position = position
 
     def __str__(self):
-        """
-        Returns a string representation of the TypologyAspect instance.
-
-        :return: A string representation of the TypologyAspect instance.
-        """
         return self.aspect_name
 
     def __repr__(self):
-        """
-        Returns a string representation of the TypologyAspect instance.
-
-        :return: A string representation of the TypologyAspect instance.
-        """
         return f"TypologyAspect({self.aspect_name!r}, {self.position})"

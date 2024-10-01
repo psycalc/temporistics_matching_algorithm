@@ -1,0 +1,217 @@
+# Translations template for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-09-14 15:01+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.14.0\n"
+
+#: app/routes.py:44
+msgid "Invalid input. Please provide all required fields."
+msgstr "Entrada inválida. Proporcione todos los campos requeridos."  # Spanish Translation
+
+#: app/routes.py:49
+msgid "Invalid typology name. Please select a valid typology."
+msgstr "Nombre de tipología no válido. Seleccione una tipología válida."
+
+#: app/routes.py:54
+msgid "Invalid type for User 1. Please select a valid type."
+msgstr "Tipo no válido para el Usuario 1. Seleccione un tipo válido."
+
+#: app/routes.py:56
+msgid "Invalid type for User 2. Please select a valid type."
+msgstr "Tipo no válido para el Usuario 2. Seleccione un tipo válido."
+
+#: app/routes.py:72
+msgid "An internal server error occurred"
+msgstr "Ocurrió un error interno del servidor."
+
+#: env/lib/python3.9/site-packages/flask_wtf/file.py:35
+#: env/lib/python3.9/site-packages/wtforms/validators.py:293
+#: env/lib/python3.9/site-packages/wtforms/validators.py:323
+msgid "This field is required."
+msgstr "Este campo es obligatorio."
+
+#: env/lib/python3.9/site-packages/flask_wtf/file.py:69
+msgid "File does not have an approved extension: {extensions}"
+msgstr "El archivo no tiene una extensión aprobada: {extensions}"
+
+#: env/lib/python3.9/site-packages/flask_wtf/file.py:77
+msgid "File does not have an approved extension."
+msgstr "El archivo no tiene una extensión aprobada."
+
+#: env/lib/python3.9/site-packages/flask_wtf/file.py:112
+msgid "File must be between {min_size} and {max_size} bytes."
+msgstr "El archivo debe tener entre {min_size} y {max_size} bytes."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:86
+#, python-format
+msgid "Invalid field name '%s'."
+msgstr "Nombre de campo no válido '%s'."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:99
+#, python-format
+msgid "Field must be equal to %(other_name)s."
+msgstr "El campo debe ser igual a %(other_name)s."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:145
+#, python-format
+msgid "Field must be at least %(min)d character long."
+msgid_plural "Field must be at least %(min)d characters long."
+msgstr[0] "El campo debe tener al menos %(min)d carácter."
+msgstr[1] "El campo debe tener al menos %(min)d caracteres."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:151
+#, python-format
+msgid "Field cannot be longer than %(max)d character."
+msgid_plural "Field cannot be longer than %(max)d characters."
+msgstr[0] "El campo no puede tener más de %(max)d carácter."
+msgstr[1] "El campo no puede tener más de %(max)d caracteres."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:157
+#, python-format
+msgid "Field must be exactly %(max)d character long."
+msgid_plural "Field must be exactly %(max)d characters long."
+msgstr[0] "El campo debe tener exactamente %(max)d carácter."
+msgstr[1] "El campo debe tener exactamente %(max)d caracteres."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:163
+#, python-format
+msgid "Field must be between %(min)d and %(max)d characters long."
+msgstr "El campo debe tener entre %(min)d y %(max)d caracteres."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:216
+#, python-format
+msgid "Number must be at least %(min)s."
+msgstr "El número debe ser al menos %(min)s."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:219
+#, python-format
+msgid "Number must be at most %(max)s."
+msgstr "El número debe ser como máximo %(max)s."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:222
+#, python-format
+msgid "Number must be between %(min)s and %(max)s."
+msgstr "El número debe estar entre %(min)s y %(max)s."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:358
+msgid "Invalid input."
+msgstr "Entrada inválida."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:422
+msgid "Invalid email address."
+msgstr "Dirección de correo electrónico no válida."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:460
+msgid "Invalid IP address."
+msgstr "Dirección IP no válida."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:503
+msgid "Invalid Mac address."
+msgstr "Dirección MAC no válida."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:540
+msgid "Invalid URL."
+msgstr "URL no válida."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:561
+msgid "Invalid UUID."
+msgstr "UUID no válida."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:594
+#, python-format
+msgid "Invalid value, must be one of: %(values)s."
+msgstr "Valor no válido, debe ser uno de: %(values)s."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:629
+#, python-format
+msgid "Invalid value, can't be any of: %(values)s."
+msgstr "Valor no válido, no puede ser ninguno de: %(values)s."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:698
+msgid "This field cannot be edited"
+msgstr "Este campo no se puede editar."
+
+#: env/lib/python3.9/site-packages/wtforms/validators.py:714
+msgid "This field is disabled and cannot have a value"
+msgstr "Este campo está deshabilitado y no puede tener un valor."
+
+#: env/lib/python3.9/site-packages/wtforms/csrf/core.py:96
+msgid "Invalid CSRF Token."
+msgstr "Token CSRF no válido."
+
+#: env/lib/python3.9/site-packages/wtforms/csrf/session.py:63
+msgid "CSRF token missing."
+msgstr "Token CSRF faltante."
+
+#: env/lib/python3.9/site-packages/wtforms/csrf/session.py:71
+msgid "CSRF failed."
+msgstr "CSRF fallido."
+
+#: env/lib/python3.9/site-packages/wtforms/csrf/session.py:76
+msgid "CSRF token expired."
+msgstr "Token CSRF expirado."
+
+#: env/lib/python3.9/site-packages/wtforms/fields/choices.py:142
+msgid "Invalid Choice: could not coerce."
+msgstr "Elección no válida: no se pudo forzar."
+
+#: env/lib/python3.9/site-packages/wtforms/fields/choices.py:149
+#: env/lib/python3.9/site-packages/wtforms/fields/choices.py:203
+msgid "Choices cannot be None."
+msgstr "Las opciones no pueden ser ninguna."
+
+#: env/lib/python3.9/site-packages/wtforms/fields/choices.py:155
+msgid "Not a valid choice."
+msgstr "No es una elección válida."
+
+#: env/lib/python3.9/site-packages/wtforms/fields/choices.py:193
+msgid "Invalid choice(s): one or more data inputs could not be coerced."
+msgstr "Elección(es) no válida(s): una o más entradas de datos no pudieron ser forzadas."
+
+#: env/lib/python3.9/site-packages/wtforms/fields/choices.py:214
+#, python-format
+msgid "'%(value)s' is not a valid choice for this field."
+msgid_plural "'%(value)s' are not valid choices for this field."
+msgstr[0] "'%(value)s' no es una elección válida para este campo."
+msgstr[1] "'%(value)s' no son elecciones válidas para este campo."
+
+#: env/lib/python3.9/site-packages/wtforms/fields/datetime.py:51
+msgid "Not a valid datetime value."
+msgstr "No es un valor de fecha y hora válido."
+
+#: env/lib/python3.9/site-packages/wtforms/fields/datetime.py:77
+msgid "Not a valid date value."
+msgstr "No es un valor de fecha válido."
+
+#: env/lib/python3.9/site-packages/wtforms/fields/datetime.py:103
+msgid "Not a valid time value."
+msgstr "No es un valor de tiempo válido."
+
+#: env/lib/python3.9/site-packages/wtforms/fields/datetime.py:148
+msgid "Not a valid week value."
+msgstr "No es un valor de semana válido."
+
+#: env/lib/python3.9/site-packages/wtforms/fields/numeric.py:82
+#: env/lib/python3.9/site-packages/wtforms/fields/numeric.py:92
+msgid "Not a valid integer value."
+msgstr "No es un valor entero válido."
+
+#: env/lib/python3.9/site-packages/wtforms/fields/numeric.py:168
+msgid "Not a valid decimal value."
+msgstr "No es un valor decimal válido."
+
+#: env/lib/python3.9/site-packages/wtforms/fields/numeric.py:197
+msgid "Not a valid float value."
+msgstr "No es un valor flotante válido."

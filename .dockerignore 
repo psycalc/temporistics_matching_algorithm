@@ -5,3 +5,11 @@ __pycache__
 .DS_Store
 .git
 .vscode
+.env
+node_modules
+*.log
+*.csv
+.env.*
+tests/
+*.md
+

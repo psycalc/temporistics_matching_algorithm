@@ -1,40 +1,23 @@
-# Use a specific version of the Python image to ensure consistency.
-# slim-buster version is smaller and more secure than the full image.
-FROM python:3.8-slim-buster AS base
-
-# Set environment variables to:
-# 1. Force Python stdout and stderr streams to be unbuffered.
-# 2. Prevent Python from writing pyc files to disk (equivalent to python -B option).
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
-# Set the working directory inside the container to /app.
+# Stage 1: Build dependencies
+FROM python:3.8-slim-buster AS builder
 WORKDIR /app
-
-# Install dependencies:
-# Copy only the requirements.txt file to leverage Docker cache,
-# install the Python dependencies, then copy the rest of the app.
-FROM base AS dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --user --no-cache-dir -r requirements.txt
 
-# Final stage
-FROM base
-COPY --from=dependencies /usr/local/lib/python3.8/site-packages /usr/local/lib/python3.8/site-packages
+# Stage 2: Copy the dependencies and application code
+FROM python:3.8-slim-buster
+WORKDIR /app
+COPY --from=builder /root/.local /root/.local
+ENV PATH=/root/.local/bin:$PATH
 COPY . .
 
-# Non-root User:
-# Create a user to run the application safely (not as root).
-# This is a security best practice in Docker containers.
-RUN adduser --disabled-password --gecos '' myuser
-# Create a directory for log files
-RUN mkdir /app/logs && chown -R myuser:myuser /app/logs
-USER myuser
+# Copy entrypoint script and make it executable
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-
-# Make port 5000 available to the world outside this container.
 EXPOSE 5000
+ENV FLASK_APP run.py
+ENV FLASK_ENV production
 
-# Run the application:
-# Use the exec form of CMD to help Docker send the correct signals to the Python process.
-CMD ["python", "run.py"]
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "run:app"]

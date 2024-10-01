@@ -152,6 +152,12 @@ We welcome contributions! Here's how to help:
 
 Consult [GitHub documentation](https://help.github.com/articles/creating-a-pull-request/) for more on pull requests.
 
+## Adding Translations
+To add or update translations:
+1. Modify the `.pot` file in the `messages.pot`.
+2. Use Babel to generate `.po` files for each language.
+3. Run the `msgfmt` command to compile `.mo` files.
+
 ## Troubleshooting
 
 If you encounter issues:
@@ -186,4 +192,9 @@ For questions or feedback, email us at `your.email@example.com`.
 (Optionally, include a link to a short video demo of the application)
 
 Remember to replace placeholders like `your-username` and `your.email@example.com` with your actual information.
+
+## Running Tests
+To run the tests, execute:
+```bash
+python -m unittest discover tests
 ```

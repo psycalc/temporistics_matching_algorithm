@@ -1,49 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Relationship Calculator Result</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-            font-size: 2em; /* Double the font size */
-        }
-        .result-container {
-            text-align: center;
-            background-color: #ffffff;
-            padding: 40px; /* Double the padding */
-            border-radius: 20px; /* Double the border radius */
-            box-shadow: 0 0 20px rgba(0,0,0,0.1); /* Double the box shadow */
-            width: 600px; /* Adjusted width for container to fit content */
-        }
-        h1 {
-            margin-bottom: 20px; /* Double the margin for spacing */
-        }
-        p {
-            margin-bottom: 20px; /* Double the margin for spacing */
-        }
-        a {
-            text-decoration: none;
-            color: #008CBA;
-            padding: 10px 20px; /* Double the padding */
-            border-radius: 10px; /* Double the border radius */
-            border: 2px solid #008CBA; /* Double the border width */
-        }
-        a:hover {
-            background-color: #008CBA;
-            color: white;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/result.css') }}">
 </head>
 <body>
     <div class="result-container">
         <h1>Result</h1>
         <p>Relationship Type: {{ relationship_type }}</p>
         <p>Comfort Score: {{ comfort_score }}</p>
+
         <a href="{{ url_for('main.index') }}">Go Back</a>
+
+        {% if debug %}
+        <div class="debug-info">
+            <h2>Debug Information</h2>
+            <p><strong>User 1 Type:</strong> {{ user1_type }}</p>
+            <p><strong>User 2 Type:</strong> {{ user2_type }}</p>
+            <p><strong>Typology Name:</strong> {{ typology_name }}</p>
+            <p><strong>Raw Request Data:</strong> {{ request_data }}</p>
+            <p><strong>Additional Logs:</strong> {{ logs }}</p>
+        </div>
+        {% endif %}
     </div>
 </body>
 </html>

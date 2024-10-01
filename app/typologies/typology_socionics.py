@@ -1,11 +1,12 @@
 import gettext
 from itertools import product
 from .typology import Typology
-from flask_babel import lazy_gettext as _l
+from flask_babelplus import lazy_gettext as _l
 
-class TypologySocionics(Typology):
+class TypologySocionics(Typology):  # Наследуем от Typology
     def __init__(self, language="en"):
         self.set_language(language)
+        # Инициализируем базовый класс с аспектами
         super().__init__([
             _l("Intuitive Logical Extratim"),
             _l("Sensory Ethical Introtim"),
@@ -28,8 +29,10 @@ class TypologySocionics(Typology):
             _ = gettext.gettext
             print(f"Error loading translation: {e}")  # Or use logging
 
-
     def get_all_types(self):
+        """
+        Returns all possible combinations of types in Socionics.
+        """
         valid_types = []
         aspects = ["Intuitive", "Sensory", "Ethical", "Logical"]
         traits = ["Extratim", "Introtim"]
@@ -46,22 +49,25 @@ class TypologySocionics(Typology):
         return valid_types
 
     def get_all_quadras(self):
+        """
+        Returns all quadras and their descriptions.
+        """
         quadras = {
             'Alpha': {
                 'types': [_l('Seeker (ILE)'), _l('Analyst (LII)'), _l('Enthusiast (ESE)'), _l('Mediator (SEI)')],
-                'description': _l('The first quadra (Alpha) in socionics is defined by the aspects of Intuition of Possibilities, Structural Logic, Ethics of Emotions, and Sensation of Sensations. Its representatives value new opportunities and theories, inspiration, fun, and care for comfort. In the first quadra, stereotypical thinking is condemned - the ability to think creatively and fantasize is welcomed. Freedom of speech, striving for justice, and the search for truth are the main values of the representatives of this quadra.')
+                'description': _l('The first quadra (Alpha) in socionics is defined by the aspects of Intuition of Possibilities, Structural Logic, Ethics of Emotions, and Sensation of Sensations. Its representatives value new opportunities and theories, inspiration, fun, and care for comfort.')
             },
             'Beta': {
                 'types': [_l('Mentor (EIE)'), _l('Marshal (SLE)'), _l('Inspector (LSI)'), _l('Lyricist (IEI)')],
-                'description': _l('The second quadra (Beta) in socionics is known as the Embodiers. The mission of the Embodiers quadra is to transform the initial concept into a complete ideology and implement new orders by creating corresponding organizational structures. The main characteristics of this rigid quadra are aristocracy (closedness, predominance of vertical, hierarchical, managerial ties) and resoluteness (decisiveness, great weight of volitional methods).')
+                'description': _l('The second quadra (Beta) in socionics is known as the Embodiers. The mission of the Embodiers quadra is to transform the initial concept into a complete ideology and implement new orders by creating corresponding organizational structures.')
             },
             'Gamma': {
                 'types': [_l('Politician (SEE)'), _l('Entrepreneur (LIE)'), _l('Critic (ILI)'), _l('Guardian (ESI)')],
-                'description': _l('The third quadra (Gamma) in socionics is known as the Reformers. The mission of the Reformers quadra is to remove the accumulated contradictions from the previous stage through criticism of admitted mistakes and carry out reform of rigid structures that have outlived their usefulness. The main characteristics of this quadra are democracy (openness, decentralization, diversity) and resoluteness (priority of power methods, decisive and active actions).')
+                'description': _l('The third quadra (Gamma) in socionics is known as the Reformers. The mission of the Reformers quadra is to remove the accumulated contradictions from the previous stage through criticism of admitted mistakes and carry out reform of rigid structures that have outlived their usefulness.')
             },
             'Delta': {
                 'types': [_l('Administrator (LSE)'), _l('Master (SLI)'), _l('Advisor (IEE)'), _l('Humanist (EII)')],
-                'description': _l('The fourth quadra (Delta) in socionics is known as the Perfectors. The mission of the Perfectors quadra is to bring the initial but reformed idea to exhaustion through improvement. The main characteristics of this quadra are aristocracy (closedness, elitism, quality of life) and discursiveness (deliberation, decision-making by non-violent methods).')
+                'description': _l('The fourth quadra (Delta) in socionics is known as the Perfectors. The mission of the Perfectors quadra is to bring the initial but reformed idea to exhaustion through improvement.')
             }
         }
         return quadras
@@ -69,8 +75,13 @@ class TypologySocionics(Typology):
     def get_aspects(self):
         return self.aspects
 
-    def shorten_type(self, typology_type):
-        return typology_type
+    def shorten_type(self, types):
+        """
+        Shortens the representation of types by converting the aspects into their initials.
+        """
+        if isinstance(types, str):
+            types = [types]
+        return ["".join([word[0] for word in type_name.split()]) for type_name in types]
 
     @staticmethod
     def get_dual_type(type_name):

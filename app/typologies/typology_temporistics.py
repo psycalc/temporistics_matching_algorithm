@@ -1,14 +1,14 @@
 from typing import List
-from .typology import Typology
-
 from itertools import permutations
+from typology import Typology  # Импортируем ваш базовый абстрактный класс
 
-class TypologyTemporistics(Typology):
+class TypologyTemporistics(Typology):  # Наследуем от Typology
     def __init__(self):
         """
         Initializes a new instance of the TypologyTemporistics class.
+        Temporistics is based on four key time aspects: Past, Present, Future, and Eternity.
         """
-        super().__init__(["Past", "Current", "Future", "Eternity"])
+        super().__init__(["Past", "Present", "Future", "Eternity"])  # Инициализация базового класса
 
     TETRADS = {
         '6-1-2': "Era of Individuality (P)",
@@ -20,27 +20,27 @@ class TypologyTemporistics(Typology):
     QUADRAS_AND_DESCRIPTIONS = {
         'Antipodes': {
             'types': ["Game Master", "Maestro", "Player", "Politician"],
-            'description': 'Antipodes are one-plane N and P. The place is fixed, the position in space is fixed in all senses, the point of view. Everything personal, self-image is fixed. The direction of development and the search for a way of existence are subject to manipulation.'
+            'description': 'Antipodes are one-plane N and P. Fixed position in all senses, focused on self-image and manipulation.'
         },
         'Guardians and Border Guards': {
             'types': ["Missionary", "Standard Bearer", "Rescuer", "Knight"],
-            'description': 'Guardians and border guards are one-plane V and P. Everything personal, self-image is fixed. The way to exist is fixed. The direction of development and the search for your place are subject to manipulation.'
+            'description': 'Guardians and Border Guards are one-plane V and P. Focused on self-image and the search for place, with manipulation.'
         },
         'Old-timers and Founders': {
             'types': ["Theorist", "Oracle", "Conqueror", "Star"],
-            'description': 'Old-timers and founders of the "face" world are one-plane N and V. The way to exist is fixed. The place in the world is fixed. The direction of development and everything personal + self-image are subject to manipulation.'
+            'description': 'Old-timers and founders are one-plane N and V. Fixed place and existence with manipulation.'
         },
         'Conductors': {
             'types': ["Ideologist", "Samurai", "Colonist", "Pioneer"],
-            'description': 'Conductors are one-plane B and V. The way to exist is fixed. The direction of development is fixed. The place in the world and the image of personality are subject to manipulation.'
+            'description': 'Conductors are one-plane B and V. Fixed direction and existence, with manipulation.'
         },
         'Scouts and Scouts': {
             'types': ["Scout", "Hacker", "Gray Cardinal", "Taster"],
-            'description': 'Scouts and scouts are one-plane N and B. The place in the world and the direction of development are fixed. The way to exist and the image of personality are subject to manipulation.'
+            'description': 'Scouts are one-plane N and B. Fixed place and development with manipulation.'
         },
         'Nomads and Tramps': {
             'types': ["Tamada", "Pathfinder", "Robinson", "Initiator"],
-            'description': 'Nomads and tramps are one-plane P and B. Everything personal, self-image, and direction of development are fixed. Place in the world and way of existence are subject to manipulation.'
+            'description': 'Nomads and Tramps are one-plane P and B. Self-image and development are fixed; existence is manipulated.'
         }
     }
 
@@ -53,57 +53,39 @@ class TypologyTemporistics(Typology):
     }
 
     def validate_tetrad_sequence(self, tetrad_sequence: str) -> None:
-      """
-      Validates a tetrad sequence.
-
-      :param tetrad_sequence: A string representing a tetrad sequence.
-      :raises ValueError: If the tetrad sequence is invalid.
-      """
-      if tetrad_sequence not in self.TETRADS:
-          raise ValueError(f"Invalid tetrad sequence: {tetrad_sequence}")
+        """
+        Validates a tetrad sequence.
+        """
+        if tetrad_sequence not in self.TETRADS:
+            raise ValueError(f"Invalid tetrad sequence: {tetrad_sequence}")
 
     def get_tetrads(self, tetrad_sequence: str) -> str:
-      """
-      Returns the description for a given tetrad sequence.
-
-      :param tetrad_sequence: A string representing a tetrad sequence.
-      :return: A string representing the description for the given tetrad sequence.
-      :raises ValueError: If the tetrad sequence is invalid.
-      """
-      self.validate_tetrad_sequence(tetrad_sequence)
-      return self.TETRADS.get(tetrad_sequence, "Unknown Tetrad")
+        """
+        Returns the description for a given tetrad sequence.
+        """
+        self.validate_tetrad_sequence(tetrad_sequence)
+        return self.TETRADS.get(tetrad_sequence, "Unknown Tetrad")
 
     def get_quadras(self, quadra_name: str) -> List[str]:
-      """
-      Returns the list of types for a given quadra.
-
-      :param quadra_name: A string representing a quadra name.
-      :return: A list of strings representing the types for the given quadra.
-      :raises ValueError: If the quadra name is invalid.
-      """
-      if quadra_name not in self.QUADRAS:
-          raise ValueError(f"Invalid quadra name: {quadra_name}")
-      return self.QUADRAS[quadra_name]
+        """
+        Returns the list of types for a given quadra.
+        """
+        if quadra_name not in self.QUADRAS:
+            raise ValueError(f"Invalid quadra name: {quadra_name}")
+        return self.QUADRAS[quadra_name]
 
     def get_quadra_description(self, quadra_name: str) -> str:
-      """
-      Returns the description for a given quadra.
+        """
+        Returns the description for a given quadra.
+        """
+        if quadra_name not in self.QUADRA_DESCRIPTIONS:
+            raise ValueError(f"Invalid quadra name: {quadra_name}")
+        return self.QUADRA_DESCRIPTIONS[quadra_name]
 
-      :param quadra_name: A string representing a quadra name.
-      :return: A string representing the description for the given quadra.
-      :raises ValueError: If the quadra name is invalid.
-      """
-      if quadra_name not in self.QUADRA_DESCRIPTIONS:
-          raise ValueError(f"Invalid quadra name: {quadra_name}")
-      return self.QUADRA_DESCRIPTIONS[quadra_name]
-    
     @staticmethod
     def get_time_periods_short(time_periods: List[str]) -> List[str]:
         """
         Returns the shortened form of the time periods.
-
-        :param time_periods: A list of strings representing the time periods.
-        :return: A list of strings representing the shortened form of the time periods.
         """
         time_periods_short = []
         for period in time_periods:
@@ -111,35 +93,58 @@ class TypologyTemporistics(Typology):
                 period = "Current"
             time_periods_short.append(period[0])
         return time_periods_short
-    
+
     INTER_TYPE_RELATIONSHIPS = {
-        # Fill this dictionary with the relationships between types
-        # Example: ('Game Master', 'Player'): "Rivalry"
+        ("Past", "Present"): "Superficial Agreement",
+        ("Future", "Eternity"): "Shared Vision",
+        ("Past", "Past"): "Complete Unity",
+        ("Present", "Future"): "Strategic Conflict",
     }
-    
+
     def get_intertype_relationship(self, type1: str, type2: str) -> str:
         """
         Returns the intertype relationship between two given types.
-
-        :param type1: A string representing the first type.
-        :param type2: A string representing the second type.
-        :return: A string representing the relationship between the two types.
-        :raises ValueError: If the types are invalid or if the relationship is not defined.
         """
         relationship = self.INTER_TYPE_RELATIONSHIPS.get((type1, type2), None)
         if relationship is None:
             raise ValueError(f"Intertype relationship between {type1} and {type2} is not defined.")
         return relationship
-    
-    # get aspects
-    def get_aspects(self):
-        return self.aspects
-    
+
+    def get_comfort_score(self, relationship_type: str):
+        """
+        Returns a comfort score based on the relationship type.
+        """
+        comfort_scores = {
+            "Complete Unity": (100, "Perfect alignment in all priorities."),
+            "Deep Harmony": (90, "Top two time priorities match, leading to significant harmony."),
+            "Shared Vision": (75, "Top three priorities align, resulting in cooperation."),
+            "Superficial Agreement": (50, "Only the last priority matches, shallow agreement."),
+            "Strategic Conflict": (40, "Differences lead to friction, but can stimulate growth."),
+            "Surface Influence": (30, "Minor overlap in low priorities."),
+            "Temporal Tension": (25, "Constant tension due to opposing priorities."),
+            "Illusion of Compatibility": (20, "Appears aligned on the surface, but mismatched in critical areas."),
+        }
+        return comfort_scores.get(relationship_type, (0, "Unknown relationship type"))
+
+    def determine_relationship_type(self, user1_type: str, user2_type: str):
+        """
+        Determines the relationship type between two users based on their time perspectives.
+        """
+        user1_priority = user1_type.split(", ")[0]  # Highest priority time aspect
+        user2_priority = user2_type.split(", ")[0]
+
+        return self.get_intertype_relationship(user1_priority, user2_priority)
+
     def get_all_types(self):
-        # Assuming temporistics involves combinations of its aspects just like the socionics example
+        """
+        Returns all possible combinations of time perspectives (aspects).
+        """
         return [", ".join([str(aspect) for aspect in perm]) for perm in permutations(self.aspects, 4)]
 
-    def shorten_type(self, types):
+    def shorten_type(self, types: List[str]) -> List[str]:
+        """
+        Shortens the representation of types by converting the aspects into their initials.
+        """
         if isinstance(types, str):
             types = [types]
         return ["".join([aspect[0] for aspect in type_name.split(", ")]) for type_name in types]

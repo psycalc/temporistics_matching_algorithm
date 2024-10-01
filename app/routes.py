@@ -1,20 +1,19 @@
-from flask import Blueprint, render_template, request, jsonify, current_app, redirect, url_for
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
-from .services import get_types_by_typology, cache
-from .relationship_calculator import RelationshipCalculator
-from .socionics_relationship_calculator import SocionicsRelationshipCalculator
+from flask import Blueprint, render_template, request, jsonify, current_app, redirect, url_for, flash, make_response
+from flask_login import login_user, logout_user, login_required, current_user
+from .forms import RegistrationForm, LoginForm, ProfileForm, EditProfileForm
+from .models import User, UserType
+from . import db, login_manager
+from .services import get_types_by_typology, calculate_relationship
 from .typologies import TypologyTemporistics, TypologyPsychosophia, TypologyAmatoric, TypologySocionics
 from flask_wtf import FlaskForm
 from wtforms import HiddenField
-from .services import calculate_relationship
-from flask_babel import _
-from flask import make_response
-from app.forms import RegistrationForm, LoginForm
-from flask import render_template, flash, redirect, url_for
+from urllib.parse import urlparse, urljoin
 
 main = Blueprint('main', __name__)
-limiter = Limiter(key_func=get_remote_address)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 class EmptyForm(FlaskForm):
     csrf_token = HiddenField()
@@ -36,41 +35,33 @@ def get_typology_class(typology_name):
 
 @main.route('/calculate', methods=['POST'])
 def calculate():
-    typology_name = request.form.get('typology')
     user1_type = request.form.get('user1')
     user2_type = request.form.get('user2')
+    typology_name = request.form.get('typology')
+    relationship_type, comfort_score = calculate_relationship(user1_type, user2_type, typology_name)
 
-    if not typology_name or not user1_type or not user2_type:
-        return render_template('error.html', error_message=_("Invalid input. Please provide all required fields.")), 400
+    debug = current_app.config['DEBUG']
+    logs = "Debug logs or details can be displayed here."
 
-    typology_class = get_typology_class(typology_name)
-
-    if not typology_class:
-        return render_template('error.html', error_message=_("Invalid typology name. Please select a valid typology.")), 400
-
-    # Validate user types
-    valid_types = typology_class().get_all_types()
-    if user1_type not in valid_types:
-        return render_template('error.html', error_message=_("Invalid type for User 1. Please select a valid type.")), 400
-    if user2_type not in valid_types:
-        return render_template('error.html', error_message=_("Invalid type for User 2. Please select a valid type.")), 400
-
-    relationship_type, comfort_score = calculate_relationship(user1_type, user2_type, typology_class)
-    return render_template('result.html', relationship_type=relationship_type, comfort_score=comfort_score)
+    return render_template('result.html', 
+                           relationship_type=relationship_type,
+                           comfort_score=comfort_score,
+                           user1_type=user1_type,
+                           user2_type=user2_type,
+                           typology_name=typology_name,
+                           request_data=request.form,
+                           logs=logs,
+                           debug=debug)
 
 @main.route('/', methods=['GET'])
-@limiter.limit("100/hour")
 def index():
-    try:
+    if current_user.is_authenticated:
         default_typology_name = "Temporistics"
         types = get_types_by_typology(default_typology_name)
         form = EmptyForm()
-
         return render_template('index.html', types=types, form=form)
-
-    except Exception as e:
-        current_app.logger.error(f"An error occurred: {str(e)}")
-        return render_template('error.html', error_message=_("An internal server error occurred")), 500
+    else:
+        return redirect(url_for('main.login'))
 
 @main.route('/change_language', methods=['POST'])
 def change_language():
@@ -85,21 +76,75 @@ def change_language():
     else:
         current_app.logger.error(f"Failed to change language. Supported languages: {current_app.config['LANGUAGES']}")
         return jsonify({"success": False, "error": "Language change failed. Please select a supported language."}), 400
-    
+
 @main.route('/register', methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        # TODO: Add user registration logic
-        flash('Account created for {}!'.format(form.username.data), 'success')
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        
+        user_type = UserType(typology_name=form.typology_name.data, type_value=form.type_value.data, user=user)
+        db.session.add(user)
+        db.session.add(user_type)
+        db.session.commit()
+        
+        flash('Your account has been created! You can now log in.', 'success')
         return redirect(url_for('main.login'))
     return render_template('register.html', title='Register', form=form)
 
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
+
 @main.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():
-        # TODO: Add user login logic
-        flash('You have been logged in!', 'success')
-        return redirect(url_for('main.index'))
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user, remember=form.remember.data)
+            next_page = request.args.get('next')
+            if not is_safe_url(next_page):
+                return abort(400)
+            return redirect(next_page) if next_page else redirect(url_for('main.index'))
+        else:
+            flash('Login Unsuccessful. Please check email and password.', 'danger')
     return render_template('login.html', title='Login', form=form)
+
+@main.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('main.login'))
+
+@main.route('/user/<username>', methods=['GET', 'POST'])
+@login_required
+def user_profile(username):
+    user = User.query.filter_by(username=username).first_or_404()
+
+    if user != current_user:
+        flash('You do not have permission to view or edit this profile.', 'danger')
+        return redirect(url_for('main.index'))
+
+    form = ProfileForm(obj=user)
+
+    if form.validate_on_submit():
+        user.email = form.email.data
+        user.typology_name = form.typology_name.data
+        user.type_value = form.type_value.data
+        try:
+            db.session.commit()
+            flash('Profile updated successfully.', 'success')
+        except:
+            db.session.rollback()
+            flash('An error occurred while updating your profile. Please try again.', 'danger')
+
+        return redirect(url_for('main.user_profile', username=user.username))
+
+    return render_template('profile.html', user=user, form=form)
