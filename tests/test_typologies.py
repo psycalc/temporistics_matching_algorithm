@@ -1,16 +1,29 @@
-import unittest
+import pytest
+from app.typologies.typology_temporistics import TypologyTemporistics
 
-class TestTypologyTemporistics(unittest.TestCase):
-    def setUp(self):
-        from app import create_app  # Import here to avoid premature Flask context usage
-        self.app = create_app('testing')
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        # Importing here ensures it's within a context
-        from app.typologies.typology_temporistics import TypologyTemporistics
-        self.typology = TypologyTemporistics()
 
-    def tearDown(self):
-        self.app_context.pop()
+@pytest.fixture
+def typology(app):
+    with app.app_context():
+        return TypologyTemporistics()
 
-    # Your tests here...
+
+# Додайте ваші тести тут, використовуючи фікстуру typology
+def test_typology_temporistics_tetrad(typology):
+    # Проверим корректное описание тетрады
+    description = typology.get_tetrad_description("6-1-2")
+    assert "Era of Individuality" in description
+
+def test_typology_temporistics_invalid_tetrad(typology):
+    import pytest
+    with pytest.raises(ValueError):
+        typology.get_tetrad_description("invalid")
+
+def test_typology_temporistics_quadra(typology):
+    types = typology.get_quadra_types("Antipodes")
+    assert "Game Master" in types
+
+def test_typology_temporistics_invalid_quadra(typology):
+    import pytest
+    with pytest.raises(ValueError):
+        typology.get_quadra_types("NonExistentQuadra")

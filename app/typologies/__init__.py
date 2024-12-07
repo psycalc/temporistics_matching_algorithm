@@ -12,10 +12,10 @@ from .typology_socionics import TypologySocionics
 
 # List all the classes that should be available when importing the package
 __all__ = [
-    'TypologyTemporistics',
-    'TypologyPsychosophia',
-    'TypologyAmatoric',
-    'TypologySocionics',
+    "TypologyTemporistics",
+    "TypologyPsychosophia",
+    "TypologyAmatoric",
+    "TypologySocionics",
 ]
 
 # This allows the classes to be imported directly from the package

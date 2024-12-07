@@ -1,26 +1,27 @@
 import os
+import logging
 from flask import Flask
-from app import create_app
+from app import create_app, db
+from flask_migrate import Migrate
 
-# Load the configuration from the environment variable.
-# This approach emphasizes security and flexibility, allowing different configurations based on the environment.
-config_name = os.getenv('FLASK_CONFIG', 'development')
-if not config_name:
-    raise ValueError("FLASK_CONFIG environment variable not set.")
+logging.basicConfig(level=logging.INFO)  # Set up logging
 
+config_name = os.getenv("FLASK_CONFIG", "development")
 app = create_app(config_name)
+migrate = Migrate(app, db)
 
 if __name__ == "__main__":
-    # Retrieve host and port from environment variables with default values.
-    # This allows for flexible deployment configurations.
-    host = os.getenv('FLASK_RUN_HOST', '0.0.0.0')
-    port = os.getenv('FLASK_RUN_PORT', '5000')
+    if app.config["DEBUG"]:
+        logging.warning(
+            "Running in DEBUG mode. Make sure this is not enabled in production!"
+        )
+    host = os.getenv("FLASK_RUN_HOST", "0.0.0.0")
+    port = os.getenv("FLASK_RUN_PORT", "5000")
 
-    # Validate if port is an integer
     try:
         port = int(port)
     except ValueError:
-        raise ValueError("FLASK_RUN_PORT environment variable must be an integer.")
+        logging.error("FLASK_RUN_PORT environment variable must be an integer.")
+        raise
 
-    # Run the Flask application with the specified host and port
-    app.run(host=host, port=port, debug=app.config['DEBUG'])
+    app.run(host=host, port=port, debug=app.config["DEBUG"])

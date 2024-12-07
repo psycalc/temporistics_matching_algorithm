@@ -1,51 +1,76 @@
-import unittest
-from app import create_app
+import pytest
+from app import db
+from app.models import User, UserType
+from flask_login import current_user
 
-class TestRoutes(unittest.TestCase):
-    def setUp(self):
-        self.app = create_app('testing')
-        self.client = self.app.test_client()
 
-    def test_index_route(self):
-        response = self.client.get('/')
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Psychological Calculator', response.data)
+@pytest.fixture
+def client(app):
+    return app.test_client()
 
-    def test_change_language_route(self):
-        response = self.client.post('/change_language', data={'language': 'en'})
-        self.assertEqual(response.status_code, 302)
 
-    def test_get_types_route_temporistics(self):
-        response = self.client.get('/get_types?typology=Temporistics')
-        self.assertEqual(response.status_code, 200)
-        # Assert based on expected types data, e.g., 
-        # self.assertIn(b'"types":', response.data)
+@pytest.fixture(autouse=True)
+def setup_database(app, db_url):
+    app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+    with app.app_context():
+        db.create_all()
+        user_type = UserType(typology_name="Temporistics", type_value="YourTypeValue")
+        db.session.add(user_type)
+        db.session.commit()
+        user = User(username="testuser", email="test@example.com", user_type=user_type)
+        user.set_password("testpassword")
+        db.session.add(user)
+        db.session.commit()
+    yield
+    with app.app_context():
+        db.session.remove()
+        db.drop_all()
 
-    def test_get_types_route_psychosophia(self):
-        response = self.client.get('/get_types?typology=Psychosophia')
-        self.assertEqual(response.status_code, 200)
-        # Assert based on expected types data
 
-    def test_get_types_route_amatoric(self):
-        response = self.client.get('/get_types?typology=Amatoric')
-        self.assertEqual(response.status_code, 200)
-        # Assert based on expected types data
+def test_index_route(client):
+    response = client.get("/")
+    assert response.status_code == 302
 
-    def test_get_types_route_socionics(self):
-        response = self.client.get('/get_types?typology=Socionics')
-        self.assertEqual(response.status_code, 200)
-        # Assert based on expected types data
 
-    # Add tests for any other routes, for example, a route that handles form submission:
-    def test_relationship_calculation(self):
-        # Replace 'user1_type', 'user2_type', and 'typology' with your actual form field names and test data
-        form_data = {'user1': 'Type1', 'user2': 'Type2', 'typology': 'Temporistics'}
-        response = self.client.post('/', data=form_data)
-        self.assertEqual(response.status_code, 200)
-        # Assert based on expected response, e.g., 
-        # self.assertIn(b'Relationship Type:', response.data)
+def test_login(client, app):
+    with app.app_context():
+        response = client.post("/login", data={
+            "email": "test@example.com",
+            "password": "testpassword",
+            "submit": "Login"
+        }, follow_redirects=True)
+        # Проверяем, что редирект на index, и пользователь залогинен
+        assert response.status_code == 200
+        # В идеале проверить current_user, но current_user не доступен напрямую.
+        # Можно проверить контекст или использовать Flask-Login utilities.
+        # Простой вариант: Протестировать, что в ответе есть какая-то фраза для залогиненного пользователя.
 
-    # Add more test cases for other routes and scenarios
+def test_login_wrong_password(client, app):
+    with app.app_context():
+        response = client.post("/login", data={
+            "email": "test@example.com",
+            "password": "wrongpassword",
+            "submit": "Login"
+        }, follow_redirects=True)
+        # Должен остаться на странице логина с flash сообщением
+        assert response.status_code == 200
+        assert b"Login Unsuccessful" in response.data
 
-if __name__ == '__main__':
-    unittest.main()
+def test_logout(client, app):
+    with app.app_context():
+        # Сначала логинимся
+        client.post("/login", data={
+            "email": "test@example.com",
+            "password": "testpassword"
+        }, follow_redirects=True)
+        # Теперь логаут
+        response = client.get("/logout", follow_redirects=True)
+        assert response.status_code == 200
+        # Можно проверить, что в ответе нет признаков залогиненного пользователя
+
+def test_protected_page_requires_login(client, app):
+    with app.app_context():
+        response = client.get("/user/testuser", follow_redirects=False)
+        assert response.status_code == 302
+        assert "/login" in response.headers["Location"]
+

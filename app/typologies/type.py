@@ -1,13 +1,20 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
+
 class Type(ABC):
     """
     An abstract base class for different psychological types.
     This class provides a structure for defining various attributes and behaviors common to all types.
     """
 
-    def __init__(self, full_name: str, pseudonym: str, aspect: str, descriptions: Dict[str, Dict[str, str]]):
+    def __init__(
+        self,
+        full_name: str,
+        pseudonym: str,
+        aspect: str,
+        descriptions: Dict[str, Dict[str, str]],
+    ):
         """
         Initializes a new instance of a Type.
 
@@ -52,7 +59,7 @@ class Type(ABC):
         return "".join(word[0].upper() for word in self._full_name.split())
 
     @abstractmethod
-    def get_description(self, length: str = 'short') -> str:
+    def get_description(self, length: str = "short") -> str:
         """
         Abstract method to get a description of the type.
         Must be implemented by subclasses to return either a short or full description.

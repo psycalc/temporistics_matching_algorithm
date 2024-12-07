@@ -1,48 +1,127 @@
 from .typology import Typology
 from itertools import permutations
 
+
 class TypologyPsychosophia(Typology):
+    """
+    TypologyPsychosophia class represents the typology based on Psychosophy,
+    which includes four aspects: Emotion, Logic, Will, and Physics.
+    """
+
     def __init__(self):
         """
         Initializes a new instance of the TypologyPsychosophia class.
         """
-        super().__init__(["Emotion", "Logic", "Will", "Power"])
-    
+        # Aspects in Psychosophy: Emotion (E), Logic (L), Will (W), Physics (F)
+        super().__init__(["Emotion", "Logic", "Will", "Physics"])
+
     def get_all_quadras(self):
         """
-        Returns all quadras of psychosophy with their descriptions.
-        
-        Each quadra consists of four types that share common values and characteristics.
+        Returns all quadras of Psychosophy with their descriptions.
+
+        Each quadra consists of six types that share common values and characteristics.
         """
         quadras = {
-            'First': {
-                'types': ['Andersen (ELWF)', 'Ghazali (EWLV)', 'Goethe (PWLE)', 'Aristippus (PLWE)'],
-                'description': 'The first psychosophic quadra is characterized by processional Will and Logic, as well as resultative Physics and Emotion. Its representatives value arguments and heated discussions. Proving one\'s rightness is important for the types of this quadra, because their self-esteem depends significantly on it. These types are usually unpretentious in everyday life and entertainment, which is why their personal relationships are the strongest compared to other quadras. At the same time, they are ambitious, like to discuss their goals and decisions.'
+            "First Quadra": {
+                "types": [
+                    "Gandhi (EFLW)",
+                    "Van Gogh (EFLW)",
+                    "Mother Teresa (EFLW)",
+                    "Mozart (EFLW)",
+                    "Andersen (EFLW)",
+                    "Ghazali (EFLW)",
+                ],
+                "description": "Characterized by a strong emphasis on Emotion and Physics. Values harmony, creativity, and aesthetic expression.",
             },
-            'Second': {
-                'types': ['Pushkin (EPWL)', 'Pasternak (EWPL)', 'Lao Tzu (LPWE)', 'Plato (LWPE)'],
-                'description': 'The second psychosophic quadra is characterized by processional Will and Physics, as well as resultative Emotion and Logic. It includes such types as Pushkin (EPWL), Pasternak (EWPL), Lao Tzu (LPWE) and Plato (LWPE). This quadra can be called "the most silent" of all, since those aspects that are primarily manifested through speech (Emotion with Logic) are in positions of functions with the property "result". For these types, the collective and interaction with it are very important. They like to cooperate and compete with other people, gather a team to achieve goals and develop joint strategies. Also for them, the primary issue is the beauty and aesthetics of the material world. They have a desire to decorate and bring to perfection their place of residence or work. In people, they value grooming more than just a beautiful appearance. For them it is important that a person constantly improves, making efforts for this, and only such people, in their understanding, deserve respect. The strong sides of the types of the second quadra are: the ability to achieve long-term goals, good taste, care for their health, tolerance for stormy emotional manifestations, constant work on themselves. Their weak sides are unwillingness to question established dogmas, lack of charisma and low level of empathy.'
+            "Second Quadra": {
+                "types": [
+                    "Napoleon (FEWL)",
+                    "Lenin (FEWL)",
+                    "Hitler (FEWL)",
+                    "Joan of Arc (FEWL)",
+                    "Alexander the Great (FEWL)",
+                    "Catherine the Great (FEWL)",
+                ],
+                "description": "Emphasizes Physics and Emotion with a focus on action and transformation. Values determination and influence.",
             },
-            'Third': {
-                'types': ['Rousseau (ELFW)', 'Bukharin (EWFL)', 'Napoleon (PFLW)', 'Lenin (PLWF)'],
-                'description': 'The third psychosophic quadra is characterized by processional Physics and Logic, as well as resultative Will and Emotion. It includes such types as Rousseau (ELFW), Bukharin (EWFL), Napoleon (PFLW) and Lenin (PLWF). Its representatives are "people of the Renaissance era" who make the world beautiful and spiritualized. These types are active and mobile, constantly improving their body, love walks and nature. This helps them get a lot of pleasure from life, maintain good health for many years. And an inexhaustible interest in knowing the world makes them study a lot, think, discuss on all sorts of philosophical topics. Types of the third quadra show themselves well in intellectual activity, as well as in those types of art that require excellent mastery of technique - handicrafts, drawing, classical dances and music. Their strong sides are freethinking, naturalness, subtle understanding of aesthetics. Their weak sides are uncompromisingness and fussiness, a tendency to believe in beautifully designed but unconfirmed concepts.' 
-            }
-            
+            "Third Quadra": {
+                "types": [
+                    "Einstein (LEFW)",
+                    "Descartes (LEFW)",
+                    "Newton (LEFW)",
+                    "Spinoza (LEFW)",
+                    "Kant (LEFW)",
+                    "Hegel (LEFW)",
+                ],
+                "description": "Centers on Logic and Emotion. Values knowledge, exploration, and understanding.",
+            },
+            "Fourth Quadra": {
+                "types": [
+                    "Steve Jobs (LWEF)",
+                    "Bill Gates (LWEF)",
+                    "Mark Zuckerberg (LWEF)",
+                    "Elon Musk (LWEF)",
+                    "Nikola Tesla (LWEF)",
+                    "Warren Buffett (LWEF)",
+                ],
+                "description": "Focuses on Logic and Will. Values innovation, leadership, and strategic thinking.",
+            },
+            "Fifth Quadra": {
+                "types": [
+                    "Buddha (WELF)",
+                    "Lao Tzu (WELF)",
+                    "Dalai Lama (WELF)",
+                    "Confucius (WELF)",
+                    "Socrates (WELF)",
+                    "Plato (WELF)",
+                ],
+                "description": "Emphasizes Will and Emotion. Values wisdom, introspection, and philosophical contemplation.",
+            },
+            "Sixth Quadra": {
+                "types": [
+                    "Machiavelli (WFEL)",
+                    "Stalin (WFEL)",
+                    "Vladimir Putin (WFEL)",
+                    "Donald Trump (WFEL)",
+                    "Julius Caesar (WFEL)",
+                    "Genghis Khan (WFEL)",
+                ],
+                "description": "Centers on Will and Physics. Values power, control, and pragmatic action.",
+            },
         }
-        
-        
         return quadras
-    
-    # get aspects
+
     def get_aspects(self):
+        """
+        Returns the list of aspects for Psychosophy.
+
+        :return: A list of aspects.
+        """
         return self.aspects
-    
+
     def get_all_types(self):
-        # Assuming temporistics involves combinations of its aspects just like the socionics example
-        return [", ".join([str(aspect) for aspect in perm]) for perm in permutations(self.aspects, 4)]
+        """
+        Returns all possible combinations of psychosophic aspects.
+
+        :return: A list of all possible combinations (permutations) of the aspects.
+        """
+        return [", ".join(perm) for perm in permutations(self.aspects, 4)]
 
     def shorten_type(self, types):
+        """
+        Shortens the representation of types by converting the aspects into their initials.
+
+        :param types: A list or string representing types (e.g., "Emotion, Logic, Will, Physics").
+        :return: A list of shortened type strings (e.g., "ELWF").
+        """
         if isinstance(types, str):
             types = [types]
-        return ["".join([aspect[0] for aspect in type_name.split(", ")]) for type_name in types]
-
+        elif not isinstance(types, list):
+            raise TypeError("Input must be a string or a list of strings.")
+        shortened_types = []
+        for type_name in types:
+            if not isinstance(type_name, str):
+                raise TypeError("All items in the list must be strings.")
+            initials = "".join([aspect[0] for aspect in type_name.split(", ")])
+            shortened_types.append(initials)
+        return shortened_types

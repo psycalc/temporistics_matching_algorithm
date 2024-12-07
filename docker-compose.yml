@@ -1,0 +1,52 @@
+
+services:
+  web:
+    build: .
+    environment:
+      - RUN_TESTS=0
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    env_file:
+      - .env  # Use an environment file for secrets
+    volumes:
+      - .:/app
+    networks:
+      - webnet
+
+  db:
+    image: postgres:12
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"   # Пробрасываем порт 5432 наружу
+    networks:
+      - webnet
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+
+  test:
+    build: .
+    environment:
+      - RUN_TESTS=1
+    depends_on:
+      - db
+    env_file:
+      - .env.test
+    volumes:
+      - .:/app
+    networks:
+      - webnet
+
+volumes:
+  pgdata:
+
+networks:
+  webnet:
