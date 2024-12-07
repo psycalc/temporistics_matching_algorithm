@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-class Typology(ABC):
 
+class Typology(ABC):
     def __init__(self, aspects):
         self.aspects = aspects
 

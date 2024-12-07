@@ -1,10 +1,12 @@
 from typing import List, Tuple, Dict
 from itertools import permutations, product
 
+
 # Assuming Typology is an abstract base class that we're inheriting from.
 class Typology:
     def __init__(self, aspects: List[str]):
         self.aspects = aspects
+
 
 class TypologyTemporistics(Typology):
     """
@@ -22,47 +24,49 @@ class TypologyTemporistics(Typology):
 
     # Dictionary mapping tetrad sequences to their descriptions.
     TETRADS: Dict[str, str] = {
-        '6-1-2': "Era of Individuality (P)",
-        '2-3-4': "Era of Order (E)",
-        '4-5-6': "Era of Movement (F)",
-        '1-5-3': "Golden Age of Each Era (C)"
+        "6-1-2": "Era of Individuality (P)",
+        "2-3-4": "Era of Order (E)",
+        "4-5-6": "Era of Movement (F)",
+        "1-5-3": "Golden Age of Each Era (C)",
     }
 
     # Dictionary containing quadras with their types and descriptions.
     QUADRAS_AND_DESCRIPTIONS: Dict[str, Dict[str, List[str]]] = {
-        'Antipodes': {
-            'types': ["Game Master", "Maestro", "Player", "Politician"],
-            'description': 'Antipodes are one-plane C and P. Fixed position in all senses, focused on self-image and manipulation.'
+        "Antipodes": {
+            "types": ["Game Master", "Maestro", "Player", "Politician"],
+            "description": "Antipodes are one-plane C and P. Fixed position in all senses, focused on self-image and manipulation.",
         },
-        'Guardians and Border Guards': {
-            'types': ["Missionary", "Standard Bearer", "Rescuer", "Knight"],
-            'description': 'Guardians and Border Guards are one-plane F and P. Focused on self-image and the search for place, with manipulation.'
+        "Guardians and Border Guards": {
+            "types": ["Missionary", "Standard Bearer", "Rescuer", "Knight"],
+            "description": "Guardians and Border Guards are one-plane F and P. Focused on self-image and the search for place, with manipulation.",
         },
-        'Old-timers and Founders': {
-            'types': ["Theorist", "Oracle", "Conqueror", "Star"],
-            'description': 'Old-timers and Founders are one-plane C and F. Fixed place and existence with manipulation.'
+        "Old-timers and Founders": {
+            "types": ["Theorist", "Oracle", "Conqueror", "Star"],
+            "description": "Old-timers and Founders are one-plane C and F. Fixed place and existence with manipulation.",
         },
-        'Conductors': {
-            'types': ["Ideologist", "Samurai", "Colonist", "Pioneer"],
-            'description': 'Conductors are one-plane E and F. Fixed direction and existence, with manipulation.'
+        "Conductors": {
+            "types": ["Ideologist", "Samurai", "Colonist", "Pioneer"],
+            "description": "Conductors are one-plane E and F. Fixed direction and existence, with manipulation.",
         },
-        'Scouts': {
-            'types': ["Scout", "Hacker", "Gray Cardinal", "Taster"],
-            'description': 'Scouts are one-plane C and E. Fixed place and development with manipulation.'
+        "Scouts": {
+            "types": ["Scout", "Hacker", "Gray Cardinal", "Taster"],
+            "description": "Scouts are one-plane C and E. Fixed place and development with manipulation.",
         },
-        'Nomads and Tramps': {
-            'types': ["Tamada", "Pathfinder", "Robinson", "Initiator"],
-            'description': 'Nomads and Tramps are one-plane P and E. Self-image and development are fixed; existence is manipulated.'
-        }
+        "Nomads and Tramps": {
+            "types": ["Tamada", "Pathfinder", "Robinson", "Initiator"],
+            "description": "Nomads and Tramps are one-plane P and E. Self-image and development are fixed; existence is manipulated.",
+        },
     }
 
     # Separate dictionaries for quadras and their descriptions.
     QUADRAS: Dict[str, List[str]] = {
-        quadra_name: data['types'] for quadra_name, data in QUADRAS_AND_DESCRIPTIONS.items()
+        quadra_name: data["types"]
+        for quadra_name, data in QUADRAS_AND_DESCRIPTIONS.items()
     }
 
     QUADRA_DESCRIPTIONS: Dict[str, str] = {
-        quadra_name: data['description'] for quadra_name, data in QUADRAS_AND_DESCRIPTIONS.items()
+        quadra_name: data["description"]
+        for quadra_name, data in QUADRAS_AND_DESCRIPTIONS.items()
     }
 
     def validate_tetrad_sequence(self, tetrad_sequence: str) -> None:
@@ -156,7 +160,7 @@ class TypologyTemporistics(Typology):
         3: "Deep Harmony",
         2: "Shared Vision",
         1: "Superficial Agreement",
-        0: "Strategic Conflict"
+        0: "Strategic Conflict",
     }
 
     # Populating the INTER_TYPE_RELATIONSHIPS dictionary
@@ -168,7 +172,9 @@ class TypologyTemporistics(Typology):
             # For simplicity, assigning "Strategic Conflict" for differing aspects
             INTER_TYPE_RELATIONSHIPS[(aspect1, aspect2)] = "Strategic Conflict"
 
-    def get_intertype_relationship(self, type1_aspects: List[str], type2_aspects: List[str]) -> str:
+    def get_intertype_relationship(
+        self, type1_aspects: List[str], type2_aspects: List[str]
+    ) -> str:
         """
         Determines the intertype relationship between two types based on their aspects.
 
@@ -205,11 +211,23 @@ class TypologyTemporistics(Typology):
         """
         comfort_scores = {
             "Complete Unity": (100, "Perfect alignment in all priorities."),
-            "Deep Harmony": (90, "Top three time priorities match, leading to significant harmony."),
-            "Shared Vision": (75, "Top two priorities align, resulting in cooperation."),
-            "Superficial Agreement": (50, "Only one priority matches, leading to shallow agreement."),
-            "Strategic Conflict": (25, "Differences lead to friction, but can stimulate growth."),
-            "Unknown Relationship": (0, "Relationship type is undefined.")
+            "Deep Harmony": (
+                90,
+                "Top three time priorities match, leading to significant harmony.",
+            ),
+            "Shared Vision": (
+                75,
+                "Top two priorities align, resulting in cooperation.",
+            ),
+            "Superficial Agreement": (
+                50,
+                "Only one priority matches, leading to shallow agreement.",
+            ),
+            "Strategic Conflict": (
+                25,
+                "Differences lead to friction, but can stimulate growth.",
+            ),
+            "Unknown Relationship": (0, "Relationship type is undefined."),
         }
         return comfort_scores.get(relationship_type, (0, "Unknown relationship type"))
 
@@ -232,7 +250,9 @@ class TypologyTemporistics(Typology):
             raise ValueError("User types must have at least one aspect.")
 
         # Determining the relationship type
-        relationship_type = self.get_intertype_relationship(user1_aspects, user2_aspects)
+        relationship_type = self.get_intertype_relationship(
+            user1_aspects, user2_aspects
+        )
 
         return relationship_type
 
@@ -269,6 +289,6 @@ class TypologyTemporistics(Typology):
         for type_name in types:
             if not isinstance(type_name, str):
                 raise TypeError("All items in the list must be strings.")
-            initials = ''.join([aspect[0] for aspect in type_name.split(", ")])
+            initials = "".join([aspect[0] for aspect in type_name.split(", ")])
             shortened_types.append(initials)
         return shortened_types

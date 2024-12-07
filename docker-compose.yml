@@ -19,6 +19,8 @@ services:
       - .env
     volumes:
       - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"   # Пробрасываем порт 5432 наружу
     networks:
       - webnet
     healthcheck:
@@ -27,6 +29,18 @@ services:
       timeout: 10s
       retries: 5
 
+
+  test:
+    build: .
+    command: pytest
+    depends_on:
+      - db
+    env_file:
+      - .env.test
+    volumes:
+      - .:/app
+    networks:
+      - webnet
 
 volumes:
   pgdata:
