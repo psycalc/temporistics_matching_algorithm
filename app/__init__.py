@@ -21,6 +21,10 @@ def create_app(config_name=None):
     config_name = config_name or "development"
     app.config.from_object(config_dict.get(config_name))
 
+    # Если мы в тестинге, отключаем проброс исключений.
+    if app.config.get("TESTING"):
+        app.config["PROPAGATE_EXCEPTIONS"] = False
+
     db.init_app(app)
     migrate.init_app(app, db)
     cache.init_app(app)
@@ -46,6 +50,12 @@ def create_app(config_name=None):
 
     from .routes import main as main_blueprint
     app.register_blueprint(main_blueprint)
+
+    # Добавляем тестовый маршрут для вызова ошибки 500, только если TESTING=True
+    if app.config.get("TESTING"):
+        @app.route("/cause_500")
+        def cause_500():
+            raise RuntimeError("Test 500 error")
 
     from .errors import register_error_handlers
     register_error_handlers(app)

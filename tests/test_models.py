@@ -29,12 +29,14 @@ def test_user_model(app):
 
 def test_user_with_type(app):
     with app.app_context():
-        # Создаём UserType
-        user_type = UserType(typology_name="Temporistics", type_value="SomeValue")
+        # Заменяем SomeValue на корректный тип для Temporistics
+        user_type = UserType(
+            typology_name="Temporistics", 
+            type_value="Past, Current, Future, Eternity"
+        )
         db.session.add(user_type)
         db.session.commit()
 
-        # Создаём User с user_type
         user = User(username="typeuser", email="type@example.com", user_type=user_type)
         user.set_password("securepass")
         db.session.add(user)
@@ -44,7 +46,9 @@ def test_user_with_type(app):
         assert retrieved is not None
         assert retrieved.user_type is not None
         assert retrieved.user_type.typology_name == "Temporistics"
-        assert retrieved.user_type.type_value == "SomeValue"
+        # Проверяем новое корректное значение
+        assert retrieved.user_type.type_value == "Past, Current, Future, Eternity"
+
 
 def test_user_uniqueness(app):
     with app.app_context():
@@ -56,9 +60,7 @@ def test_user_uniqueness(app):
         user2 = User(username="uniqueuser", email="unique2@example.com")
         user2.set_password("pass2")
         db.session.add(user2)
-        # Ожидаем, что при commit будет ошибка уникальности
-        # В реальности вы можете ожидать IntegrityError от SQLAlchemy:
+        # Ожидаем IntegrityError
         import sqlalchemy.exc
         with pytest.raises(sqlalchemy.exc.IntegrityError):
             db.session.commit()
-

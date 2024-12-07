@@ -3,6 +3,9 @@ from flask_login import UserMixin
 from passlib.hash import bcrypt
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, ForeignKey, Float
+from sqlalchemy import event
+from app.services import get_typology_instance
+
 
 
 # Модель User
@@ -35,3 +38,17 @@ class UserType(db.Model):
     type_value = db.Column(db.String(50), nullable=False)
     # user_id УБРАТЬ!
 
+def validate_user_type(mapper, connection, target):
+    # target это экземпляр UserType, который мы пытаемся вставить или обновить.
+    typology_instance = get_typology_instance(target.typology_name)
+    if not typology_instance:
+        raise ValueError(f"Unknown typology: {target.typology_name}")
+
+    all_types = typology_instance.get_all_types()
+    if target.type_value not in all_types:
+        raise ValueError(
+            f"Invalid type_value '{target.type_value}' for typology '{target.typology_name}'"
+        )
+
+event.listen(UserType, 'before_insert', validate_user_type)
+event.listen(UserType, 'before_update', validate_user_type)

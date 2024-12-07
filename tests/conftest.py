@@ -33,3 +33,7 @@ def app():
         # Убедитесь, что база данных чистая и создаём все таблицы
         db.create_all()
         yield application
+
+@pytest.fixture
+def client(app):
+    return app.test_client()

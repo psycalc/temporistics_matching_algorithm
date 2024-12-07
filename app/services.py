@@ -72,3 +72,16 @@ def get_distance_if_compatible(user1, user2):
         raise ValueError("Users are not compatible enough to consider meeting")
 
     return get_users_distance(user1, user2)
+
+def get_typology_instance(typology_name):
+    typology_classes = {
+        "Temporistics": TypologyTemporistics,
+        "Psychosophia": TypologyPsychosophia,
+        "Amatoric": TypologyAmatoric,
+        "Socionics": TypologySocionics,
+    }
+    typology_class = typology_classes.get(typology_name)
+    if typology_class:
+        return typology_class()
+    return None
+
