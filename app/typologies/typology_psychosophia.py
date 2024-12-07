@@ -16,11 +16,6 @@ class TypologyPsychosophia(Typology):
         super().__init__(["Emotion", "Logic", "Will", "Physics"])
 
     def get_all_quadras(self):
-        """
-        Returns all quadras of Psychosophy with their descriptions.
-
-        Each quadra consists of six types that share common values and characteristics.
-        """
         quadras = {
             "First Quadra": {
                 "types": [
@@ -92,28 +87,12 @@ class TypologyPsychosophia(Typology):
         return quadras
 
     def get_aspects(self):
-        """
-        Returns the list of aspects for Psychosophy.
-
-        :return: A list of aspects.
-        """
         return self.aspects
 
     def get_all_types(self):
-        """
-        Returns all possible combinations of psychosophic aspects.
-
-        :return: A list of all possible combinations (permutations) of the aspects.
-        """
         return [", ".join(perm) for perm in permutations(self.aspects, 4)]
 
     def shorten_type(self, types):
-        """
-        Shortens the representation of types by converting the aspects into their initials.
-
-        :param types: A list or string representing types (e.g., "Emotion, Logic, Will, Physics").
-        :return: A list of shortened type strings (e.g., "ELWF").
-        """
         if isinstance(types, str):
             types = [types]
         elif not isinstance(types, list):
@@ -125,3 +104,25 @@ class TypologyPsychosophia(Typology):
             initials = "".join([aspect[0] for aspect in type_name.split(", ")])
             shortened_types.append(initials)
         return shortened_types
+
+    def determine_relationship_type(self, user1_type: str, user2_type: str) -> str:
+        """
+        Здесь мы должны определить логику определения типа отношений.
+        Пока можем упростить:
+        - Если типы совпадают, возвращаем 'Identity'
+        - Иначе 'Unknown Relationship'
+        """
+        if user1_type == user2_type:
+            return "Identity"
+        return "Unknown Relationship"
+
+    def get_comfort_score(self, relationship_type: str) -> (int, str):
+        """
+        Возвращает комфорт-скор.
+        Для примера:
+        - Identity: 100
+        - Unknown: 0
+        """
+        if relationship_type == "Identity":
+            return 100, "Perfect alignment"
+        return 0, "No known comfort score"
