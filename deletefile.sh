@@ -29,20 +29,19 @@ convert_size_to_bytes() {
     esac
 }
 
-# Check for Git installation
-if ! command -v git &> /dev/null
-then
+# Check for Git
+if ! command -v git &> /dev/null; then
     echo "Git is not installed. Please install Git and rerun."
     exit 1
 fi
 
-# Check if script runs in the root of a Git repo
+# Check if in root of Git repository
 if [ ! -d ".git" ]; then
     echo "This script must be run from the root of a Git repository."
     exit 1
 fi
 
-# Stash changes if there are any unstaged modifications
+# Stash any unstaged changes
 if [ -n "$(git status --porcelain)" ]; then
     echo "Uncommitted changes found. Stashing changes..."
     git stash save "pre-filter-repo stash - $(date +"%Y-%m-%d %H:%M:%S")"
@@ -56,7 +55,7 @@ echo "Searching for files larger than $SIZE_THRESHOLD in repository history..."
 # Convert threshold to bytes
 SIZE_THRESHOLD_BYTES=$(convert_size_to_bytes "$SIZE_THRESHOLD")
 
-# Find large files in history
+# Find large files
 LARGE_FILES=$(git rev-list --objects --all | \
     git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | \
     grep '^blob' | \
@@ -78,7 +77,6 @@ echo "$LARGE_FILES"
 read -p "Do you want to remove these files from the history? [y/N]: " confirm
 if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
     echo "Operation canceled."
-    # Restore stash if created
     if [ "$STASHED" = true ]; then
         git stash pop
     fi
@@ -95,14 +93,26 @@ git branch "$BACKUP_BRANCH"
 
 echo "Removing files from history using git-filter-repo..."
 
-# Build the filter-repo arguments for all files
+# Ensure a fresh state for git-filter-repo
+# Remove any existing filter-repo data
+rm -rf .git/filter-repo
+
+# Build the filter-repo arguments
 FILTER_ARGS=()
 for FILE in $FILES_TO_REMOVE; do
     FILTER_ARGS+=("--path" "$FILE")
 done
 
-# Run git filter-repo once with all files
+# Run git filter-repo once with all files, using --force to proceed
 git filter-repo --force --invert-paths "${FILTER_ARGS[@]}"
+
+# Remove refs/original if it exists, as it's no longer needed
+if [ -d .git/refs/original ]; then
+    echo "Removing refs/original..."
+    rm -rf .git/refs/original
+    git reflog expire --expire=now --all
+    git gc --prune=now --aggressive
+fi
 
 # Verify removal
 echo "Verifying that large files have been removed..."
@@ -116,9 +126,10 @@ if [ -z "$CHECK_LARGE_FILES" ]; then
 else
     echo "Warning: Some large files are still present:"
     echo "$CHECK_LARGE_FILES"
+    echo "You may need to rerun the script or investigate these files manually."
 fi
 
-read -p "Do you want to forcibly push the rewritten history to the '$REMOTE_NAME' remote? [y/N]: " push_confirm
+read -p "Do you want to forcibly push the rewritten history to '$REMOTE_NAME'? [y/N]: " push_confirm
 if [[ "$push_confirm" =~ ^[Yy]$ ]]; then
     echo "Forcibly pushing changes..."
     git push --force --all "$REMOTE_NAME"
