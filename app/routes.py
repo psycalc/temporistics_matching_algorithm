@@ -249,3 +249,28 @@ def check_distance():
             return render_template("check_distance_form.html")
     else:
         return render_template("check_distance_form.html")
+
+
+@main.route("/nearby_compatibles")
+@login_required
+def nearby_compatibles():
+    # Получаем всех пользователей кроме текущего
+    users = User.query.filter(User.id != current_user.id).all()
+    compatible_list = []
+
+    for u in users:
+        # Проверяем наличие координат
+        if u.latitude is not None and u.longitude is not None and current_user.latitude is not None and current_user.longitude is not None:
+            try:
+                dist = get_distance_if_compatible(current_user, u)
+                # Если дошли до сюда, значит совместимость есть
+                compatible_list.append((u, dist))
+            except ValueError:
+                # Значит несовместимы, пропускаем
+                pass
+
+    # Сортируем по расстоянию
+    compatible_list.sort(key=lambda x: x[1])
+
+    # Передаем в шаблон список кортежей (пользователь, расстояние)
+    return render_template("nearby_compatibles.html", compatible_list=compatible_list)

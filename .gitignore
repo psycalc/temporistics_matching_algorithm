@@ -60,3 +60,6 @@ venv.bak/
 
 # VSCode
 .vscode/
+test.db
+/app/test.db
+app/test.db

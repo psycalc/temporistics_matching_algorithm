@@ -74,3 +74,42 @@ def test_protected_page_requires_login(client, app):
         assert response.status_code == 302
         assert "/login" in response.headers["Location"]
 
+
+def test_compatible_nearby_link_visibility(client, app):
+    # Проверяем, что без авторизации ссылка не отображается
+    response = client.get("/", follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Compatible Nearby" not in response.data
+
+    # Логинимся
+    with app.app_context():
+        # Предполагаем, что у нас есть пользователь "testuser" (создан в setup_database)
+        response = client.post("/login", data={
+            "email": "test@example.com",
+            "password": "testpassword",
+            "submit": "Login"
+        }, follow_redirects=True)
+        assert response.status_code == 200
+        # Теперь проверяем, что ссылка на Compatible Nearby появилась
+        response = client.get("/", follow_redirects=True)
+        assert b"Compatible Nearby" in response.data
+
+def test_nearby_compatibles_page(client, app):
+    # Логин
+    with app.app_context():
+        response = client.post("/login", data={
+            "email": "test@example.com",
+            "password": "testpassword",
+            "submit": "Login"
+        }, follow_redirects=True)
+        assert response.status_code == 200
+
+        # Заходим на страницу nearby_compatibles
+        response = client.get("/nearby_compatibles", follow_redirects=True)
+        assert response.status_code == 200
+        # Проверяем что страница отобразилась без ошибок
+        # Можно проверить по наличию каких-то ключевых слов
+        # Например, если шаблон содержит фразу "Compatible Users Nearby:"
+        assert b"Compatible Users Nearby:" in response.data
+
+
