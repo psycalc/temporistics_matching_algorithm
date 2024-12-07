@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# Настройки
-REMOTE_NAME="origin"  # Имя удалённого репозитория
-SIZE_THRESHOLD=75MB    # Порог размера файлов для удаления (измените по необходимости)
+# Settings
+REMOTE_NAME="origin"    # Remote repository name
+SIZE_THRESHOLD="75MB"   # File size threshold
 
-# Функция для конвертации размера в байты
+# Function to convert size to bytes
 convert_size_to_bytes() {
     local size=$1
-    local number=$(echo $size | grep -o -E '[0-9]+')
-    local unit=$(echo $size | grep -o -E '[A-Za-z]+')
+    local number=$(echo "$size" | grep -o -E '[0-9]+')
+    local unit=$(echo "$size" | grep -o -E '[A-Za-z]+')
 
     case "$unit" in
         KB|kb)
@@ -29,34 +29,34 @@ convert_size_to_bytes() {
     esac
 }
 
-# Проверка наличия Git
+# Check for Git installation
 if ! command -v git &> /dev/null
 then
-    echo "Git не установлен. Установите Git и повторите попытку."
+    echo "Git is not installed. Please install Git and rerun."
     exit 1
 fi
 
-# Проверка, находится ли скрипт в корне Git-репозитория
+# Check if script runs in the root of a Git repo
 if [ ! -d ".git" ]; then
-    echo "Скрипт должен быть запущен из корневой директории Git-репозитория."
+    echo "This script must be run from the root of a Git repository."
     exit 1
 fi
 
-# Проверка наличия незафиксированных изменений
+# Stash changes if there are any unstaged modifications
 if [ -n "$(git status --porcelain)" ]; then
-    echo "Обнаружены незафиксированные изменения. Выполняется git stash..."
+    echo "Uncommitted changes found. Stashing changes..."
     git stash save "pre-filter-repo stash - $(date +"%Y-%m-%d %H:%M:%S")"
     STASHED=true
 else
     STASHED=false
 fi
 
-echo "Поиск файлов размером более $SIZE_THRESHOLD в истории репозитория..."
+echo "Searching for files larger than $SIZE_THRESHOLD in repository history..."
 
-# Конвертация порога размера в байты
-SIZE_THRESHOLD_BYTES=$(convert_size_to_bytes $SIZE_THRESHOLD)
+# Convert threshold to bytes
+SIZE_THRESHOLD_BYTES=$(convert_size_to_bytes "$SIZE_THRESHOLD")
 
-# Поиск больших файлов в истории
+# Find large files in history
 LARGE_FILES=$(git rev-list --objects --all | \
     git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | \
     grep '^blob' | \
@@ -64,72 +64,74 @@ LARGE_FILES=$(git rev-list --objects --all | \
     sort -k2 -nr)
 
 if [ -z "$LARGE_FILES" ]; then
-    echo "Не найдено файлов, превышающих порог $SIZE_THRESHOLD."
-    # Восстановление стэша, если он был создан
+    echo "No files found exceeding $SIZE_THRESHOLD."
+    # Restore stash if created
     if [ "$STASHED" = true ]; then
         git stash pop
     fi
     exit 0
 fi
 
-echo "Найдены следующие большие файлы:"
+echo "The following large files were found:"
 echo "$LARGE_FILES"
 
-# Подтверждение удаления
-read -p "Вы хотите удалить эти файлы из истории? [y/N]: " confirm
+read -p "Do you want to remove these files from the history? [y/N]: " confirm
 if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-    echo "Отмена операции."
-    # Восстановление стэша, если он был создан
+    echo "Operation canceled."
+    # Restore stash if created
     if [ "$STASHED" = true ]; then
         git stash pop
     fi
     exit 0
 fi
 
-# Извлечение путей файлов для удаления
+# Extract file paths
 FILES_TO_REMOVE=$(echo "$LARGE_FILES" | awk '{print $1}')
 
-# Создание резервной ветки
+# Create a backup branch
 BACKUP_BRANCH="backup-$(date +%Y%m%d%H%M%S)"
-echo "Создаётся резервная ветка: $BACKUP_BRANCH"
-git branch $BACKUP_BRANCH
+echo "Creating backup branch: $BACKUP_BRANCH"
+git branch "$BACKUP_BRANCH"
 
-# Удаление файлов из истории с помощью git filter-repo
-echo "Удаление файлов из истории..."
-for FILE in $FILES_TO_REMOVE
-do
-    git filter-repo --path "$FILE" --invert-paths
+echo "Removing files from history using git-filter-repo..."
+
+# Build the filter-repo arguments for all files
+FILTER_ARGS=()
+for FILE in $FILES_TO_REMOVE; do
+    FILTER_ARGS+=("--path" "$FILE")
 done
 
-# Проверка результатов
-echo "Проверка, что большие файлы удалены..."
+# Run git filter-repo once with all files
+git filter-repo --force --invert-paths "${FILTER_ARGS[@]}"
+
+# Verify removal
+echo "Verifying that large files have been removed..."
 CHECK_LARGE_FILES=$(git rev-list --objects --all | \
     git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | \
     grep '^blob' | \
     awk -v threshold=$SIZE_THRESHOLD_BYTES '$3 >= threshold {print $4 " " $3}')
 
 if [ -z "$CHECK_LARGE_FILES" ]; then
-    echo "Удаление успешно. Больших файлов больше нет в истории."
+    echo "Removal successful. No large files remain in the history."
 else
-    echo "Предупреждение: Некоторые большие файлы всё ещё присутствуют:"
+    echo "Warning: Some large files are still present:"
     echo "$CHECK_LARGE_FILES"
 fi
 
-# Принудительная отправка изменений
-read -p "Вы хотите принудительно отправить изменения на удалённый репозиторий '$REMOTE_NAME'? [y/N]: " push_confirm
+read -p "Do you want to forcibly push the rewritten history to the '$REMOTE_NAME' remote? [y/N]: " push_confirm
 if [[ "$push_confirm" =~ ^[Yy]$ ]]; then
-    echo "Отправка изменений..."
-    git push --force --all $REMOTE_NAME
-    git push --force --tags $REMOTE_NAME
-    echo "История успешно переписана и отправлена на удалённый репозиторий."
+    echo "Forcibly pushing changes..."
+    git push --force --all "$REMOTE_NAME"
+    git push --force --tags "$REMOTE_NAME"
+    echo "History successfully rewritten and pushed to the remote repository."
 else
-    echo "Принудительная отправка отменена. Не забудьте самостоятельно отправить изменения, когда будете готовы."
+    echo "Force push canceled. Remember to manually push when ready."
 fi
 
-# Восстановление стэша, если он был создан
+# Restore stashed changes if any
 if [ "$STASHED" = true ]; then
-    echo "Восстановление сохранённых изменений из стэша..."
+    echo "Restoring stashed changes..."
     git stash pop
 fi
 
-echo "Операция завершена."
+echo "Operation completed."
