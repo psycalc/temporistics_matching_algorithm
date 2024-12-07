@@ -24,6 +24,7 @@ from .typologies import (
 from flask_wtf import FlaskForm
 from wtforms import HiddenField
 from urllib.parse import urlparse, urljoin
+from app.services import get_distance_if_compatible
 
 main = Blueprint("main", __name__)
 
@@ -229,3 +230,22 @@ def user_profile(username):
         return redirect(url_for("main.user_profile", username=user.username))
 
     return render_template("profile.html", user=user, form=form)
+
+@main.route("/check_distance", methods=["GET", "POST"])
+@login_required
+def check_distance():
+    if request.method == "POST":
+        other_username = request.form.get("other_username")
+        other_user = User.query.filter_by(username=other_username).first()
+        if not other_user:
+            flash("User not found", "danger")
+            return render_template("check_distance_form.html")
+
+        try:
+            dist = get_distance_if_compatible(current_user, other_user)
+            return render_template("check_distance_result.html", distance=dist, user=other_user)
+        except ValueError as e:
+            flash(str(e), "danger")
+            return render_template("check_distance_form.html")
+    else:
+        return render_template("check_distance_form.html")

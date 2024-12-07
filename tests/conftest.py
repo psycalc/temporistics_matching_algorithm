@@ -30,4 +30,6 @@ def app():
     # Например: application.config["TESTING"] = True
 
     with application.app_context():
+        # Убедитесь, что база данных чистая и создаём все таблицы
+        db.create_all()
         yield application

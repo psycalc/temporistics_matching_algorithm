@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "Additional info: This project deals with crypt features."
 find . -type f -name "*.py" \
   -not -path "*/venv/*" \
   -not -path "*/.git/*" \
@@ -11,7 +12,6 @@ find . -type f -name "*.py" \
       cat "$f"
     fi
   done' sh {} + \
-| sed '/^[[:space:]]*#/d;/^$/d' \
 | awk 'BEGIN{q=0} {if(index($0,"\"\"\"")>0){q=!q;next} if(!q)print}' \
 | tr '\n' ' ' \
 | sed 's/  */ /g'

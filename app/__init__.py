@@ -42,7 +42,6 @@ def create_app(config_name=None):
     def get_locale():
         return request.accept_languages.best_match(app.config["LANGUAGES"])
 
-    # Назначаем функцию выбора локали экземпляру babel
     babel.locale_selector_func = get_locale
 
     from .routes import main as main_blueprint
@@ -50,5 +49,13 @@ def create_app(config_name=None):
 
     from .errors import register_error_handlers
     register_error_handlers(app)
+
+    # Импортируем модели после создания приложения
+    from .models import User, UserType
+
+    # Теперь, когда модели импортированы, создадим таблицы.
+    # Важно делать это в контексте приложения
+    # with app.app_context():
+    #     db.create_all()
 
     return app
