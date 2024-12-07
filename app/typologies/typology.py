@@ -1,28 +1,27 @@
 from abc import ABC, abstractmethod
 
-
 class Typology(ABC):
     def __init__(self, aspects):
         self.aspects = aspects
 
     @abstractmethod
     def get_all_types(self):
-        """
-        Абстрактный метод, который должен возвращать все типы для данной типологии.
-        """
         pass
 
     @abstractmethod
     def shorten_type(self, types):
+        pass
+
+    @abstractmethod
+    def determine_relationship_type(self, user1_type: str, user2_type: str) -> str:
         """
-        Абстрактный метод, который сокращает типы в случае необходимости.
+        Определяет тип отношений между двумя типами.
         """
         pass
 
-    @staticmethod
-    def get_typology_classes():
+    @abstractmethod
+    def get_comfort_score(self, relationship_type: str) -> (int, str):
         """
-        Возвращает список всех классов-наследников типологии.
-        Это позволяет динамически находить и использовать любые типологии.
+        Возвращает кортеж (числовой_скор_комфорта, текстовое_описание) для данного типа отношений.
         """
-        return Typology.__subclasses__()
+        pass

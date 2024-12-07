@@ -59,9 +59,14 @@ def calculate():
     user1_type = request.form.get("user1")
     user2_type = request.form.get("user2")
     typology_name = request.form.get("typology")
-    relationship_type, comfort_score = calculate_relationship(
-        user1_type, user2_type, typology_name
-    )
+
+    # Проверяем наличие параметров
+    if not user1_type or not user2_type or not typology_name:
+        flash("Missing required parameters for calculation.", "danger")
+        return render_template("result.html", error="Missing required parameters for calculation."), 200
+
+    # Если все параметры на месте, вызываем calculate_relationship
+    relationship_type, comfort_score = calculate_relationship(user1_type, user2_type, typology_name)
 
     debug = current_app.config["DEBUG"]
     logs = "Debug logs or details can be displayed here."

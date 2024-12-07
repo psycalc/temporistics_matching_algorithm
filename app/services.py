@@ -40,3 +40,15 @@ def calculate_relationship(user1, user2, typology):
     relationship_type = typology_instance.determine_relationship_type(user1, user2)
     comfort_score, _ = typology_instance.get_comfort_score(relationship_type)
     return relationship_type, comfort_score
+
+def get_typology_instance(typology_name):
+    typology_classes = {
+        "Temporistics": TypologyTemporistics,
+        "Psychosophia": TypologyPsychosophia,
+        "Amatoric": TypologyAmatoric,
+        "Socionics": TypologySocionics,
+    }
+    typology_class = typology_classes.get(typology_name)
+    if typology_class:
+        return typology_class()
+    return None

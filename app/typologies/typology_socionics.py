@@ -1,16 +1,11 @@
 import gettext
 from itertools import product
 from .typology import Typology
-from flask_babel  import lazy_gettext as _l
+from flask_babel import lazy_gettext as _l
 
-
-class TypologySocionics(Typology):  # Наследуем от Typology
+class TypologySocionics(Typology):
     def __init__(self, language="en"):
         self.set_language(language)
-        # Инициализируем базовый класс списком базовых аспектов,
-        # которые используются для генерации типов. 
-        # Но учтите, что в Socionics аспекты - это Intuitive/Sensory, Ethical/Logical, Extratim/Introtim.
-        # Можно перечислить их все или оставить только базовый набор, т.к. get_all_types() генерирует финальные типы:
         super().__init__(["Intuitive", "Sensory", "Ethical", "Logical", "Extratim", "Introtim"])
 
     def set_language(self, language):
@@ -24,7 +19,7 @@ class TypologySocionics(Typology):  # Наследуем от Typology
         except Exception as e:
             # Fallback to default language or log error
             _ = gettext.gettext
-            print(f"Error loading translation: {e}")  # Or use logging
+            print(f"Error loading translation: {e}")
 
     def get_all_types(self):
         irrationals = ["Intuitive", "Sensory"]
@@ -40,9 +35,6 @@ class TypologySocionics(Typology):  # Наследуем от Typology
         return valid_types
 
     def get_all_quadras(self):
-        """
-        Returns all quadras and their descriptions.
-        """
         quadras = {
             "Alpha": {
                 "types": [
@@ -95,9 +87,6 @@ class TypologySocionics(Typology):  # Наследуем от Typology
         return self.aspects
 
     def shorten_type(self, types):
-        """
-        Shortens the representation of types by converting the aspects into their initials.
-        """
         if isinstance(types, str):
             types = [types]
         return ["".join([word[0] for word in type_name.split()]) for type_name in types]
@@ -145,3 +134,16 @@ class TypologySocionics(Typology):  # Наследуем от Typology
             "SLI": "EII",
         }
         return activity_pairs.get(type_name)
+
+    def determine_relationship_type(self, user1_type: str, user2_type: str) -> str:
+        # Пример базовой логики:
+        # Если типы совпадают - "Identity", иначе "Unknown Relationship".
+        if user1_type == user2_type:
+            return "Identity"
+        return "Unknown Relationship"
+
+    def get_comfort_score(self, relationship_type: str) -> (int, str):
+        # Пример: Identity - 100, остальное - 0
+        if relationship_type == "Identity":
+            return 100, "Perfect alignment"
+        return 0, "No known comfort score"

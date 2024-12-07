@@ -31,3 +31,7 @@ def app():
 
     with application.app_context():
         yield application
+
+@pytest.fixture
+def client(app):
+    return app.test_client()
