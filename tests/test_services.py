@@ -17,3 +17,22 @@ def test_calculate_relationship(app):
         )
         assert relationship_type is not None
         assert comfort_score is not None
+
+
+def test_get_types_psychosophia(app):
+    with app.app_context():
+        types = get_types_by_typology("Psychosophia")
+        assert types is not None
+        assert len(types) > 0  # Проверим, что не пусто
+
+def test_calculate_relationship_invalid_typology(app):
+    with app.app_context():
+        with pytest.raises(ValueError):
+            calculate_relationship("Past", "Future", "NonExistentTypology")
+
+
+def test_calculate_relationship_empty_input(app):
+    with app.app_context():
+        with pytest.raises(ValueError):
+            calculate_relationship("", "Future", "Temporistics")
+
