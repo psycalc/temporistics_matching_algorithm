@@ -1,47 +1,56 @@
 {% extends "base.html" %}
 {% block content %}
-  <div class="content-section">
-    <form method="POST" action="">
-      {{ form.hidden_tag() }}
-      <fieldset class="form-group">
-        <legend class="border-bottom mb-4">Join Today</legend>
-        <div class="form-group">
-          {{ form.username.label(class="form-control-label") }}
-          {{ form.username(class="form-control form-control-lg") }}
-          {% for error in form.username.errors %}
-            <span class="text-danger">{{ error }}</span>
-          {% endfor %}
-        </div>
-        <div class="form-group">
-          {{ form.email.label(class="form-control-label") }}
-          {{ form.email(class="form-control form-control-lg") }}
-          {% for error in form.email.errors %}
-            <span class="text-danger">{{ error }}</span>
-          {% endfor %}
-        </div>
-        <div class="form-group">
-          {{ form.password.label(class="form-control-label") }}
-          {{ form.password(class="form-control form-control-lg") }}
-          {% for error in form.password.errors %}
-            <span class="text-danger">{{ error }}</span>
-          {% endfor %}
-        </div>
-        <div class="form-group">
-          {{ form.confirm_password.label(class="form-control-label") }}
-          {{ form.confirm_password(class="form-control form-control-lg") }}
-          {% for error in form.confirm_password.errors %}
-            <span class="text-danger">{{ error }}</span>
-          {% endfor %}
-        </div>
-      </fieldset>
-      <div class="form-group">
-        {{ form.submit(class="btn btn-outline-info") }}
-      </div>
-    </form>
-    <div class="border-top pt-3">
-      <small class="text-muted">
-        Already have an account? <a href="{{ url_for('main.login') }}">Sign In</a>
-      </small>
-    </div>
+
+{% if form.errors %}
+  <div class="alert alert-danger">
+    <pre>{{ form.errors }}</pre>
   </div>
+{% endif %}
+
+<div class="content-section">
+  <form method="POST" action="">
+    {{ form.hidden_tag() }}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Join Today</legend>
+      <div class="form-group">
+        {{ form.username.label(class="form-control-label") }}
+        {{ form.username(class="form-control form-control-lg") }}
+      </div>
+      <div class="form-group">
+        {{ form.email.label(class="form-control-label") }}
+        {{ form.email(class="form-control form-control-lg") }}
+      </div>
+      <div class="form-group">
+        {{ form.password.label(class="form-control-label") }}
+        {{ form.password(class="form-control form-control-lg") }}
+      </div>
+      <div class="form-group">
+        {{ form.confirm_password.label(class="form-control-label") }}
+        {{ form.confirm_password(class="form-control form-control-lg") }}
+      </div>
+
+      <!-- Итерируемся по всем доступным типологиям -->
+      {% for subform in form.typologies %}
+        <hr>
+        <!-- Отображаем название типологии просто текстом, а в коде она хранится в hidden_field -->
+        <div class="form-group">
+          <strong>Typology:</strong> {{ subform.typology_name.data }}
+          {{ subform.typology_name() }} {# hidden field #}
+        </div>
+        <div class="form-group">
+          {{ subform.type_value.label(class="form-control-label") }}
+          {{ subform.type_value(class="form-control form-control-lg") }}
+        </div>
+      {% endfor %}
+    </fieldset>
+    <div class="form-group">
+      {{ form.submit(class="btn btn-outline-info") }}
+    </div>
+  </form>
+  <div class="border-top pt-3">
+    <small class="text-muted">
+      Already have an account? <a href="{{ url_for('main.login') }}">Sign In</a>
+    </small>
+  </div>
+</div>
 {% endblock %}

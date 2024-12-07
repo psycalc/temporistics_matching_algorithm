@@ -1,7 +1,9 @@
-version: '3'
+
 services:
   web:
     build: .
+    environment:
+      - RUN_TESTS=0
     ports:
       - "5000:5000"
     depends_on:
@@ -32,7 +34,8 @@ services:
 
   test:
     build: .
-    command: pytest
+    environment:
+      - RUN_TESTS=1
     depends_on:
       - db
     env_file:

@@ -105,10 +105,7 @@ class TypologyPsychosophia(Typology):
 
         :return: A list of all possible combinations (permutations) of the aspects.
         """
-        return [
-            "".join([aspect[0] for aspect in perm])
-            for perm in permutations(self.aspects, 4)
-        ]
+        return [", ".join(perm) for perm in permutations(self.aspects, 4)]
 
     def shorten_type(self, types):
         """

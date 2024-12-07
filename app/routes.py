@@ -8,6 +8,7 @@ from flask import (
     url_for,
     flash,
     make_response,
+    abort
 )
 from flask_login import login_user, logout_user, login_required, current_user
 from .forms import RegistrationForm, LoginForm, ProfileForm, EditProfileForm
@@ -26,22 +27,23 @@ from urllib.parse import urlparse, urljoin
 
 main = Blueprint("main", __name__)
 
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-
 class EmptyForm(FlaskForm):
     csrf_token = HiddenField()
 
+def get_available_typologies():
+    # Предположим, эта функция возвращает список всех доступных типологий динамически.
+    # Вы можете реализовать логику получения из базы или конфигурации.
+    return ["Temporistics", "Psychosophia", "Amatoric", "Socionics"]
 
 @main.route("/get_types", methods=["GET"])
 def get_types():
     typology_name = request.args.get("typology")
     types = get_types_by_typology(typology_name)
     return jsonify({"types": types})
-
 
 def get_typology_class(typology_name):
     typology_classes = {
@@ -51,7 +53,6 @@ def get_typology_class(typology_name):
         "Socionics": TypologySocionics,
     }
     return typology_classes.get(typology_name)
-
 
 @main.route("/calculate", methods=["POST"])
 def calculate():
@@ -77,7 +78,6 @@ def calculate():
         debug=debug,
     )
 
-
 @main.route("/", methods=["GET"])
 def index():
     if current_user.is_authenticated:
@@ -88,12 +88,10 @@ def index():
     else:
         return redirect(url_for("main.login"))
 
-
 @main.route("/change_language", methods=["POST"])
 def change_language():
     COOKIE_NAME = "locale"
-    COOKIE_EXPIRATION = 60 * 60 * 24 * 30  # 30 days
-
+    COOKIE_EXPIRATION = 60 * 60 * 24 * 30
     language = request.form.get("language")
     if language and language in current_app.config["LANGUAGES"]:
         response = make_response(redirect(url_for("main.index")))
@@ -113,27 +111,62 @@ def change_language():
             400,
         )
 
-
 @main.route("/register", methods=["GET", "POST"])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for("home"))
+        return redirect(url_for("main.index"))
+
     form = RegistrationForm()
-    if form.validate_on_submit():
+
+    available_typologies = get_available_typologies()
+
+    # Убедимся, что количество entries в form.typologies равно количеству доступных типологий
+    while len(form.typologies) < len(available_typologies):
+        form.typologies.append_entry()
+
+    # Устанавливаем для каждой типологии её имя и варианты type_value
+    for i, subform in enumerate(form.typologies):
+        typology_name = available_typologies[i]
+        subform.typology_name.data = typology_name  # Ставим имя типологии в hidden_field
+
+        available_types = get_types_by_typology(typology_name)
+        if available_types:
+            subform.type_value.choices = [(t, t) for t in available_types]
+        else:
+            subform.type_value.choices = [("No available types", "No available types")]
+
+    if request.method == "POST" and form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash("Your account has been created!", "success")
-        return redirect(url_for("login"))
-    return render_template("register.html", title="Register", form=form)
 
+        # Создаём UserType для каждой типологии
+        last_user_type_id = None
+        for subform in form.typologies:
+            ut = UserType(
+                typology_name=subform.typology_name.data,
+                type_value=subform.type_value.data
+            )
+            db.session.add(ut)
+            db.session.commit()
+            last_user_type_id = ut.id
+
+        # Привязываем последний созданный user_type к user (просто как пример)
+        user.type_id = last_user_type_id
+        db.session.commit()
+
+        flash("Your account has been created! You can now log in.", "success")
+        return redirect(url_for("main.login"))
+    elif request.method == "POST" and not form.validate():
+        flash("Registration failed. Please correct the errors below and try again.", "danger")
+
+    return render_template("register.html", title="Register", form=form)
 
 def is_safe_url(target):
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
     return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc
-
 
 @main.route("/login", methods=["GET", "POST"])
 def login():
@@ -152,13 +185,11 @@ def login():
             flash("Login Unsuccessful. Please check email and password.", "danger")
     return render_template("login.html", title="Login", form=form)
 
-
 @main.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect(url_for("main.login"))
-
 
 @main.route("/user/<username>", methods=["GET", "POST"])
 @login_required
@@ -169,21 +200,31 @@ def user_profile(username):
         flash("You do not have permission to view or edit this profile.", "danger")
         return redirect(url_for("main.index"))
 
-    form = ProfileForm(obj=user)
+    form = ProfileForm()
+
+    if request.method == "GET":
+        form.email.data = user.email
+        if user.user_type:
+            form.typology_name.data = user.user_type.typology_name
+            form.type_value.data = user.user_type.type_value
 
     if form.validate_on_submit():
         user.email = form.email.data
-        user.typology_name = form.typology_name.data
-        user.type_value = form.type_value.data
+        if not user.user_type:
+            user.user_type = UserType(
+                typology_name=form.typology_name.data,
+                type_value=form.type_value.data
+            )
+        else:
+            user.user_type.typology_name = form.typology_name.data
+            user.user_type.type_value = form.type_value.data
+
         try:
             db.session.commit()
             flash("Profile updated successfully.", "success")
-        except:
+        except Exception:
             db.session.rollback()
-            flash(
-                "An error occurred while updating your profile. Please try again.",
-                "danger",
-            )
+            flash("An error occurred while updating your profile. Please try again.", "danger")
 
         return redirect(url_for("main.user_profile", username=user.username))
 

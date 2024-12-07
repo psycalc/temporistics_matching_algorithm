@@ -11,9 +11,8 @@ class User(UserMixin, db.Model):
     id = Column(Integer, primary_key=True)
     username = Column(String(80), unique=True, nullable=False)
     email = Column(String(120), unique=True, nullable=False)
+    password_hash = Column(String(128), nullable=False)  # Добавить это поле
     type_id = Column(Integer, ForeignKey("user_type.id"))
-    
-    # Устанавливаем relationship, чтобы можно было сразу передавать user_type при создании
     user_type = db.relationship("UserType", backref="users")
 
     def set_password(self, password):

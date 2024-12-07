@@ -5,47 +5,41 @@ from wtforms import (
     SubmitField,
     BooleanField,
     SelectField,
-    EmailField,
+    FieldList,
+    FormField,
+    HiddenField
 )
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 from app.models import User
 
+# Форма для одной пары "типология - тип"
+class TypologyTypeForm(FlaskForm):
+    class Meta:
+        csrf = False
+        
+    typology_name = HiddenField()  # Название типологии задаём в routes.py
+    type_value = SelectField("Type Value", validators=[DataRequired()], choices=[])
 
 class RegistrationForm(FlaskForm):
-    username = StringField(
-        "Username", validators=[DataRequired(), Length(min=2, max=20)]
-    )
+    username = StringField("Username", validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField("Password", validators=[DataRequired()])
-    confirm_password = PasswordField(
-        "Confirm Password", validators=[DataRequired(), EqualTo("password")]
-    )
+    confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo("password")])
 
-    # Додаємо поля для вибору типології та типу
-    typology_name = SelectField(
-        "Typology Name",
-        choices=[("Temporistics", "Temporistics"), ("Psychosophia", "Psychosophia")],
-        validators=[DataRequired()],
-    )
-    type_value = StringField("Type Value", validators=[DataRequired()])
+    # Список пар типология—тип, количество определяется динамически в routes.py
+    typologies = FieldList(FormField(TypologyTypeForm))
 
     submit = SubmitField("Sign Up")
 
-    # Кастомні валідації
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
         if user:
-            raise ValidationError(
-                "That username is already taken. Please choose a different one."
-            )
+            raise ValidationError("That username is already taken. Please choose a different one.")
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user:
-            raise ValidationError(
-                "That email is already registered. Please choose a different one."
-            )
-
+            raise ValidationError("That email is already registered. Please choose a different one.")
 
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
@@ -53,13 +47,11 @@ class LoginForm(FlaskForm):
     remember = BooleanField("Remember Me")
     submit = SubmitField("Login")
 
-
 class EditProfileForm(FlaskForm):
-    email = EmailField("Email", validators=[DataRequired(), Email()])
+    email = StringField("Email", validators=[DataRequired(), Email()])
     typology_name = StringField("Typology Name")
     type_value = StringField("Type")
     submit = SubmitField("Save Changes")
-
 
 class ProfileForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])

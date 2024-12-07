@@ -7,19 +7,11 @@ from flask_babel  import lazy_gettext as _l
 class TypologySocionics(Typology):  # Наследуем от Typology
     def __init__(self, language="en"):
         self.set_language(language)
-        # Инициализируем базовый класс с аспектами
-        super().__init__(
-            [
-                _l("Intuitive Logical Extratim"),
-                _l("Sensory Ethical Introtim"),
-                _l("Ethical Sensory Extratim"),
-                _l("Logical Intuitive Introtim"),
-                _l("Intuitive Ethical Extratim"),
-                _l("Sensory Logical Introtim"),
-                _l("Logical Sensory Extratim"),
-                _l("Ethical Intuitive Introtim"),
-            ]
-        )
+        # Инициализируем базовый класс списком базовых аспектов,
+        # которые используются для генерации типов. 
+        # Но учтите, что в Socionics аспекты - это Intuitive/Sensory, Ethical/Logical, Extratim/Introtim.
+        # Можно перечислить их все или оставить только базовый набор, т.к. get_all_types() генерирует финальные типы:
+        super().__init__(["Intuitive", "Sensory", "Ethical", "Logical", "Extratim", "Introtim"])
 
     def set_language(self, language):
         global _
@@ -35,22 +27,16 @@ class TypologySocionics(Typology):  # Наследуем от Typology
             print(f"Error loading translation: {e}")  # Or use logging
 
     def get_all_types(self):
-        """
-        Returns all possible combinations of types in Socionics.
-        """
+        irrationals = ["Intuitive", "Sensory"]
+        rationals = ["Ethical", "Logical"]
+        orientation = ["Extratim", "Introtim"]
+
         valid_types = []
-        aspects = ["Intuitive", "Sensory", "Ethical", "Logical"]
-        traits = ["Extratim", "Introtim"]
-
-        for aspect1 in aspects:
-            for aspect2 in aspects:
-                if aspect1 != aspect2:
-                    for trait1 in traits:
-                        for trait2 in traits:
-                            if trait1 != trait2:
-                                type_name = f"{aspect1} {aspect2} {trait1}"
-                                valid_types.append(type_name)
-
+        for irr in irrationals:
+            for rat in rationals:
+                for ori in orientation:
+                    type_name = f"{irr}, {rat}, {ori}"
+                    valid_types.append(type_name)
         return valid_types
 
     def get_all_quadras(self):
