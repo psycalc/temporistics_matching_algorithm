@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Compatible Users Nearby:</h1>
+{% if compatible_list %}
+  <ul>
+    {% for user, dist in compatible_list %}
+      <li>
+        <strong>{{ user.username }}</strong> ({{ user.email }}): {{ dist|round(2) }} km away
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No compatible users found nearby.</p>
+{% endif %}
+{% endblock %}

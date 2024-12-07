@@ -60,4 +60,12 @@ def create_app(config_name=None):
     from .errors import register_error_handlers
     register_error_handlers(app)
 
+    # Импортируем модели после создания приложения
+    from .models import User, UserType
+
+    # Теперь, когда модели импортированы, создадим таблицы.
+    # Важно делать это в контексте приложения
+    # with app.app_context():
+    #     db.create_all()
+
     return app
