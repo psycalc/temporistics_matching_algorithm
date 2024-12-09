@@ -11,6 +11,7 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 from app.models import User
+from wtforms.fields import FloatField
 
 # Форма для одной пары "типология - тип"
 class TypologyTypeForm(FlaskForm):
@@ -48,9 +49,12 @@ class LoginForm(FlaskForm):
     submit = SubmitField("Login")
 
 class EditProfileForm(FlaskForm):
+    username = StringField("Username", validators=[DataRequired(), Length(min=2, max=80)])
     email = StringField("Email", validators=[DataRequired(), Email()])
-    typology_name = StringField("Typology Name")
-    type_value = StringField("Type")
+    typology_name = StringField("Typology Name", validators=[DataRequired()])
+    type_value = StringField("Type Value", validators=[DataRequired()])
+    latitude = FloatField("Latitude", validators=[DataRequired()])
+    longitude = FloatField("Longitude", validators=[DataRequired()])
     submit = SubmitField("Save Changes")
 
 class ProfileForm(FlaskForm):

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Edit Profile</h2>
+  <form method="POST" action="">
+    {{ form.hidden_tag() }}
+
+    <div>
+      <label for="username">Username</label>
+      {{ form.username(class="form-control") }}
+    </div>
+
+    <div>
+      <label for="email">Email</label>
+      {{ form.email(class="form-control") }}
+    </div>
+
+    <div>
+      <label for="typology_name">Typology Name</label>
+      {{ form.typology_name(class="form-control") }}
+    </div>
+
+    <div>
+      <label for="type_value">Type Value</label>
+      {{ form.type_value(class="form-control") }}
+    </div>
+
+    <div>
+      <label for="latitude">Latitude</label>
+      {{ form.latitude(class="form-control") }}
+    </div>
+
+    <div>
+      <label for="longitude">Longitude</label>
+      {{ form.longitude(class="form-control") }}
+    </div>
+
+    <div>
+      {{ form.submit(class="btn btn-primary") }}
+    </div>
+  </form>
+{% endblock %}
