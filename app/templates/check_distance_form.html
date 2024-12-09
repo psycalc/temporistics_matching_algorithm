@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Check Distance to Another Compatible User</h2>
+<form method="POST" action="{{ url_for('main.check_distance') }}">
+  {{ form.csrf_token }}
+  <div class="form-group">
+    <label>Other User Username</label>
+    <input type="text" name="other_username" class="form-control" required>
+  </div>
+  <button type="submit" class="btn btn-primary">Check Distance</button>
+</form>
+{% endblock %}

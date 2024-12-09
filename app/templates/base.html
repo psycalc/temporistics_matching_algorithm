@@ -12,7 +12,9 @@
             {% if current_user.is_authenticated %}
                 <a class="nav-item nav-link" href="{{ url_for('main.logout') }}">Logout</a>
                 <a class="nav-item nav-link" href="{{ url_for('main.user_profile', username=current_user.username) }}">Profile</a>
-            {% else %}
+              <!-- Добавляем новый пункт меню для списка совместимых пользователей поблизости -->
+        <a class="nav-item nav-link" href="{{ url_for('main.nearby_compatibles') }}">Compatible Nearby</a>
+      {% else %}
                 <a class="nav-item nav-link" href="{{ url_for('main.register') }}">Register</a>
                 <a class="nav-item nav-link" href="{{ url_for('main.login') }}">Login</a>
             {% endif %}

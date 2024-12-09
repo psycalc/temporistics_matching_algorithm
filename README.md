@@ -1,200 +1,102 @@
-Here's the full README.md with all the typologies in code blocks:
+# Psychological Calculator Project
 
-```markdown
-# Relationship Calculator
+**Table of Contents:**
+1. [Project Description](#project-description)
+2. [Theoretical Foundations](#theoretical-foundations)
+    - [Temporistics (Time)](#temporistics-time)
+    - [Psychosophy (Personality Aspects)](#psychosophy-personality-aspects)
+    - [Socionics (Modeling of Information)](#socionics-modeling-of-information)
+3. [Implementation in Code](#implementation-in-code)
+    - [Typology Classes](#typology-classes)
+    - [Services and Data Validation](#services-and-data-validation)
+    - [Routes and Forms](#routes-and-forms)
+4. [Testing](#testing)
+5. [Installation and Run](#installation-and-run)
+6. [Additional Information](#additional-information)
 
-## Table of Contents
+---
 
-- [Overview](#overview)
-- [Features](#features)
-- [Supported Relationship Types](#supported-relationship-types)
-  - [Temporistics](#temporistics)
-  - [Psychosophia](#psychosophia)
-  - [Amatoric](#amatoric)
-  - [Socionics](#socionics)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Extending Typologies](#extending-typologies)
-- [Contributing](#contributing)
-- [Troubleshooting](#troubleshooting)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
-- [Contact](#contact)
-- [Screenshots](#screenshots)
-- [Video Demonstration](#video-demonstration)
+## Project Description
 
-## Overview
+This project integrates theoretical concepts from three typologies (Temporistics, Psychosophy, and Socionics) and implements them in a web application. Users can select their types, calculate relationships between types, and view the "comfort score" of these interactions.
 
-The Relationship Calculator is an innovative Python application that evaluates compatibility between individuals based on psychological typologies. It currently supports Temporistics, Psychosophia, Amatoric, and Socionics, providing a unique perspective on interpersonal dynamics.
+The main goal is to demonstrate how theoretical models of perception (time, personality aspects, information) can be transformed into practical code, tested thoroughly, and presented through a web interface.
 
-## Features
+## Theoretical Foundations
 
-- Assess relationship types across various typologies.
-- Calculate and display comfort scores for relationships.
-- Visual representation of comfort scores with terminal color codes.
-- Extensible architecture to incorporate more typologies.
+### Temporistics (Time)
+- **Four aspects:** Past, Current, Future, Eternity.
+- **Induction vs. Deduction:**
+  - Positions 1 & 4: Deductive (acting based on a preformed overall picture of time).
+  - Positions 2 & 3: Inductive (collecting and analyzing information about time).
 
-## Supported Relationship Types
+Conflict arises when one person operates deductively from a big-picture principle, while another uses induction, gathering data and adapting continuously.
 
-The tool evaluates multiple relationship dynamics across the following typologies:
+### Psychosophy (Personality Aspects)
+- **Four aspects:** Emotion, Logic, Will, Physics.
+- **Analysis vs. Synthesis:**
+  - Positions 1 & 4: Synthetic (holistic perception of the aspect).
+  - Positions 2 & 3: Analytic (breaking the aspect down into components).
 
-### Temporistics
+Conflict: a synthetic individual acts holistically without dissecting details, while an analytic individual seeks to break everything down and understand each part.
 
-```
-Temporistics is a psychological typology developed by Alexander Kronengold that categorizes people based on their relationship with time and temporal perspectives. It focuses on how individuals perceive and interact with the past, present, future, and eternity. Temporistics proposes that each person has a dominant time perspective that shapes their worldview, values, and behavior.
+### Socionics (Modeling of Information)
+- Focuses on logical, ethical, sensory, and intuitive modeling of information.
+- Each type perceives and processes information differently:
+  - The logician uses systems and structures,
+  - The ethicist focuses on emotional exchange,
+  - The sensor relies on tangible, concrete reality,
+  - The intuit deals with abstract concepts and possibilities.
 
-In Temporistics, individuals are classified into 16 types based on their combination of four temporal aspects: Past, Present, Future, and Eternity. These types are organized into six quadras (groups of four types) and four tetrads (groups of three types). The quadras describe the shared values and characteristics of the types within each group, while the tetrads represent specific eras or periods.
+Conflict: Different types struggle to "mirror" or understand the other's model of perception.
 
-The Relationship Calculator tool evaluates various relationship types, such as Homochrony (similar temporal perspectives) and Heterochrony (different temporal perspectives), across the Temporistics typology, providing insights into interpersonal dynamics and compatibility based on individuals' temporal orientations.
-```
+## Implementation in Code
 
-### Psychosophia
+### Typology Classes
+Under `app/typologies/`, each typology is implemented as a class derived from an abstract `Typology`. They provide methods like:
+- `get_all_types()` to retrieve all types.
+- `shorten_type()` to abbreviate type names.
+- `determine_relationship_type()` to calculate the relationship type between two given types.
+- `get_comfort_score()` to determine a "comfort score" based on their relationship.
 
-```
-Psychosophia, also known as the Philosophical Typology or Psyche-Yoga, is a system developed by Alexey Afanasiev that classifies individuals based on their core psychological aspects: Emotion, Logic, Will, and Power. It explores the interplay between these aspects and their influence on behavior, decision-making, and personal development.
+These methods directly reflect the theoretical principles: induction/deduction (Temporistics), analysis/synthesis (Psychosophy), and modeling (Socionics).
 
-Psychosophia proposes that each individual has a unique combination of these four aspects, with one aspect being dominant (the "leading" or "Program" function), one auxiliary (the "Creative" function), and two weaker functions. This combination determines an individual's psychological type, which shapes their values, motivations, and patterns of thought and behavior.
+### Services and Data Validation
+`services.py` contains:
+- `get_types_by_typology()`: returns type lists according to the chosen typology class.
+- `calculate_relationship(user1, user2, typology)`: applies typology logic to determine relationship type and comfort score.
 
-The Relationship Calculator evaluates multiple relationship dynamics across the Psychosophia typology, such as Identity/Philia, Full Eros, Full Agape, Extinguishment, Neutrality, Mirage, Order/Full Order, Revision, Therapy-Misunderstanding, Therapy-Attraction, and Conflict Submission/Dominance, providing insights into interpersonal dynamics and compatibility based on the interplay of psychological aspects.
-```
+`models.py` holds `User` and `UserType` models. User types are validated before insertion, ensuring no invalid type values are saved. This enforces theoretical constraints at the database level.
 
-### Amatoric
+### Routes and Forms
+`routes.py` ties logic to the web interface:
+- `/calculate`: users submit two types and a typology to get a result.
+- `/register`: users choose their types from dynamically loaded lists of available typologies.
 
-```
-The Amatoric Typology, developed by John Alan Lee, is centered around the concepts of love, passion, friendship, and romance. It aims to understand and categorize individuals based on their attitudes, values, and approaches to interpersonal relationships and emotional connections.
+`forms.py` manages forms for registration, login, and profile editing. The form fields and validations are driven by the theoretical concepts implemented in the classes.
 
-The Amatoric Typology identifies six distinct types of love: Eros (romantic love), Ludus (playful love), Storge (friendship love), Pragma (practical love), Mania (possessive love), and Agape (selfless love). Each type of love is characterized by specific behaviors, attitudes, and motivations in interpersonal relationships.
+## Testing
+Tests ensure the theory is correctly implemented:
+- `tests/test_typologies.py`: checks typology logic — from retrieving types to determining relationships and handling errors.
+- `tests/test_routes.py`: verifies user flows, including login, registration, language changes, and calculation endpoints.
+- `tests/test_services.py`: ensures `calculate_relationship()` and `get_types_by_typology()` work as intended.
+- `tests/test_models.py`: tests database logic and `UserType` validation.
+- `tests/test_errors.py`: confirms correct handling of 404 and 500 errors.
 
-The Relationship Calculator tool evaluates relationship types like Philia, Storge, Eros, and Agape across the Amatoric Typology, providing insights into interpersonal dynamics and compatibility based on individuals' attitudes and approaches to love and relationships.
-```
+A high test coverage (~93%) confirms that the theoretical ideas are correctly mirrored in code and thoroughly tested.
 
-### Socionics
+## Installation and Run
 
-```
-Socionics is a pseudoscientific theory developed by Aušra Augustinavičiūtė that describes personality types based on a combination of different psychological traits, such as introversion/extraversion, logic/ethics, intuition/sensing, and rationality/irrationality. It provides insights into interpersonal dynamics and compatibility between types.
-
-In Socionics, individuals are classified into 16 types based on the combination of four dichotomies: Extraversion/Introversion, Intuition/Sensing, Thinking/Feeling, and Judging/Perceiving. These types are further organized into quadras (groups of four types) based on shared values and characteristics.
-
-The Relationship Calculator tool evaluates various relationship types like Philia (friendship), Eros (romantic love), Duality (complementary relationship), Conflict (clashing relationship), and Mirror (reflective relationship) across the Socionics typology, providing a unique perspective on interpersonal dynamics and compatibility.
-```
-
-## Prerequisites
-
-Ensure you have the following:
-
-- Python 3.8+
-- Pip (Python package installer)
-
-## Installation
-
-To set up the project locally:
-
-1. Clone the repository:
+Prerequisites: Python 3.10+, Flask, pytest, and other dependencies listed in `requirements.txt`.
 
 ```bash
-git clone https://github.com/your-username/relationship-calculator.git
-```
-
-2. Navigate to the project directory:
-
-```bash
-cd relationship-calculator
-```
-
-3. Create a virtual environment (optional but recommended):
-
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-```
-
-4. Install the required dependencies:
-
-```bash
+# Install dependencies
 pip install -r requirements.txt
-```
 
-## Usage
+# Run tests
+python -m pytest --maxfail=1 --disable-warnings -q
 
-1. Set the required environment variables:
-
-```bash
-export FLASK_CONFIG=development  # or 'production', 'testing'
-export SECRET_KEY=your-secret-key
-# Set other environment variables as needed
-```
-
-2. Start the application:
-
-```bash
-python run.py
-```
-
-3. Navigate to `http://localhost:5000` to use the tool.
-
-## Extending Typologies
-
-To add a new typology:
-
-1. Create a new class in `app/typologies`.
-2. Update the `available_typologies` dictionary in the calculation module.
-
-## Contributing
-
-We welcome contributions! Here's how to help:
-
-1. Fork the repository.
-2. Create your feature branch: `git checkout -b new-feature`.
-3. Commit your changes: `git commit -am 'Add some feature'`.
-4. Push to the branch: `git push origin new-feature`.
-5. Submit a pull request.
-
-Consult [GitHub documentation](https://help.github.com/articles/creating-a-pull-request/) for more on pull requests.
-
-## Adding Translations
-To add or update translations:
-1. Modify the `.pot` file in the `messages.pot`.
-2. Use Babel to generate `.po` files for each language.
-3. Run the `msgfmt` command to compile `.mo` files.
-
-## Troubleshooting
-
-If you encounter issues:
-
-- Check Python and Pip versions.
-- Ensure all environment variables are set correctly.
-- Look at the error logs for specifics and adjust accordingly.
-- Common issues and their solutions:
-  - **Issue 1**: Description and resolution steps.
-  - **Issue 2**: Description and resolution steps.
-  - ...
-
-## License
-
-This project is under the [MIT License](LICENSE).
-
-## Acknowledgements
-
-- Inspired by diverse psychological typologies.
-- Thanks to contributors for enhancements and feedback.
-
-## Contact
-
-For questions or feedback, email us at `your.email@example.com`.
-
-## Screenshots
-
-(Include a few screenshots of your application here to make the README visually appealing)
-
-## Video Demonstration
-
-(Optionally, include a link to a short video demo of the application)
-
-Remember to replace placeholders like `your-username` and `your.email@example.com` with your actual information.
-
-## Running Tests
-To run the tests, execute:
-```bash
-python -m unittest discover tests
-```
+# Start the application (development mode)
+export FLASK_APP=app
+export FLASK_ENV=development
+flask run

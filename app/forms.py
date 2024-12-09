@@ -13,7 +13,6 @@ from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationE
 from app.models import User
 from wtforms.fields import FloatField
 
-# Форма для одной пары "типология - тип"
 class TypologyTypeForm(FlaskForm):
     class Meta:
         csrf = False
@@ -26,10 +25,7 @@ class RegistrationForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField("Password", validators=[DataRequired()])
     confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo("password")])
-
-    # Список пар типология—тип, количество определяется динамически в routes.py
     typologies = FieldList(FormField(TypologyTypeForm))
-
     submit = SubmitField("Sign Up")
 
     def validate_username(self, username):
@@ -61,4 +57,11 @@ class ProfileForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     typology_name = StringField("Typology Name", validators=[DataRequired()])
     type_value = StringField("Type Value", validators=[DataRequired()])
+    latitude = FloatField("Latitude", validators=[])
+    longitude = FloatField("Longitude", validators=[])
+    submit = SubmitField("Save Changes")
+
+class EditProfileForm(FlaskForm):
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    # Добавьте нужные поля для редактирования профиля
     submit = SubmitField("Save Changes")
