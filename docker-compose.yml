@@ -1,5 +1,24 @@
+version: '3.7'
 
 services:
+  db:
+    image: postgres:12
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - webnet
+
   web:
     build: .
     environment:
@@ -15,31 +34,15 @@ services:
     networks:
       - webnet
 
-  db:
-    image: postgres:12
-    env_file:
-      - .env
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"   # Пробрасываем порт 5432 наружу
-    networks:
-      - webnet
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
-
   test:
     build: .
     environment:
       - RUN_TESTS=1
+      - PYTHONPATH=/app
     depends_on:
       - db
     env_file:
-      - .env.test
+      - .env
     volumes:
       - .:/app
     networks:

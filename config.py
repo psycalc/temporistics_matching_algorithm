@@ -1,4 +1,9 @@
+# config.py
 import os
+from dotenv import load_dotenv
+
+# Загрузим переменные окружения из файла .env, который лежит в корне проекта
+load_dotenv()
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "you-will-never-guess")
@@ -15,9 +20,11 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite:///test.db"
-    WTF_CSRF_ENABLED = False  # Важно для корректной работы тестов, чтобы не было проблем с CSRF
-    SECRET_KEY = "testsecretkey"  # Явно задаём, чтобы флеш работал в тестах
+    # Если хотите в режиме тестирования использовать именно переменную окружения,
+    # убедитесь, что она определена в .env
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "sqlite:///test.db")
+    WTF_CSRF_ENABLED = False
+    SECRET_KEY = "testsecretkey"
 
 class ProductionConfig(Config):
     DEBUG = False

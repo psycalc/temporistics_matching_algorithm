@@ -169,9 +169,6 @@ HOW TO USE THIS SCRIPT:
 - Restrict search to certain directories:
   ./copy_repo_for_gpt.sh --include-dirs "app templates"
 
-- Change solution format (how the model should present final solution):
-  ./copy_repo_for_gpt.sh --solution-format lines
-
 This script collects code from specified directories, merges them into a single line of text, and provides instructions for the GPT model on how to answer. If you find the information insufficient, consider re-running the script with more directories, file types, or enabling structure display.
 
 EOF
@@ -188,7 +185,7 @@ $SOLUTION_INSTRUCTION
 
 $HOW_TO_USE
 
-If you cannot help with the provided info, please suggest how to re-run this script with different parameters (e.g., '--include-file-types', '--show-structure', '--include-dirs', '--solution-format', '--user-prompt' or other arguments) to make the provided information more complete.
+If you cannot help with the provided info, please suggest how to re-run this script with different parameters (e.g., '--include-file-types', '--show-structure', '--include-dirs' or other arguments) to make the provided information more complete.
 "
 
 # Copy to clipboard if available

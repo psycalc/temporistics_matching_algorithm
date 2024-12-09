@@ -1,4 +1,3 @@
-# tests/conftest.py
 import pytest
 import os
 import subprocess
@@ -9,7 +8,6 @@ from flask_migrate import upgrade
 @pytest.fixture(scope="session", autouse=True)
 def docker_compose_up(request):
     subprocess.run(["docker-compose", "up", "-d"], check=True)
-    # Increase sleep if DB initialization takes longer
     time.sleep(20)
     def docker_compose_down():
         subprocess.run(["docker-compose", "down"], check=True)
@@ -25,26 +23,13 @@ def app(db_url):
     application.config["SQLALCHEMY_DATABASE_URI"] = db_url
     application.config["TESTING"] = True
     with application.app_context():
-        # Ensure a clean database schema before running migrations
-        # Drop all tables if any exist (in case a previous test run left them behind)
         db.session.remove()
         db.drop_all()
-        # Now run migrations on a clean schema
-        upgrade()  # Applies all migrations to the test database
+        upgrade()  # Applies all migrations
     yield application
 
 @pytest.fixture(scope="function")
 def client(app):
     return app.test_client()
 
-@pytest.fixture(scope="function", autouse=True)
-def transaction_rollback_fixture(app):
-    # For each test, start a transaction and roll it back after test is done.
-    with app.app_context():
-        connection = db.engine.connect()
-        trans = connection.begin()
-        db.session.bind = connection
-        yield
-        trans.rollback()
-        connection.close()
-        db.session.remove()
+# transaction_rollback_fixture removed/commented out

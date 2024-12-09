@@ -5,10 +5,8 @@ from app.models import User, UserType
 
 @pytest.fixture(autouse=True)
 def setup_database(app, db_url):
-    app.config["SQLALCHEMY_DATABASE_URI"] = db_url
     with app.app_context():
-        db.create_all()
-        user_type = UserType(typology_name="Temporistics", type_value="YourTypeValue")
+        user_type = UserType(typology_name="Temporistics", type_value="Past, Current, Future, Eternity")
         db.session.add(user_type)
         db.session.commit()
         user = User(username="testuser", email="test@example.com", user_type=user_type)
@@ -16,9 +14,6 @@ def setup_database(app, db_url):
         db.session.add(user)
         db.session.commit()
     yield
-    with app.app_context():
-        db.session.remove()
-        db.drop_all()
 
 def test_get_types_by_typology(app):
     with app.app_context():
@@ -26,7 +21,6 @@ def test_get_types_by_typology(app):
         assert types is not None
         assert any("Past" in type_string for type_string in types)
         assert any("Future" in type_string for type_string in types)
-
 
 def test_calculate_relationship(app):
     with app.app_context():
@@ -36,18 +30,16 @@ def test_calculate_relationship(app):
         assert relationship_type is not None
         assert comfort_score is not None
 
-
 def test_get_types_psychosophia(app):
     with app.app_context():
         types = get_types_by_typology("Psychosophia")
         assert types is not None
-        assert len(types) > 0  # Проверим, что не пусто
+        assert len(types) > 0
 
 def test_calculate_relationship_invalid_typology(app):
     with app.app_context():
         with pytest.raises(ValueError):
             calculate_relationship("Past", "Future", "NonExistentTypology")
-
 
 def test_calculate_relationship_empty_input(app):
     with app.app_context():
@@ -57,9 +49,7 @@ def test_calculate_relationship_empty_input(app):
 def test_get_distance_if_compatible(app):
     from app.models import User, UserType, db
     from app.services import get_distance_if_compatible
-    
     with app.app_context():
-        # Создаём 2-х пользователей с совместимыми типами
         user_type = UserType(typology_name="Temporistics", type_value="Past, Current, Future, Eternity")
         db.session.add(user_type)
         db.session.commit()
@@ -68,22 +58,19 @@ def test_get_distance_if_compatible(app):
         user1.set_password("pass1")
         user2 = User(username="user2", email="u2@example.com", latitude=41.0, longitude=-74.0, user_type=user_type)
         user2.set_password("pass2")
-
         db.session.add_all([user1, user2])
         db.session.commit()
 
         dist = get_distance_if_compatible(user1, user2)
         assert dist > 0
 
-        # Проверим не совместимый случай:
-        # Изменим user2 на менее совместимый тип (комфорт <=50)
         another_type = UserType(typology_name="Temporistics", type_value="Past")
         db.session.add(another_type)
         db.session.commit()
+
         user2.user_type = another_type
         db.session.commit()
 
         import pytest
         with pytest.raises(ValueError):
             get_distance_if_compatible(user1, user2)
-

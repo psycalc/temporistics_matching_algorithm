@@ -26,9 +26,8 @@ def test_user_model(app):
 
 def test_user_with_type(app):
     with app.app_context():
-        # Заменяем SomeValue на корректный тип для Temporistics
         user_type = UserType(
-            typology_name="Temporistics", 
+            typology_name="Temporistics",
             type_value="Past, Current, Future, Eternity"
         )
         db.session.add(user_type)
@@ -45,27 +44,21 @@ def test_user_with_type(app):
         assert retrieved is not None
         assert retrieved.user_type is not None
         assert retrieved.user_type.typology_name == "Temporistics"
-        # Проверяем новое корректное значение
         assert retrieved.user_type.type_value == "Past, Current, Future, Eternity"
-
 
 def test_user_uniqueness(app):
     with app.app_context():
-        # Создаем первого пользователя
         base_username = unique_username("uniqueuser")
-        # Сохраним username, чтобы потом попытаться продублировать
         email1 = unique_email("unique1")
         user1 = User(username=base_username, email=email1)
         user1.set_password("pass1")
         db.session.add(user1)
         db.session.commit()
 
-        # Пытаемся создать второго пользователя с тем же username
         email2 = unique_email("unique2")
         user2 = User(username=base_username, email=email2)
         user2.set_password("pass2")
         db.session.add(user2)
-        # Ожидаем IntegrityError
-        import sqlalchemy.exc
+
         with pytest.raises(sqlalchemy.exc.IntegrityError):
             db.session.commit()

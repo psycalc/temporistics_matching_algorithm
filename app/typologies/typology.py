@@ -14,14 +14,10 @@ class Typology(ABC):
 
     @abstractmethod
     def determine_relationship_type(self, user1_type: str, user2_type: str) -> str:
-        """
-        Определяет тип отношений между двумя типами.
-        """
+        """Определяет тип отношений между двумя типами."""
         pass
 
     @abstractmethod
     def get_comfort_score(self, relationship_type: str) -> (int, str):
-        """
-        Возвращает кортеж (числовой_скор_комфорта, текстовое_описание) для данного типа отношений.
-        """
+        """Возвращает кортеж (числовой_скор_комфорта, текстовое_описание) для данного типа отношений."""
         pass

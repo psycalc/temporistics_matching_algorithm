@@ -1,23 +1,15 @@
 from flask_wtf import FlaskForm
 from wtforms import (
-    StringField,
-    PasswordField,
-    SubmitField,
-    BooleanField,
-    SelectField,
-    FieldList,
-    FormField,
-    HiddenField
+    StringField, PasswordField, SubmitField, BooleanField, SelectField,
+    FieldList, FormField, HiddenField, FloatField
 )
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 from app.models import User
-from wtforms.fields import FloatField
 
 class TypologyTypeForm(FlaskForm):
     class Meta:
         csrf = False
-        
-    typology_name = HiddenField()  # Название типологии задаём в routes.py
+    typology_name = HiddenField()
     type_value = SelectField("Type Value", validators=[DataRequired()], choices=[])
 
 class RegistrationForm(FlaskForm):
@@ -59,9 +51,4 @@ class ProfileForm(FlaskForm):
     type_value = StringField("Type Value", validators=[DataRequired()])
     latitude = FloatField("Latitude", validators=[])
     longitude = FloatField("Longitude", validators=[])
-    submit = SubmitField("Save Changes")
-
-class EditProfileForm(FlaskForm):
-    email = StringField("Email", validators=[DataRequired(), Email()])
-    # Добавьте нужные поля для редактирования профиля
     submit = SubmitField("Save Changes")
