@@ -100,8 +100,7 @@ def test_edit_profile_route(client, app):
         assert response.status_code == 200
         assert b"Edit Profile" in response.data
 
-        # Чтобы избежать ошибки уникальности при обновлении username, сгенерируем новый username
-        new_username = unique_username("new_user") 
+        new_username = unique_username("new_user")
         new_email = unique_email("new_email")
 
         response = client.post('/edit_profile', data={
@@ -112,5 +111,22 @@ def test_edit_profile_route(client, app):
             'latitude': '40.0',
             'longitude': '-73.0'
         }, follow_redirects=True)
-        # Проверим, что обновление прошло успешно
+
         assert b"Profile updated successfully." in response.data
+
+        # Дополнительная проверка: извлечь обновленного пользователя из БД
+        updated_user = User.query.filter_by(id=user.id).first()
+        assert updated_user is not None
+        assert updated_user.username == new_username
+        assert updated_user.email == new_email
+        # Если вы храните поля latitude/longitude в модели User,
+        # То стоит проверить и их, например:
+        assert updated_user.latitude == 40.0
+        assert updated_user.longitude == -73.0
+
+        # Также проверяем типологию
+        updated_type = updated_user.user_type
+        assert updated_type is not None
+        assert updated_type.typology_name == 'Updated Typology'
+        assert updated_type.type_value == 'Updated Value'
+
