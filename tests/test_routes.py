@@ -1,14 +1,9 @@
 import pytest
-import uuid
 from app import db
 from app.models import User, UserType
 from flask_login import current_user
+from tests.test_helpers import unique_username, unique_email
 
-def unique_username(prefix="testuser"):
-    return f"{prefix}_{uuid.uuid4().hex[:8]}"
-
-def unique_email(prefix="test", domain="example.com"):
-    return f"{prefix}_{uuid.uuid4().hex[:8]}@{domain}"
 
 def test_index_route(client):
     response = client.get("/")
@@ -94,8 +89,8 @@ def test_edit_profile_route(client, app):
         response = client.post('/edit_profile', data={
             'username': new_username,
             'email': new_email,
-            'typology_name': 'Updated Typology',
-            'type_value': 'Updated Value',
+            'typology_name': 'Temporistics',
+            'type_value': 'Past, Current, Future, Eternity',
             'latitude': '40.0',
             'longitude': '-73.0'
         }, follow_redirects=True)
@@ -109,8 +104,8 @@ def test_edit_profile_route(client, app):
         assert updated_user.longitude == -73.0
         updated_type = updated_user.user_type
         assert updated_type is not None
-        assert updated_type.typology_name == 'Updated Typology'
-        assert updated_type.type_value == 'Updated Value'
+        assert updated_type.typology_name == 'Temporistics'
+        assert updated_type.type_value == 'Past, Current, Future, Eternity'
 
 def test_compatible_nearby_link_visibility(client, app):
     response = client.get("/", follow_redirects=True)
@@ -118,8 +113,15 @@ def test_compatible_nearby_link_visibility(client, app):
     assert b"Compatible Nearby" not in response.data
 
     with app.app_context():
+        # Create the user before trying to log in
+        username = unique_username("testuser")
+        email = unique_email("testuser")
+        user = User(username=username, email=email)
+        user.set_password("testpassword")
+        db.session.add(user)
+        db.session.commit()
         response = client.post("/login", data={
-            "email": "test@example.com",
+            "email": email,
             "password": "testpassword",
             "submit": "Login"
         }, follow_redirects=True)
@@ -130,8 +132,15 @@ def test_compatible_nearby_link_visibility(client, app):
 
 def test_nearby_compatibles_page(client, app):
     with app.app_context():
+        # Create the user before trying to log in
+        username = unique_username("testuser")
+        email = unique_email("testuser")
+        user = User(username=username, email=email)
+        user.set_password("testpassword")
+        db.session.add(user)
+        db.session.commit()
         response = client.post("/login", data={
-            "email": "test@example.com",
+            "email": email,
             "password": "testpassword",
             "submit": "Login"
         }, follow_redirects=True)
@@ -207,8 +216,8 @@ def test_register_post_valid(client, app):
 def test_register_post_invalid(client, app):
     with app.app_context():
         response = client.post("/register", data={
-            "username": "testuser2",
-            "email": "test@example.com",
+            "username": unique_username("testuser2"),
+            "email": unique_email("testuser"),
             "password": "newpassword",
             "confirm_password": "newpassword"
         }, follow_redirects=True)
@@ -217,29 +226,54 @@ def test_register_post_invalid(client, app):
 
 def test_user_profile_logged_in(client, app):
     with app.app_context():
+        # Create the user before trying to log in
+        username = unique_username("someuser")
+        email = unique_email("someuser")
+        user = User(username=username, email=email)
+        user.set_password("testpassword")
+        db.session.add(user)
+        db.session.commit()
+
+        # Now log in with the newly created user
         client.post("/login", data={
-            "email": "test@example.com",
+            "email": email,
             "password": "testpassword"
         }, follow_redirects=True)
 
-        response = client.get("/user/testuser")
+        # Check the profile page
+        response = client.get(f"/user/{username}")
         assert response.status_code == 200
-        assert b"test@example.com" in response.data
+        assert email.encode() in response.data  # Check the user's actual email
 
-        response = client.post("/user/testuser", data={
+        # Update the user's email
+        response = client.post(f"/user/{username}", data={
             "email": "updated@example.com",
             "typology_name": "Temporistics",
             "type_value": "Past, Current, Future, Eternity"
         }, follow_redirects=True)
         assert response.status_code == 200
-        updated_user = User.query.filter_by(username="testuser").first()
+
+        updated_user = User.query.filter_by(username=username).first()
         assert updated_user.email == "updated@example.com"
+
 
 def test_user_profile_other_user(client, app):
     with app.app_context():
+        # Create a user first
+        username = unique_username("someuser")
+        email = unique_email("someuser")
+        user = User(username=username, email=email)
+        user.set_password("testpassword")
+        db.session.add(user)
+        db.session.commit()
+
+        # Now log in with the newly created user
         client.post("/login", data={
-            "email": "test@example.com",
+            "email": email,
             "password": "testpassword"
         }, follow_redirects=True)
+
+        # Attempting to access a non-existent user's profile should now produce a 404
         response = client.get("/user/nonexistentuser")
         assert response.status_code == 404
+

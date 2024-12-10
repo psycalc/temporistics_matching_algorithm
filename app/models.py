@@ -33,7 +33,6 @@ class UserType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     typology_name = db.Column(db.String(50), nullable=False)
     type_value = db.Column(db.String(50), nullable=False)
-    # user_id УБРАТЬ!
 
 def validate_user_type(mapper, connection, target):
     # target это экземпляр UserType, который мы пытаемся вставить или обновить.

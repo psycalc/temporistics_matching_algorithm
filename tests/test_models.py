@@ -1,14 +1,10 @@
 import pytest
-import uuid
 from app import db
 from app.models import User, UserType
 import sqlalchemy.exc
+from tests.test_helpers import unique_username, unique_email
 
-def unique_username(prefix="testuser"):
-    return f"{prefix}_{uuid.uuid4().hex[:8]}"
 
-def unique_email(prefix="test", domain="example.com"):
-    return f"{prefix}_{uuid.uuid4().hex[:8]}@{domain}"
 
 def test_user_model(app):
     with app.app_context():
