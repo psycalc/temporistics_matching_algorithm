@@ -1,23 +1,15 @@
 from flask_wtf import FlaskForm
 from wtforms import (
-    StringField,
-    PasswordField,
-    SubmitField,
-    BooleanField,
-    SelectField,
-    FieldList,
-    FormField,
-    HiddenField
+    StringField, PasswordField, SubmitField, BooleanField, SelectField,
+    FieldList, FormField, HiddenField, FloatField
 )
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 from app.models import User
-from wtforms.fields import FloatField  # Добавляем импорт FloatField
 
 class TypologyTypeForm(FlaskForm):
     class Meta:
         csrf = False
-        
-    typology_name = HiddenField()  # Название типологии задаём в routes.py
+    typology_name = HiddenField()
     type_value = SelectField("Type Value", validators=[DataRequired()], choices=[])
 
 class RegistrationForm(FlaskForm):
@@ -44,15 +36,19 @@ class LoginForm(FlaskForm):
     remember = BooleanField("Remember Me")
     submit = SubmitField("Login")
 
+class EditProfileForm(FlaskForm):
+    username = StringField("Username", validators=[DataRequired(), Length(min=2, max=80)])
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    typology_name = StringField("Typology Name", validators=[DataRequired()])
+    type_value = StringField("Type Value", validators=[DataRequired()])
+    latitude = FloatField("Latitude", validators=[DataRequired()])
+    longitude = FloatField("Longitude", validators=[DataRequired()])
+    submit = SubmitField("Save Changes")
+
 class ProfileForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     typology_name = StringField("Typology Name", validators=[DataRequired()])
     type_value = StringField("Type Value", validators=[DataRequired()])
     latitude = FloatField("Latitude", validators=[])
     longitude = FloatField("Longitude", validators=[])
-    submit = SubmitField("Save Changes")
-
-class EditProfileForm(FlaskForm):
-    email = StringField("Email", validators=[DataRequired(), Email()])
-    # Добавьте нужные поля для редактирования профиля
     submit = SubmitField("Save Changes")

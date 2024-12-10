@@ -2,114 +2,152 @@ import pytest
 from app import db
 from app.models import User, UserType
 from flask_login import current_user
-
-
-@pytest.fixture
-def client(app):
-    return app.test_client()
-
-
-@pytest.fixture(autouse=True)
-def setup_database(app, db_url):
-    app.config["SQLALCHEMY_DATABASE_URI"] = db_url
-    with app.app_context():
-        db.create_all()
-        # Заменяем "YourTypeValue" на действительный тип
-        user_type = UserType(
-            typology_name="Temporistics",
-            type_value="Past, Current, Future, Eternity"
-        )
-        db.session.add(user_type)
-        db.session.commit()
-        user = User(username="testuser", email="test@example.com", user_type=user_type)
-        user.set_password("testpassword")
-        db.session.add(user)
-        db.session.commit()
-    yield
-    with app.app_context():
-        db.session.remove()
-        db.drop_all()
+from tests.test_helpers import unique_username, unique_email
 
 
 def test_index_route(client):
     response = client.get("/")
     assert response.status_code == 302
 
-
 def test_login(client, app):
     with app.app_context():
+        username = unique_username("loginuser")
+        email = unique_email("loginuser")
+        user = User(username=username, email=email)
+        user.set_password("testpassword")
+        db.session.add(user)
+        db.session.commit()
+
         response = client.post("/login", data={
-            "email": "test@example.com",
+            "email": email,
             "password": "testpassword",
             "submit": "Login"
         }, follow_redirects=True)
-        assert response.status_code == 200
-        # Можно добавить дополнительные проверки содержимого ответа, если нужно.
 
+        assert response.status_code == 200
 
 def test_login_wrong_password(client, app):
     with app.app_context():
+        username = unique_username("wrongpass")
+        email = unique_email("wrongpass")
+        user = User(username=username, email=email)
+        user.set_password("correctpassword")
+        db.session.add(user)
+        db.session.commit()
+
         response = client.post("/login", data={
-            "email": "test@example.com",
+            "email": email,
             "password": "wrongpassword",
             "submit": "Login"
         }, follow_redirects=True)
+        print(response.data)
         assert response.status_code == 200
         assert b"Login Unsuccessful" in response.data
 
-
 def test_logout(client, app):
     with app.app_context():
+        username = unique_username("logoutuser")
+        email = unique_email("logoutuser")
+        user = User(username=username, email=email)
+        user.set_password("testpassword3")
+        db.session.add(user)
+        db.session.commit()
+
         client.post("/login", data={
-            "email": "test@example.com",
-            "password": "testpassword"
+            "email": email,
+            "password": "testpassword3"
         }, follow_redirects=True)
         response = client.get("/logout", follow_redirects=True)
         assert response.status_code == 200
 
-
 def test_protected_page_requires_login(client, app):
-    with app.app_context():
-        response = client.get("/user/testuser", follow_redirects=False)
-        assert response.status_code == 302
-        assert "/login" in response.headers["Location"]
+    response = client.get("/user/someusername", follow_redirects=False)
+    assert response.status_code == 302
+    location = response.headers.get("Location", "")
+    assert "/login" in location, f"Expected redirect to /login, got {location}"
 
+def test_edit_profile_route(client, app):
+    with app.app_context():
+        username = unique_username("editprofile")
+        email = unique_email("editprofile")
+        user = User(username=username, email=email)
+        user.set_password("testpassword4")
+        db.session.add(user)
+        db.session.commit()
+
+        client.post('/login', data={
+            'email': email,
+            'password': 'testpassword4'
+        }, follow_redirects=True)
+
+        response = client.get('/edit_profile', follow_redirects=True)
+        assert response.status_code == 200
+        assert b"Edit Profile" in response.data
+
+        new_username = unique_username("new_user")
+        new_email = unique_email("new_email")
+        response = client.post('/edit_profile', data={
+            'username': new_username,
+            'email': new_email,
+            'typology_name': 'Temporistics',
+            'type_value': 'Past, Current, Future, Eternity',
+            'latitude': '40.0',
+            'longitude': '-73.0'
+        }, follow_redirects=True)
+        assert b"Profile updated successfully." in response.data
+
+        updated_user = User.query.filter_by(id=user.id).first()
+        assert updated_user is not None
+        assert updated_user.username == new_username
+        assert updated_user.email == new_email
+        assert updated_user.latitude == 40.0
+        assert updated_user.longitude == -73.0
+        updated_type = updated_user.user_type
+        assert updated_type is not None
+        assert updated_type.typology_name == 'Temporistics'
+        assert updated_type.type_value == 'Past, Current, Future, Eternity'
 
 def test_compatible_nearby_link_visibility(client, app):
-    # Проверяем, что без авторизации ссылка не отображается
     response = client.get("/", follow_redirects=True)
     assert response.status_code == 200
     assert b"Compatible Nearby" not in response.data
 
-    # Логинимся
     with app.app_context():
-        # Предполагаем, что у нас есть пользователь "testuser" (создан в setup_database)
+        # Create the user before trying to log in
+        username = unique_username("testuser")
+        email = unique_email("testuser")
+        user = User(username=username, email=email)
+        user.set_password("testpassword")
+        db.session.add(user)
+        db.session.commit()
         response = client.post("/login", data={
-            "email": "test@example.com",
+            "email": email,
             "password": "testpassword",
             "submit": "Login"
         }, follow_redirects=True)
         assert response.status_code == 200
-        # Теперь проверяем, что ссылка на Compatible Nearby появилась
+
         response = client.get("/", follow_redirects=True)
         assert b"Compatible Nearby" in response.data
 
 def test_nearby_compatibles_page(client, app):
-    # Логин
     with app.app_context():
+        # Create the user before trying to log in
+        username = unique_username("testuser")
+        email = unique_email("testuser")
+        user = User(username=username, email=email)
+        user.set_password("testpassword")
+        db.session.add(user)
+        db.session.commit()
         response = client.post("/login", data={
-            "email": "test@example.com",
+            "email": email,
             "password": "testpassword",
             "submit": "Login"
         }, follow_redirects=True)
         assert response.status_code == 200
 
-        # Заходим на страницу nearby_compatibles
         response = client.get("/nearby_compatibles", follow_redirects=True)
         assert response.status_code == 200
-        # Проверяем что страница отобразилась без ошибок
-        # Можно проверить по наличию каких-то ключевых слов
-        # Например, если шаблон содержит фразу "Compatible Users Nearby:"
         assert b"Compatible Users Nearby:" in response.data
 
 def test_get_types(client, app):
@@ -122,31 +160,27 @@ def test_get_types(client, app):
 
 def test_calculate(client, app):
     with app.app_context():
-        # Валидный запрос
         response = client.post("/calculate", data={
             "user1": "Past, Current, Future, Eternity",
             "user2": "Past, Current, Future, Eternity",
             "typology": "Temporistics"
         })
         assert response.status_code == 200
-        assert b"result.html" not in response.data # Шаблон не обязательно упомянут в контенте, но можно проверить контент.
+        assert b"result.html" not in response.data
         assert b"Comfort Score:" in response.data
 
-        # Невалидный запрос, например без user2
         response = client.post("/calculate", data={
             "user1": "Past, Current, Future, Eternity",
             "typology": "Temporistics"
         })
-        # Проверяем, что все равно 200, но контент другой или flash сообщение (в зависимости от реализации)
         assert response.status_code == 200
 
 def test_change_language(client, app):
     with app.app_context():
-        # Валидный язык
         response = client.post("/change_language", data={"language": "en"}, follow_redirects=False)
         assert response.status_code == 302
         assert "locale" in response.headers.get("Set-Cookie", "")
-        # Невалидный язык
+
         response = client.post("/change_language", data={"language": "xx"}, follow_redirects=True)
         assert response.status_code == 400
         assert b"Language change failed" in response.data
@@ -171,20 +205,19 @@ def test_register_post_valid(client, app):
             "typologies-2-typology_name": "Amatoric",
             "typologies-2-type_value": "Love, Passion, Friendship, Romance",
             "typologies-3-typology_name": "Socionics",
-            "typologies-3-type_value": "Intuitive, Ethical, Extratim"  # или любой доступный тип
+            "typologies-3-type_value": "Intuitive, Ethical, Extratim"
         }, follow_redirects=True)
         assert response.status_code == 200
         assert b"Your account has been created! You can now log in." in response.data
-        # Проверить в базе, что user создан
+
         new_user = User.query.filter_by(username="newuser").first()
         assert new_user is not None
 
 def test_register_post_invalid(client, app):
     with app.app_context():
-        # Уже есть testuser, попробуем зарегать второго с тем же email
         response = client.post("/register", data={
-            "username": "testuser2",
-            "email": "test@example.com",
+            "username": unique_username("testuser2"),
+            "email": unique_email("testuser"),
             "password": "newpassword",
             "confirm_password": "newpassword"
         }, follow_redirects=True)
@@ -193,32 +226,54 @@ def test_register_post_invalid(client, app):
 
 def test_user_profile_logged_in(client, app):
     with app.app_context():
-        # Логинимся
+        # Create the user before trying to log in
+        username = unique_username("someuser")
+        email = unique_email("someuser")
+        user = User(username=username, email=email)
+        user.set_password("testpassword")
+        db.session.add(user)
+        db.session.commit()
+
+        # Now log in with the newly created user
         client.post("/login", data={
-            "email": "test@example.com",
+            "email": email,
             "password": "testpassword"
         }, follow_redirects=True)
-        # Смотрим свой профиль
-        response = client.get("/user/testuser")
+
+        # Check the profile page
+        response = client.get(f"/user/{username}")
         assert response.status_code == 200
-        assert b"test@example.com" in response.data # email в форме
-        # Пробуем изменить профиль
-        response = client.post("/user/testuser", data={
+        assert email.encode() in response.data  # Check the user's actual email
+
+        # Update the user's email
+        response = client.post(f"/user/{username}", data={
             "email": "updated@example.com",
             "typology_name": "Temporistics",
             "type_value": "Past, Current, Future, Eternity"
         }, follow_redirects=True)
         assert response.status_code == 200
-        updated_user = User.query.filter_by(username="testuser").first()
+
+        updated_user = User.query.filter_by(username=username).first()
         assert updated_user.email == "updated@example.com"
+
 
 def test_user_profile_other_user(client, app):
     with app.app_context():
+        # Create a user first
+        username = unique_username("someuser")
+        email = unique_email("someuser")
+        user = User(username=username, email=email)
+        user.set_password("testpassword")
+        db.session.add(user)
+        db.session.commit()
+
+        # Now log in with the newly created user
         client.post("/login", data={
-            "email": "test@example.com",
+            "email": email,
             "password": "testpassword"
         }, follow_redirects=True)
-        # Пытаемся зайти на профиль другого пользователя, которого нет
+
+        # Attempting to access a non-existent user's profile should now produce a 404
         response = client.get("/user/nonexistentuser")
         assert response.status_code == 404
 

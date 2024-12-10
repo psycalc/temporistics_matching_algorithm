@@ -1,66 +1,60 @@
 import pytest
 from app import db
 from app.models import User, UserType
+import sqlalchemy.exc
+from tests.test_helpers import unique_username, unique_email
 
-
-@pytest.fixture(autouse=True)
-def setup_database(app, db_url):
-    app.config["SQLALCHEMY_DATABASE_URI"] = db_url
-    with app.app_context():
-        db.create_all()
-    yield
-    with app.app_context():
-        db.session.remove()
-        db.drop_all()
 
 
 def test_user_model(app):
     with app.app_context():
-        user = User(username="testuser", email="test@example.com")
+        username = unique_username("testuser_model")
+        email = unique_email("test_model")
+        user = User(username=username, email=email)
         user.set_password("testpassword")
         db.session.add(user)
         db.session.commit()
 
-        retrieved_user = User.query.filter_by(username="testuser").first()
+        retrieved_user = User.query.filter_by(username=username).first()
         assert retrieved_user is not None
-        assert retrieved_user.email == "test@example.com"
+        assert retrieved_user.email == email
         assert retrieved_user.check_password("testpassword")
-
 
 def test_user_with_type(app):
     with app.app_context():
-        # Заменяем SomeValue на корректный тип для Temporistics
         user_type = UserType(
-            typology_name="Temporistics", 
+            typology_name="Temporistics",
             type_value="Past, Current, Future, Eternity"
         )
         db.session.add(user_type)
         db.session.commit()
 
-        user = User(username="typeuser", email="type@example.com", user_type=user_type)
+        username = unique_username("typeuser")
+        email = unique_email("typeuser")
+        user = User(username=username, email=email, user_type=user_type)
         user.set_password("securepass")
         db.session.add(user)
         db.session.commit()
 
-        retrieved = User.query.filter_by(username="typeuser").first()
+        retrieved = User.query.filter_by(username=username).first()
         assert retrieved is not None
         assert retrieved.user_type is not None
         assert retrieved.user_type.typology_name == "Temporistics"
-        # Проверяем новое корректное значение
         assert retrieved.user_type.type_value == "Past, Current, Future, Eternity"
-
 
 def test_user_uniqueness(app):
     with app.app_context():
-        user1 = User(username="uniqueuser", email="unique@example.com")
+        base_username = unique_username("uniqueuser")
+        email1 = unique_email("unique1")
+        user1 = User(username=base_username, email=email1)
         user1.set_password("pass1")
         db.session.add(user1)
         db.session.commit()
 
-        user2 = User(username="uniqueuser", email="unique2@example.com")
+        email2 = unique_email("unique2")
+        user2 = User(username=base_username, email=email2)
         user2.set_password("pass2")
         db.session.add(user2)
-        # Ожидаем IntegrityError
-        import sqlalchemy.exc
+
         with pytest.raises(sqlalchemy.exc.IntegrityError):
             db.session.commit()

@@ -1,39 +1,27 @@
 # tests/conftest.py
 import pytest
 import os
-import subprocess
-import time
 from app import create_app, db
+from flask_migrate import Migrate, upgrade
 
-@pytest.fixture(scope="session", autouse=True)
-def docker_compose_up(request):
-    subprocess.run(["docker-compose", "up", "-d"], check=True)
-    time.sleep(20)
-
-    def docker_compose_down():
-        subprocess.run(["docker-compose", "down"], check=True)
-
-    request.addfinalizer(docker_compose_down)
-
+migrate = Migrate()
 
 @pytest.fixture(scope="session")
 def db_url():
-    return os.environ.get("DATABASE_URL", "postgresql://user:password@localhost:5432/testdb")
-
+    return os.environ.get("DATABASE_URL", "postgresql://testuser:password@db:5432/testdb")
 
 @pytest.fixture(scope="session")
-def app():
-    # Создаём приложение в конфигурации "testing" (убедитесь, что такой конфиг существует)
+def app(db_url):
     application = create_app("testing")
-
-    # Здесь можно задать любые тестовые настройки
-    # Например: application.config["TESTING"] = True
-
+    application.config["SQLALCHEMY_DATABASE_URI"] = db_url
+    application.config["TESTING"] = True
     with application.app_context():
-        # Убедитесь, что база данных чистая и создаём все таблицы
+        migrate.init_app(application, db)
+        upgrade()
+        # Создаём таблицы, которых нет в миграциях (например, user_type)
         db.create_all()
-        yield application
+    yield application
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def client(app):
     return app.test_client()
