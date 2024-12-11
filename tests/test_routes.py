@@ -3,6 +3,7 @@ from app import db
 from app.models import User, UserType
 from flask_login import current_user
 from tests.test_helpers import unique_username, unique_email
+from io import BytesIO
 
 
 def test_index_route(client):
@@ -276,4 +277,41 @@ def test_user_profile_other_user(client, app):
         # Attempting to access a non-existent user's profile should now produce a 404
         response = client.get("/user/nonexistentuser")
         assert response.status_code == 404
+
+
+def test_upload_profile_image(client, app):
+    with app.app_context():
+        # Создаем пользователя
+        username = unique_username("imageuser")
+        email = unique_email("imageuser")
+        user = User(username=username, email=email)
+        user.set_password("testpassword")
+        db.session.add(user)
+        db.session.commit()
+
+    # Логинимся
+    client.post("/login", data={
+        "email": email,
+        "password": "testpassword"
+    }, follow_redirects=True)
+
+    # Создаем фейковый файл изображение
+    data = {
+        "username": username,
+        "email": email,
+        "typology_name": "Temporistics",
+        "type_value": "Past, Current, Future, Eternity",
+        "latitude": "40.0",
+        "longitude": "-73.0",
+        "profile_image": (BytesIO(b"fake image content"), "test.png")
+    }
+
+    response = client.post("/edit_profile", data=data, content_type='multipart/form-data', follow_redirects=True)
+
+    assert response.status_code == 200
+    # Проверяем, что запись в БД обновилась
+    with app.app_context():
+        updated_user = User.query.filter_by(username=username).first()
+        assert updated_user is not None
+        assert updated_user.profile_image == "test.png"
 

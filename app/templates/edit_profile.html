@@ -2,7 +2,7 @@
 
 {% block content %}
   <h2>Edit Profile</h2>
-  <form method="POST" action="">
+  <form method="POST" action="" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
 
     <div>
@@ -34,7 +34,10 @@
       <label for="longitude">Longitude</label>
       {{ form.longitude(class="form-control") }}
     </div>
-
+    <div>
+      <label for="profile_image">Profile Image</label>
+      {{ form.profile_image(class="form-control") }}
+    </div>
     <div>
       {{ form.submit(class="btn btn-primary") }}
     </div>

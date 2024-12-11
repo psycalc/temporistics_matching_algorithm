@@ -3,6 +3,7 @@ from config import config_dict
 from .extensions import db, migrate, cache  # <-- Вот тут!
 from flask_login import LoginManager
 from flask_babel import Babel
+import os
 
 login_manager = LoginManager()
 login_manager.login_view = "main.login"
@@ -16,6 +17,9 @@ def create_app(config_name=None):
     # Если мы в тестинге, отключаем проброс исключений.
     if app.config.get("TESTING"):
         app.config["PROPAGATE_EXCEPTIONS"] = False
+        # Set UPLOAD_FOLDER dynamically
+        app.config["UPLOAD_FOLDER"] = os.path.join(app.instance_path, 'uploads')
+        os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
     db.init_app(app)
     migrate.init_app(app, db)

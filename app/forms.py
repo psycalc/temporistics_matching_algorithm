@@ -5,6 +5,7 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 from app.models import User
+from flask_wtf.file import FileField, FileAllowed
 
 class TypologyTypeForm(FlaskForm):
     class Meta:
@@ -43,6 +44,7 @@ class EditProfileForm(FlaskForm):
     type_value = StringField("Type Value", validators=[DataRequired()])
     latitude = FloatField("Latitude", validators=[DataRequired()])
     longitude = FloatField("Longitude", validators=[DataRequired()])
+    profile_image = FileField("Profile Image", validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')])
     submit = SubmitField("Save Changes")
 
 class ProfileForm(FlaskForm):

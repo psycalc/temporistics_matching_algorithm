@@ -16,6 +16,7 @@ class User(UserMixin, db.Model):
     password_hash = Column(String(128), nullable=False)  # Ensure non-nullable
     type_id = Column(Integer, ForeignKey("user_type.id"))
     user_type = db.relationship("UserType", backref="users")
+    profile_image = Column(String(200), nullable=True)
 
     # Add latitude/longitude fields since tests assume their presence
     latitude = Column(Float, nullable=True)

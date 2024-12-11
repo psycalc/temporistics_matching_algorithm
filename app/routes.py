@@ -14,6 +14,8 @@ from flask_wtf import FlaskForm
 from wtforms import HiddenField
 from urllib.parse import urlparse, urljoin
 from app.services import get_distance_if_compatible
+from werkzeug.utils import secure_filename
+import os
 
 main = Blueprint("main", __name__)
 
@@ -214,6 +216,7 @@ def edit_profile():
     if form.validate_on_submit():
         try:
             from .services import update_user_profile
+            # Обновляем профиль пользователя
             update_user_profile(
                 current_user,
                 username=form.username.data,
@@ -223,12 +226,39 @@ def edit_profile():
                 latitude=form.latitude.data,
                 longitude=form.longitude.data,
             )
+
+            # Если был загружен файл с картинкой
+            if form.profile_image.data:
+                file = form.profile_image.data
+                filename = secure_filename(file.filename)
+                
+                uploads_dir = current_app.config['UPLOAD_FOLDER']
+                os.makedirs(uploads_dir, exist_ok=True)  # Убедимся, что директория существует
+
+                file_path = os.path.join(uploads_dir, filename)
+
+                # Проверяем, что путь не указывает на директорию
+                if os.path.isdir(file_path):
+                    raise ValueError(f"'{file_path}' is a directory, expected a file path.")
+
+                # Проверка MIME-типа
+                if not file.mimetype.startswith("image/"):
+                    raise ValueError("Uploaded file is not an image.")
+
+                file.save(file_path)
+                current_user.profile_image = filename
+
+            # Сохраняем изменения в базе данных
+            db.session.commit()
+
             flash("Profile updated successfully.", "success")
             return redirect(url_for("main.user_profile", username=current_user.username))
         except Exception as e:
-            current_app.logger.error(f"Error updating profile: {e}")
-            flash("An error occurred while updating your profile. Please try again.", "danger")
+            current_app.logger.error(f"Error updating profile for user {current_user.username}: {e}", exc_info=True)
+            flash("An unexpected error occurred. Please try again later.", "danger")
+
     return render_template("edit_profile.html", form=form)
+
 
 @main.route("/check_distance", methods=["GET", "POST"])
 @login_required
