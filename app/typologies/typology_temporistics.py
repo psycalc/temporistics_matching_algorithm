@@ -163,6 +163,21 @@ class TypologyTemporistics(Typology):
         0: "Strategic Conflict",
     }
 
+    # Деталізовані типи відносин у Temporistics з назвами як у Психософії
+    DETAILED_RELATIONSHIPS = {
+        "Identity/Philia": "Коли всі 4 аспекти часу збігаються у тому ж порядку або перші два аспекти однакові. Повна гармонія відносин.",
+        "Full Eros": "Коли перші два аспекти одного типу є третім і четвертим у іншого, і навпаки. Доповнюючі часові перспективи.",
+        "Full Agape": "Коли перші два аспекти одного типу є третім і четвертим у іншого, але не навпаки. Односторонні часові відносини.",
+        "Psychosophia Extinguishment": "Коли часові послідовності є дзеркальними відображеннями. Протилежні часові перспективи.",
+        "Neutrality": "Коли перший аспект різний, але є деякі збіги в інших позиціях. Нейтральні часові відносини.",
+        "Mirage": "Коли перший аспект одного типу є третім у іншого і навпаки. Ілюзія часової гармонії.",
+        "Order/Full Order": "Коли перший аспект одного типу є другим у іншого і навпаки. Впорядковані часові відносини.",
+        "Revision": "Коли перший аспект одного типу є четвертим у іншого. Ревізійні часові відносини.",
+        "Therapy-Misunderstanding": "Коли другий аспект одного типу є четвертим у іншого, але не навпаки. Терапевтично-непорозумілі відносини.",
+        "Therapy-Attraction": "Коли другий аспект одного типу є третім у іншого і навпаки. Терапевтично-притягальні відносини.",
+        "Conflict Submission/Dominance": "Коли перший аспект одного типу є слабкістю іншого, але не навпаки. Конфліктні часові відносини."
+    }
+
     # Populating the INTER_TYPE_RELATIONSHIPS dictionary
     for aspect1, aspect2 in product(ASPECTS, repeat=2):
         if aspect1 == aspect2:
@@ -172,84 +187,153 @@ class TypologyTemporistics(Typology):
             # For simplicity, assigning "Strategic Conflict" for differing aspects
             INTER_TYPE_RELATIONSHIPS[(aspect1, aspect2)] = "Strategic Conflict"
 
-    def get_intertype_relationship(
-        self, type1_aspects: List[str], type2_aspects: List[str]
-    ) -> str:
+    def get_intertype_relationship(self, type1_aspects: List[str], type2_aspects: List[str]) -> str:
         """
-        Determines the intertype relationship between two types based on their aspects.
+        Визначає тип міжтипових відносин для двох типів на основі їх аспектів.
+        
+        Відносини визначаються тим, як різні типи сприймають і взаємодіють з часовими перспективами.
+        Важливим є порядок часових аспектів (минуле, теперішнє, майбутнє, вічність), 
+        оскільки це впливає на характер взаємодії.
 
         Args:
-            type1_aspects (List[str]): List of aspects for the first type.
-            type2_aspects (List[str]): List of aspects for the second type.
+            type1_aspects (List[str]): Список аспектів для першого типу.
+            type2_aspects (List[str]): Список аспектів для другого типу.
 
         Returns:
-            str: The type of intertype relationship.
+            str: Тип міжтипових відносин.
 
         Raises:
-            ValueError: If the aspects lists are not valid.
+            ValueError: Якщо списки аспектів не є дійсними.
         """
         if not (type1_aspects and type2_aspects):
-            raise ValueError("Aspects lists cannot be empty.")
+            raise ValueError("Списки аспектів не можуть бути порожніми.")
 
-        # Counting the number of matching aspects in the same positions
-        matches = sum(1 for a1, a2 in zip(type1_aspects, type2_aspects) if a1 == a2)
+        # Порядок перевірок має значення!
+        # Спочатку перевіряємо найбільш специфічні випадки
 
-        # Determining the relationship type based on the number of matches
-        relationship_type = self.RELATIONSHIP_TYPES.get(matches, "Unknown Relationship")
-
-        return relationship_type
+        # Identity/Philia - ідентичні типи або однакові перші два аспекти або спільний перший аспект
+        if type1_aspects == type2_aspects:
+            return "Identity/Philia"
+        if type1_aspects[:2] == type2_aspects[:2]:
+            return "Identity/Philia"
+        if type1_aspects[0] == type2_aspects[0]:
+            return "Identity/Philia"
+            
+        # Психосоphia Extinguishment - повністю протилежні послідовності часових аспектів
+        if type1_aspects == list(reversed(type2_aspects)):
+            return "Psychosophia Extinguishment"
+            
+        # Chronological Conflict - перший аспект одного типу є останнім у іншого
+        # Виключаємо випадок Psychosophia Extinguishment
+        if (type1_aspects[0] == type2_aspects[-1] or type1_aspects[-1] == type2_aspects[0]) and type1_aspects != list(reversed(type2_aspects)):
+            return "Chronological Conflict"
+            
+        # Order/Full Order - перший аспект одного типу є другим у іншого і навпаки
+        if type1_aspects[0] == type2_aspects[1] and type1_aspects[1] == type2_aspects[0]:
+            return "Order/Full Order"
+            
+        # Full Eros - перші дві функції одного типу є третьою і четвертою в іншого, і навпаки
+        if set(type1_aspects[:2]) == set(type2_aspects[2:]) and set(type1_aspects[2:]) == set(type2_aspects[:2]):
+            return "Full Eros"
+            
+        # Full Agape - перші дві функції одного типу є третьою і четвертою в іншого, але не навпаки
+        if ((set(type1_aspects[:2]) == set(type2_aspects[2:]) and set(type1_aspects[2:]) != set(type2_aspects[:2])) or
+           (set(type2_aspects[:2]) == set(type1_aspects[2:]) and set(type2_aspects[2:]) != set(type1_aspects[:2]))):
+            return "Full Agape"
+            
+        # Mirage - перша функція одного типу є третьою в іншого і навпаки
+        if type1_aspects[0] == type2_aspects[2] and type1_aspects[2] == type2_aspects[0]:
+            return "Mirage"
+            
+        # Revision - перша функція одного типу є четвертою в іншого і навпаки
+        if type1_aspects[0] == type2_aspects[3] and type1_aspects[3] == type2_aspects[0]:
+            return "Revision"
+            
+        # Therapy-Attraction - друга функція одного типу є третьою в іншого і навпаки
+        if type1_aspects[1] == type2_aspects[2] and type1_aspects[2] == type2_aspects[1]:
+            return "Therapy-Attraction"
+            
+        # Therapy-Misunderstanding - друга функція одного типу є четвертою в іншого, але не навпаки
+        if ((type1_aspects[1] == type2_aspects[3] and type1_aspects[3] != type2_aspects[1]) or
+            (type2_aspects[1] == type1_aspects[3] and type2_aspects[3] != type1_aspects[1])):
+            return "Therapy-Misunderstanding"
+            
+        # Conflict Submission/Dominance - перша функція одного типу є слабкістю іншого, але не навпаки
+        if ((type1_aspects[0] in type2_aspects[2:] and type2_aspects[0] not in type1_aspects[2:]) or
+            (type2_aspects[0] in type1_aspects[2:] and type1_aspects[0] not in type2_aspects[2:])):
+            return "Conflict Submission/Dominance"
+            
+        # Neutrality - різні перші функції, немає повного конфлікту
+        return "Neutrality"
 
     def get_comfort_score(self, relationship_type: str) -> Tuple[int, str]:
         """
-        Returns a comfort score and description based on the relationship type.
+        Повертає оцінку комфорту та опис для даного типу відносин,
+        використовуючи нові назви відносин за аналогією з Психософією.
 
         Args:
-            relationship_type (str): The type of relationship.
+            relationship_type (str): Тип відносин.
 
         Returns:
-            Tuple[int, str]: A tuple containing the comfort score and its description.
+            Tuple[int, str]: Кортеж, що містить оцінку комфорту та її опис.
         """
         comfort_scores = {
-            "Complete Unity": (100, "Perfect alignment in all priorities."),
-            "Deep Harmony": (
-                90,
-                "Top three time priorities match, leading to significant harmony.",
-            ),
-            "Shared Vision": (
-                75,
-                "Top two priorities align, resulting in cooperation.",
-            ),
-            "Superficial Agreement": (
-                50,
-                "Only one priority matches, leading to shallow agreement.",
-            ),
-            "Strategic Conflict": (
-                25,
-                "Differences lead to friction, but can stimulate growth.",
-            ),
-            "Unknown Relationship": (0, "Relationship type is undefined."),
+            "Identity/Philia": (95, self.DETAILED_RELATIONSHIPS["Identity/Philia"]),
+            "Full Eros": (80, self.DETAILED_RELATIONSHIPS["Full Eros"]),
+            "Full Agape": (100, self.DETAILED_RELATIONSHIPS["Full Agape"]),
+            "Psychosophia Extinguishment": (30, self.DETAILED_RELATIONSHIPS["Psychosophia Extinguishment"]),
+            "Neutrality": (50, self.DETAILED_RELATIONSHIPS["Neutrality"]),
+            "Mirage": (70, self.DETAILED_RELATIONSHIPS["Mirage"]),
+            "Order/Full Order": (90, self.DETAILED_RELATIONSHIPS["Order/Full Order"]),
+            "Revision": (40, self.DETAILED_RELATIONSHIPS["Revision"]),
+            "Therapy-Misunderstanding": (60, self.DETAILED_RELATIONSHIPS["Therapy-Misunderstanding"]),
+            "Therapy-Attraction": (75, self.DETAILED_RELATIONSHIPS["Therapy-Attraction"]),
+            "Conflict Submission/Dominance": (20, self.DETAILED_RELATIONSHIPS["Conflict Submission/Dominance"]),
+            
+            # Зберігаємо старі значення для зворотної сумісності
+            "Perfect Alignment": (95, "Повний збіг пріоритетів."),
+            "Homochronous Unity": (90, "Спільний перший аспект."),
+            "Temporal Compatibility": (85, "Спільні перші два аспекти."),
+            "Temporal Duality": (90, "Доповнюючі аспекти."),
+            "Mirrored Perception": (75, "Дзеркальні аспекти."),
+            "Temporal Activation": (65, "Спільна активація."),
+            "Heterotemporality": (50, "Різні часові аспекти."),
+            "Chronological Conflict": (30, "Часовий конфлікт."),
+            "Atemporal Disconnection": (10, "Повна несумісність."),
+            
+            "Unknown Relationship": (0, "Невизначений тип відносин."),
         }
-        return comfort_scores.get(relationship_type, (0, "Unknown relationship type"))
+        return comfort_scores.get(relationship_type, (0, "Невідомий тип відносин"))
 
     def determine_relationship_type(self, user1_type: str, user2_type: str) -> str:
         """
-        Determines the relationship type between two users based on their time aspects.
+        Визначає тип відносин між двома користувачами на основі їхніх часових аспектів.
+        
+        В Темпористиці, порядок часових аспектів є критичним для визначення 
+        типу взаємодії між людьми:
+        
+        - Перший аспект визначає основний фокус уваги і сприйняття часу
+        - Другий аспект підтримує перший і визначає додатковий акцент
+        - Третій і четвертий аспекти є менш свідомими, але важливими для повного розуміння типу
+        
+        Отже, збіги або відмінності в цих аспектах визначають характер взаємодії.
 
         Args:
-            user1_type (str): Comma-separated string of time aspects for the first user.
-            user2_type (str): Comma-separated string of time aspects for the second user.
+            user1_type (str): Розділений комами рядок часових аспектів для першого користувача.
+            user2_type (str): Розділений комами рядок часових аспектів для другого користувача.
 
         Returns:
-            str: The type of intertype relationship.
+            str: Тип міжтипових відносин.
         """
+        # Розділяємо рядки на списки аспектів
         user1_aspects = user1_type.split(", ")
         user2_aspects = user2_type.split(", ")
 
-        # Ensuring both users have aspects defined
+        # Перевіряємо, чи обидва користувачі мають визначені аспекти
         if not user1_aspects or not user2_aspects:
-            raise ValueError("User types must have at least one aspect.")
+            raise ValueError("Типи користувачів повинні мати хоча б один аспект.")
 
-        # Determining the relationship type
+        # Визначаємо тип відносин, використовуючи метод get_intertype_relationship
         relationship_type = self.get_intertype_relationship(
             user1_aspects, user2_aspects
         )
@@ -292,3 +376,32 @@ class TypologyTemporistics(Typology):
             initials = "".join([aspect[0] for aspect in type_name.split(", ")])
             shortened_types.append(initials)
         return shortened_types
+
+    @staticmethod
+    def are_types_homochronous(type1: str, type2: str) -> bool:
+        """
+        Determines if two types are homochronous (aligned in time orientation).
+
+        Homochrony occurs when two types share the same time orientation 
+        (Past, Current, Future, or Eternity) as their primary focus.
+
+        Args:
+            type1 (str): First type as a comma-separated string of time aspects.
+            type2 (str): Second type as a comma-separated string of time aspects.
+
+        Returns:
+            bool: True if the types are homochronous, False otherwise.
+        """
+        if not type1 or not type2:
+            return False
+
+        # Parse the types into lists of aspects
+        type1_aspects = type1.split(", ")
+        type2_aspects = type2.split(", ")
+
+        if not type1_aspects or not type2_aspects:
+            return False
+
+        # The primary aspect is the first one in each list
+        # Types are homochronous if they share the same primary aspect
+        return type1_aspects[0] == type2_aspects[0]

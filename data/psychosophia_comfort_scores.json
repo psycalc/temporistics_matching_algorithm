@@ -1,46 +1,46 @@
 {
   "Identity/Philia": {
-    "score": 10,
-    "description": "Interaction is easy, comfortable, and friendly"
+    "score": 9,
+    "description": "Взаємодія легка, комфортна і дружня"
   },
   "Full Eros": {
     "score": 8,
-    "description": "Interaction is dynamic, stimulating, and full of mutual interest"
+    "description": "Взаємодія динамічна, стимулююча і сповнена взаємного інтересу"
   },
   "Full Agape": {
-    "score": 9,
-    "description": "Interaction is comfortable, harmonious, and mutually beneficial"
+    "score": 10,
+    "description": "Взаємодія комфортна, гармонійна і взаємовигідна"
   },
   "Psychosophia Extinguishment": {
     "score": -5,
-    "description": "Interaction is distant, formal, and characterized by mutual respect"
+    "description": "Взаємодія віддалена, формальна з взаємоповагою"
   },
   "Neutrality": {
     "score": 0,
-    "description": "Interaction is neutral and polite but lacks deep understanding or connection"
+    "description": "Взаємодія нейтральна і ввічлива, але без глибокого розуміння"
   },
   "Mirage": {
     "score": 3,
-    "description": "Interaction is unpredictable, intense, and emotionally charged"
+    "description": "Взаємодія непередбачувана, інтенсивна і емоційно заряджена"
   },
   "Order/Full Order": {
     "score": 6,
-    "description": "Interaction is asymmetrical, with one partner taking a more active and dominant role"
+    "description": "Взаємодія асиметрична, один партнер більш активний і домінуючий"
   },
   "Revision": {
     "score": -3,
-    "description": "Interaction is challenging and confrontational, but can lead to growth"
+    "description": "Взаємодія складна і конфронтаційна, але може вести до росту"
   },
   "Therapy-Misunderstanding": {
     "score": 2,
-    "description": "Interaction is comfortable and easy due to shared values and worldviews"
+    "description": "Взаємодія комфортна і легка через спільні цінності"
   },
   "Therapy-Attraction": {
     "score": 4,
-    "description": "Interaction is asymmetrical, with one partner taking a more active and dominant role"
+    "description": "Взаємодія асиметрична, один партнер більш активний і підтримуючий"
   },
   "Conflict Submission/Dominance": {
     "score": -4,
-    "description": "Interaction is characterized by power struggles and conflicts"
+    "description": "Взаємодія характеризується боротьбою за владу і конфліктами"
   }
 }

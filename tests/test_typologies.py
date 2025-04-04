@@ -30,7 +30,7 @@ def test_typology_temporistics_relationships(typology):
     assert len(all_types) > 0
     same_type = all_types[0]
     relationship_type = typology.determine_relationship_type(same_type, same_type)
-    assert relationship_type in ["Complete Unity", "Deep Harmony", "Shared Vision", "Superficial Agreement", "Strategic Conflict", "Unknown Relationship"]
+    assert relationship_type in ["Identity/Philia", "Perfect Alignment", "Unknown Relationship"]
     score, desc = typology.get_comfort_score(relationship_type)
     assert score is not None
 
@@ -40,11 +40,11 @@ def test_typology_psychosophia_basic():
     assert len(all_types) > 0
     shortened = typ.shorten_type(all_types[0])
     assert len(shortened[0]) == 4
-    assert typ.determine_relationship_type(all_types[0], all_types[0]) == "Identity"
-    assert typ.determine_relationship_type(all_types[0], "Emotion, Logic, Will, Physics") == "Identity"
+    assert typ.determine_relationship_type(all_types[0], all_types[0]) == "Identity/Philia"
+    assert typ.determine_relationship_type(all_types[0], "Emotion, Logic, Will, Physics") == "Identity/Philia"
     assert typ.determine_relationship_type("BogusType", all_types[0]) == "Unknown Relationship"
-    score, desc = typ.get_comfort_score("Identity")
-    assert score == 100
+    score, desc = typ.get_comfort_score("Identity/Philia")
+    assert score > 0
     score, desc = typ.get_comfort_score("Unknown Relationship")
     assert score == 0
 
@@ -82,3 +82,93 @@ def test_typology_socionics_basic(app):
         alpha_types = quadras["Alpha"]["types"]
         assert len(alpha_types) == 4
         assert len(quadras["Alpha"]["description"]) > 0
+
+def test_temporistics_are_types_homochronous():
+    """Перевіряє, що метод TypologyTemporistics.are_types_homochronous правильно визначає гомохронність типів"""
+    from app.typologies.typology_temporistics import TypologyTemporistics
+    
+    # Типи з однаковим першим аспектом (гомохронні)
+    assert TypologyTemporistics.are_types_homochronous(
+        "Past, Current, Future, Eternity",
+        "Past, Eternity, Current, Future"
+    ) == True
+    
+    # Типи з різними першими аспектами (не гомохронні)
+    assert TypologyTemporistics.are_types_homochronous(
+        "Past, Current, Future, Eternity",
+        "Current, Past, Future, Eternity"
+    ) == False
+    
+    # Перевірка на порожні типи
+    assert TypologyTemporistics.are_types_homochronous("", "Past, Current, Future, Eternity") == False
+    assert TypologyTemporistics.are_types_homochronous("Past, Current, Future, Eternity", "") == False
+    assert TypologyTemporistics.are_types_homochronous("", "") == False
+
+def test_temporistics_detailed_relationships():
+    """Перевіряє нові деталізовані типи відносин в Temporistics"""
+    from app.typologies.typology_temporistics import TypologyTemporistics
+    
+    temporistics = TypologyTemporistics()
+    
+    # Identity/Philia - повний збіг послідовностей
+    relationship = temporistics.determine_relationship_type(
+        "Past, Current, Future, Eternity", 
+        "Past, Current, Future, Eternity"
+    )
+    assert relationship == "Identity/Philia"
+    score, desc = temporistics.get_comfort_score(relationship)
+    assert score > 90
+    
+    # Identity/Philia - спільний перший аспект
+    relationship = temporistics.determine_relationship_type(
+        "Past, Current, Future, Eternity", 
+        "Past, Eternity, Current, Future"
+    )
+    assert relationship == "Identity/Philia"
+    score, desc = temporistics.get_comfort_score(relationship)
+    assert score > 80
+    
+    # Temporal Compatibility - спільні перші два аспекти
+    relationship = temporistics.determine_relationship_type(
+        "Past, Current, Future, Eternity", 
+        "Past, Current, Eternity, Future"
+    )
+    assert relationship == "Identity/Philia"
+    score, desc = temporistics.get_comfort_score(relationship)
+    assert score > 80
+    
+    # Order/Full Order - перший аспект одного є другим аспектом іншого і навпаки
+    relationship = temporistics.determine_relationship_type(
+        "Past, Current, Future, Eternity", 
+        "Current, Past, Eternity, Future"
+    )
+    assert relationship == "Order/Full Order"
+    score, desc = temporistics.get_comfort_score(relationship)
+    assert score > 70
+    
+    # Chronological Conflict або Conflict Submission/Dominance - перший аспект одного є останнім у іншого
+    relationship = temporistics.determine_relationship_type(
+        "Past, Current, Future, Eternity", 
+        "Future, Current, Eternity, Past"
+    )
+    assert relationship in ["Chronological Conflict", "Conflict Submission/Dominance"]
+    score, desc = temporistics.get_comfort_score(relationship)
+    assert score > 15
+    
+    # Psychosophia Extinguishment або Mirrored Perception - дзеркальне відображення
+    relationship = temporistics.determine_relationship_type(
+        "Past, Current, Future, Eternity", 
+        "Eternity, Future, Current, Past"
+    )
+    assert relationship in ["Psychosophia Extinguishment", "Mirrored Perception", "Chronological Conflict"]
+    score, desc = temporistics.get_comfort_score(relationship)
+    assert score > 20
+    
+    # Heterotemporality або Neutrality - різні перші аспекти, але є збіги
+    relationship = temporistics.determine_relationship_type(
+        "Past, Current, Future, Eternity", 
+        "Current, Eternity, Past, Future"
+    )
+    assert relationship in ["Heterotemporality", "Neutrality", "Therapy-Misunderstanding"]
+    score, desc = temporistics.get_comfort_score(relationship)
+    assert score > 40

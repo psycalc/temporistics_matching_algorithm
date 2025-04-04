@@ -46,9 +46,20 @@ class RelationshipType(Enum):
     CONFLICT = "Conflict"
     BENEFIT = "Benefit"
 
-    # Temporistics Relationships
+    # Temporistics Relationships (базові)
     HOMOCHRONY = "Homochrony"
     HETEROCHRONY = "Heterochrony"
+    
+    # Temporistics Relationships (деталізовані)
+    PERFECT_ALIGNMENT = "Perfect Alignment"
+    HOMOCHRONOUS_UNITY = "Homochronous Unity"
+    TEMPORAL_COMPATIBILITY = "Temporal Compatibility"
+    TEMPORAL_DUALITY = "Temporal Duality"
+    MIRRORED_PERCEPTION = "Mirrored Perception"
+    TEMPORAL_ACTIVATION = "Temporal Activation"
+    HETEROTEMPORALITY = "Heterotemporality"
+    CHRONOLOGICAL_CONFLICT = "Chronological Conflict"
+    ATEMPORAL_DISCONNECTION = "Atemporal Disconnection"
 
     # Psychosophia Relationships
     IDENTITY_PHILIA = "Identity/Philia"
@@ -118,10 +129,23 @@ class RelationshipCalculator:
 
         elif self.typology == "Temporistics":
             # Temporistics relationship determination logic
-            if TypologyTemporistics.are_types_homochronous(user1_type, user2_type):
-                return RelationshipType.HOMOCHRONY
-            else:
-                return RelationshipType.HETEROCHRONY
+            temporistics = TypologyTemporistics()
+            relationship_type_str = temporistics.determine_relationship_type(user1_type, user2_type)
+            
+            # Повертаємо відповідний RelationshipType на основі рядка
+            relationship_mapping = {
+                "Perfect Alignment": RelationshipType.PERFECT_ALIGNMENT,
+                "Homochronous Unity": RelationshipType.HOMOCHRONOUS_UNITY,
+                "Temporal Compatibility": RelationshipType.TEMPORAL_COMPATIBILITY,
+                "Temporal Duality": RelationshipType.TEMPORAL_DUALITY,
+                "Mirrored Perception": RelationshipType.MIRRORED_PERCEPTION,
+                "Temporal Activation": RelationshipType.TEMPORAL_ACTIVATION,
+                "Heterotemporality": RelationshipType.HETEROTEMPORALITY,
+                "Chronological Conflict": RelationshipType.CHRONOLOGICAL_CONFLICT,
+                "Atemporal Disconnection": RelationshipType.ATEMPORAL_DISCONNECTION,
+            }
+            
+            return relationship_mapping.get(relationship_type_str, RelationshipType.UNKNOWN)
 
         elif self.typology == "Psychosophia":
             # Psychosophia relationship determination logic
