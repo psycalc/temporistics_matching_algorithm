@@ -47,5 +47,28 @@ def validate_user_type(mapper, connection, target):
             f"Invalid type_value '{target.type_value}' for typology '{target.typology_name}'"
         )
 
+# Функція валідації координат користувача
+def validate_user_coordinates(mapper, connection, target):
+    # Перевіримо, що latitude і longitude є числами
+    if target.latitude is not None:
+        try:
+            # Переконаємося, що це дійсно число
+            target.latitude = float(target.latitude)
+        except (ValueError, TypeError):
+            # Якщо не вдається перетворити в число, встановлюємо None
+            target.latitude = None
+    
+    if target.longitude is not None:
+        try:
+            # Переконаємося, що це дійсно число
+            target.longitude = float(target.longitude)
+        except (ValueError, TypeError):
+            # Якщо не вдається перетворити в число, встановлюємо None
+            target.longitude = None
+
 event.listen(UserType, 'before_insert', validate_user_type)
 event.listen(UserType, 'before_update', validate_user_type)
+
+# Додаємо обробники подій для валідації координат
+event.listen(User, 'before_insert', validate_user_coordinates)
+event.listen(User, 'before_update', validate_user_coordinates)

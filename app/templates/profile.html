@@ -2,7 +2,11 @@
 
 {% block content %}
   <h2>{{ user.username }}'s Profile</h2>
-
+  {% if user.profile_image %}
+    <img src="{{ url_for('static', filename='uploads/' ~ user.profile_image) }}" alt="Profile Image" style="width: 150px; height: 150px; border-radius: 50%;">
+  {% else %}
+    <img src="{{ url_for('static', filename='uploads/default.png') }}" alt="Default Profile Image" style="width: 150px; height: 150px; border-radius: 50%;">
+  {% endif %}
   <form method="POST" action="">
     {{ form.hidden_tag() }}
 

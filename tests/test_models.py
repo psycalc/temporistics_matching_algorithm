@@ -3,6 +3,7 @@ from app import db
 from app.models import User, UserType
 import sqlalchemy.exc
 from tests.test_helpers import unique_username, unique_email
+import uuid
 
 
 
@@ -58,3 +59,25 @@ def test_user_uniqueness(app):
 
         with pytest.raises(sqlalchemy.exc.IntegrityError):
             db.session.commit()
+
+def test_user_update_email(app):
+    with app.app_context():
+        unique_id = uuid.uuid4().hex[:8]
+        initial_email = f"initial_{unique_id}@example.com"
+        updated_email = f"updated_{unique_id}@example.com"
+        
+        user = User(username=f"emailtest_{unique_id}", email=initial_email)
+        user.set_password("testpassword")
+        db.session.add(user)
+        db.session.commit()
+        
+        # Перевіряємо початковий email
+        assert user.email == initial_email
+        
+        # Змінюємо email
+        user.email = updated_email
+        db.session.commit()
+        
+        # Перевіряємо, що email змінився
+        updated_user = User.query.filter_by(username=f"emailtest_{unique_id}").first()
+        assert updated_user.email == updated_email

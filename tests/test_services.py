@@ -3,6 +3,7 @@ from app.services import get_types_by_typology, calculate_relationship
 from app import db
 from app.models import User, UserType
 from tests.test_helpers import unique_username, unique_email
+import uuid
 
 
 @pytest.fixture
@@ -65,12 +66,19 @@ def test_get_distance_if_compatible(app, setup_database):
         db.session.add(user_type)
         db.session.commit()
 
+        # Використовуємо унікальні email та username
+        unique_id = uuid.uuid4().hex[:8]
+        username1 = f"user1_{unique_id}"
+        username2 = f"user2_{unique_id}"
+        email1 = f"u1_{unique_id}@example.com"
+        email2 = f"u2_{unique_id}@example.com"
+        
         # Create two users with this user type
-        user1 = User(username="user1", email="u1@example.com",
+        user1 = User(username=username1, email=email1,
                      latitude=40.0, longitude=-73.0, user_type=user_type)
         user1.set_password("pass1")
 
-        user2 = User(username="user2", email="u2@example.com",
+        user2 = User(username=username2, email=email2,
                      latitude=41.0, longitude=-74.0, user_type=user_type)
         user2.set_password("pass2")
 

@@ -8,7 +8,7 @@
 {% endif %}
 
 <div class="content-section">
-  <form method="POST" action="">
+  <form method="POST" action="" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
     <fieldset class="form-group">
       <legend class="border-bottom mb-4">Join Today</legend>
@@ -42,6 +42,10 @@
           {{ subform.type_value(class="form-control form-control-lg") }}
         </div>
       {% endfor %}
+      <div class="form-group">
+        {{ form.profile_image.label(class="form-control-label") }}
+        {{ form.profile_image(class="form-control form-control-lg") }}
+      </div>
     </fieldset>
     <div class="form-group">
       {{ form.submit(class="btn btn-outline-info") }}

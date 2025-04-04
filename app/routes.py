@@ -16,6 +16,7 @@ from urllib.parse import urlparse, urljoin
 from app.services import get_distance_if_compatible
 from werkzeug.utils import secure_filename
 import os
+from .routes_helper import handle_profile_image_upload, update_user_typology
 
 main = Blueprint("main", __name__)
 
@@ -120,29 +121,39 @@ def register():
         else:
             subform.type_value.choices = [("No available types", "No available types")]
 
-    if request.method == "POST" and form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
+    if request.method == "POST":
+        if form.validate_on_submit():
+            user = User(username=form.username.data, email=form.email.data)
+            user.set_password(form.password.data)
+            db.session.add(user)
 
-        last_user_type_id = None
-        for subform in form.typologies:
-            ut = UserType(
-                typology_name=subform.typology_name.data,
-                type_value=subform.type_value.data,
-            )
-            db.session.add(ut)
+            last_user_type = None
+            for subform in form.typologies:
+                ut = UserType(
+                    typology_name=subform.typology_name.data,
+                    type_value=subform.type_value.data,
+                )
+                db.session.add(ut)
+                db.session.flush()  # get ID without full commit
+                last_user_type = ut
+
+            if last_user_type:
+                user.type_id = last_user_type.id
+
+            # Handle profile image if provided
+            if form.profile_image.data:
+                if not handle_profile_image_upload(form.profile_image.data, user):
+                    # Image upload failed, rollback changes
+                    db.session.rollback()
+                    flash("Error uploading profile image. Please try again.", "danger")
+                    return render_template("register.html", title="Register", form=form)
+
+            # If we got here, everything succeeded
             db.session.commit()
-            last_user_type_id = ut.id
-
-        user.type_id = last_user_type_id
-        db.session.commit()
-
-        flash("Your account has been created! You can now log in.", "success")
-        return redirect(url_for("main.login"))
-    elif request.method == "POST" and not form.validate():
-        flash("Registration failed. Please correct the errors below and try again.", "danger")
+            flash("Your account has been created! You can now log in.", "success")
+            return redirect(url_for("main.login"))
+        else:
+            flash("Registration failed. Please correct the errors below and try again.", "danger")
 
     return render_template("register.html", title="Register", form=form)
 
@@ -167,8 +178,6 @@ def login():
             return render_template("login.html", title="Login", form=form)
     return render_template("login.html", title="Login", form=form)
 
-
-
 @main.route("/logout")
 @login_required
 def logout():
@@ -190,7 +199,16 @@ def user_profile(username):
             form.type_value.data = user.user_type.type_value
 
     if form.validate_on_submit():
+        # Логування даних для діагностики
+        current_app.logger.info(f"Updating user profile: {user.username}")
+        current_app.logger.info(f"Current email: {user.email}")
+        current_app.logger.info(f"New email from form: {form.email.data}")
+        
+        # Оновлення email
         user.email = form.email.data
+        current_app.logger.info(f"Email after update: {user.email}")
+        
+        # Оновлення типології
         if not user.user_type:
             user.user_type = UserType(
                 typology_name=form.typology_name.data,
@@ -199,12 +217,15 @@ def user_profile(username):
         else:
             user.user_type.typology_name = form.typology_name.data
             user.user_type.type_value = form.type_value.data
+            
         try:
             db.session.commit()
+            current_app.logger.info(f"Email after commit: {user.email}")
             flash("Profile updated successfully.", "success")
-        except Exception:
+        except Exception as e:
             db.session.rollback()
-            flash("An error occurred while updating your profile. Please try again.", "danger")
+            current_app.logger.error(f"Error updating profile: {str(e)}")
+            flash(f"An error occurred while updating your profile: {str(e)}. Please try again.", "danger")
         return redirect(url_for("main.user_profile", username=user.username))
 
     return render_template("profile.html", user=user, form=form, can_edit=(user == current_user))
@@ -214,51 +235,49 @@ def user_profile(username):
 def edit_profile():
     form = EditProfileForm(obj=current_user)
     if form.validate_on_submit():
-        try:
-            from .services import update_user_profile
-            # Обновляем профиль пользователя
-            update_user_profile(
-                current_user,
-                username=form.username.data,
-                email=form.email.data,
-                typology_name=form.typology_name.data,
-                type_value=form.type_value.data,
-                latitude=form.latitude.data,
-                longitude=form.longitude.data,
-            )
+        from .services import update_user_profile
+        old_image_filename = current_user.profile_image
 
-            # Если был загружен файл с картинкой
-            if form.profile_image.data:
-                file = form.profile_image.data
-                filename = secure_filename(file.filename)
-                
-                uploads_dir = current_app.config['UPLOAD_FOLDER']
-                os.makedirs(uploads_dir, exist_ok=True)  # Убедимся, что директория существует
+        # Update user profile data (no commit yet)
+        update_user_profile(
+            current_user,
+            username=form.username.data,
+            email=form.email.data,
+            typology_name=form.typology_name.data,
+            type_value=form.type_value.data,
+            latitude=form.latitude.data,
+            longitude=form.longitude.data,
+        )
 
-                file_path = os.path.join(uploads_dir, filename)
+        if form.profile_image.data:
+            # Перевіряємо формат зображення перед збереженням
+            filename = form.profile_image.data.filename
+            ext = os.path.splitext(filename.lower())[1]
+            if ext not in [".jpg", ".jpeg", ".png"]:
+                flash("Invalid image format. Only JPEG and PNG are supported.", "danger")
+                db.session.rollback()
+                return render_template("edit_profile.html", form=form)
+            
+            # Спробуємо обробити зображення
+            if not handle_profile_image_upload(form.profile_image.data, current_user):
+                # Image upload failed, rollback to revert profile changes as well
+                db.session.rollback()
+                flash("Error uploading profile image. Please try again.", "danger")
+                return render_template("edit_profile.html", form=form)
 
-                # Проверяем, что путь не указывает на директорию
-                if os.path.isdir(file_path):
-                    raise ValueError(f"'{file_path}' is a directory, expected a file path.")
+            # If upload succeeded, remove the old image if different
+            if old_image_filename and old_image_filename != current_user.profile_image:
+                old_image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], old_image_filename)
+                if os.path.exists(old_image_path):
+                    os.remove(old_image_path)
 
-                # Проверка MIME-типа
-                if not file.mimetype.startswith("image/"):
-                    raise ValueError("Uploaded file is not an image.")
+        # Commit after all updates (including image)
+        db.session.commit()
+        flash("Profile updated successfully.", "success")
+        return redirect(url_for("main.user_profile", username=current_user.username))
 
-                file.save(file_path)
-                current_user.profile_image = filename
-
-            # Сохраняем изменения в базе данных
-            db.session.commit()
-
-            flash("Profile updated successfully.", "success")
-            return redirect(url_for("main.user_profile", username=current_user.username))
-        except Exception as e:
-            current_app.logger.error(f"Error updating profile for user {current_user.username}: {e}", exc_info=True)
-            flash("An unexpected error occurred. Please try again later.", "danger")
-
+    # If not a POST or form not valid, just display the form
     return render_template("edit_profile.html", form=form)
-
 
 @main.route("/check_distance", methods=["GET", "POST"])
 @login_required
@@ -278,7 +297,6 @@ def check_distance():
             return render_template("check_distance_form.html")
     else:
         return render_template("check_distance_form.html")
-
 
 @main.route("/nearby_compatibles")
 @login_required

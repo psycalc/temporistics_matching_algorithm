@@ -1,14 +1,27 @@
 import os
 import logging
-from flask import Flask
+from flask import Flask, request
 from app import create_app, db
 from flask_migrate import Migrate
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 logging.basicConfig(level=logging.INFO)  # Set up logging
 
 config_name = os.getenv("FLASK_CONFIG", "development")
 app = create_app(config_name)
 migrate = Migrate(app, db)
+
+# Функція для отримання IP-адреси клієнта
+def get_ip_key():
+    return get_remote_address()
+
+# Виправлення налаштувань лімітера для уникнення попередження
+limiter = Limiter(
+    app,
+    key_func=get_ip_key,
+    default_limits=["200 per day", "50 per hour"]
+)
 
 if __name__ == "__main__":
     if app.config["DEBUG"]:
