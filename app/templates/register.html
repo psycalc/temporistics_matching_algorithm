@@ -11,7 +11,7 @@
   <form method="POST" action="" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
     <fieldset class="form-group">
-      <legend class="border-bottom mb-4">Join Today</legend>
+      <legend class="border-bottom mb-4">{{ _('Join Today') }}</legend>
       <div class="form-group">
         {{ form.username.label(class="form-control-label") }}
         {{ form.username(class="form-control form-control-lg") }}
@@ -34,7 +34,7 @@
         <hr>
         <!-- Отображаем название типологии просто текстом, а в коде она хранится в hidden_field -->
         <div class="form-group">
-          <strong>Typology:</strong> {{ subform.typology_name.data }}
+          <strong>{{ _('Typology') }}:</strong> {{ subform.typology_name.data }}
           {{ subform.typology_name() }} {# hidden field #}
         </div>
         <div class="form-group">
@@ -53,7 +53,7 @@
   </form>
   <div class="border-top pt-3">
     <small class="text-muted">
-      Already have an account? <a href="{{ url_for('main.login') }}">Sign In</a>
+      {{ _('Already have an account?') }} <a href="{{ url_for('main.login') }}">{{ _('Sign In') }}</a>
     </small>
   </div>
 </div>

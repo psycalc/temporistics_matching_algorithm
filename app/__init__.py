@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, g
 from config import config_dict
 from .extensions import db, migrate, cache  # <-- Вот тут!
 from flask_login import LoginManager
@@ -30,12 +30,32 @@ def create_app(config_name=None):
 
     # Настраиваем локаль
     def get_locale():
-        return request.accept_languages.best_match(app.config["LANGUAGES"])
-
+        # Спочатку перевіряємо наявність мови в cookies
+        locale = request.cookies.get('locale')
+        
+        # Якщо мова є в cookies і вона підтримується
+        if locale and locale in app.config['LANGUAGES']:
+            g.locale = locale  # Встановлюємо поточну мову в глобальний контекст
+            return locale
+        
+        # Якщо немає в cookies або не підтримується, використовуємо найкращу відповідність
+        best_match = request.accept_languages.best_match(app.config["LANGUAGES"])
+        g.locale = best_match
+        return best_match
+    
+    # Використовуємо новий спосіб налаштування locale_selector
     babel.locale_selector_func = get_locale
 
     from .routes import main as main_blueprint
     app.register_blueprint(main_blueprint)
+
+    # Додати template context processor для мовних перемикачів
+    @app.context_processor
+    def inject_language_form():
+        from flask_wtf import FlaskForm
+        class LanguageForm(FlaskForm):
+            pass
+        return {'form': LanguageForm()}
 
     # Добавляем тестовый маршрут для вызова ошибки 500, только если TESTING=True
     if app.config.get("TESTING"):

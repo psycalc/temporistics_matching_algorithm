@@ -13,7 +13,7 @@ class Config:
     CACHE_DEFAULT_TIMEOUT = 300
     BABEL_DEFAULT_LOCALE = os.environ.get("BABEL_DEFAULT_LOCALE", "en")
     BABEL_DEFAULT_TIMEZONE = os.environ.get("BABEL_DEFAULT_TIMEZONE", "UTC")
-    LANGUAGES = os.environ.get("LANGUAGES", "en,fr,es").split(",")
+    LANGUAGES = os.environ.get("LANGUAGES", "en,fr,es,uk").split(",")
 
 class DevelopmentConfig(Config):
     DEBUG = True

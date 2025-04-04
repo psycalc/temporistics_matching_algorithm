@@ -1,17 +1,19 @@
-# Translations template for PROJECT.
+# Ukrainian translations for PROJECT.
 # Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-04-04 21:54+0300\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2025-04-04 21:56+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: uk\n"
+"Language-Team: uk <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,84 +21,84 @@ msgstr ""
 
 #: app/templates/base.html:4
 msgid "Psychological Calculator"
-msgstr ""
+msgstr "Психологічний калькулятор"
 
 #: app/templates/base.html:11
 msgid "Home"
-msgstr ""
+msgstr "Головна"
 
 #: app/templates/base.html:13
 msgid "Logout"
-msgstr ""
+msgstr "Вийти"
 
 #: app/templates/base.html:14
 msgid "Profile"
-msgstr ""
+msgstr "Профіль"
 
 #: app/templates/base.html:16
 msgid "Compatible Nearby"
-msgstr ""
+msgstr "Сумісні поблизу"
 
 #: app/templates/base.html:18
 msgid "Register"
-msgstr ""
+msgstr "Реєстрація"
 
 #: app/templates/base.html:19
 msgid "Login"
-msgstr ""
+msgstr "Увійти"
 
 #: app/templates/login.html:8
 msgid "Log In"
-msgstr ""
+msgstr "Вхід у систему"
 
 #: app/templates/login.html:34
 msgid "Need an account?"
-msgstr ""
+msgstr "Потрібен обліковий запис?"
 
 #: app/templates/login.html:35
 msgid "Sign Up"
-msgstr ""
+msgstr "Зареєструватися"
 
 #: app/templates/profile.html:4
 #, python-format
 msgid "%(username)s's Profile"
-msgstr ""
+msgstr "Профіль користувача %(username)s"
 
 #: app/templates/profile.html:6
 msgid "Profile Image"
-msgstr ""
+msgstr "Зображення профілю"
 
 #: app/templates/profile.html:8
 msgid "Default Profile Image"
-msgstr ""
+msgstr "Зображення профілю за замовчуванням"
 
 #: app/templates/profile.html:14
 msgid "Email"
-msgstr ""
+msgstr "Електронна пошта"
 
 #: app/templates/profile.html:19
 msgid "Typology Name"
-msgstr ""
+msgstr "Назва типології"
 
 #: app/templates/profile.html:24
 msgid "Type Value"
-msgstr ""
+msgstr "Значення типу"
 
 #: app/templates/register.html:14
 msgid "Join Today"
-msgstr ""
+msgstr "Приєднатися сьогодні"
 
 #: app/templates/register.html:37
 msgid "Typology"
-msgstr ""
+msgstr "Типологія"
 
 #: app/templates/register.html:56
 msgid "Already have an account?"
-msgstr ""
+msgstr "Вже маєте обліковий запис?"
 
 #: app/templates/register.html:56
 msgid "Sign In"
-msgstr ""
+msgstr "Увійти"
 
 #: env/lib/python3.9/site-packages/click/_termui_impl.py:518
 #: venv/lib/python3.10/site-packages/click/_termui_impl.py:518
@@ -138,6 +140,7 @@ msgid "Got unexpected extra argument ({args})"
 msgid_plural "Got unexpected extra arguments ({args})"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: env/lib/python3.9/site-packages/click/core.py:1428
 #: venv/lib/python3.10/site-packages/click/core.py:1428
@@ -170,6 +173,7 @@ msgid "Takes {nargs} values but 1 was given."
 msgid_plural "Takes {nargs} values but {len} were given."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: env/lib/python3.9/site-packages/click/core.py:2778
 #: venv/lib/python3.10/site-packages/click/core.py:2778
@@ -260,6 +264,7 @@ msgid "Did you mean {possibility}?"
 msgid_plural "(Possible options: {possibilities})"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: env/lib/python3.9/site-packages/click/exceptions.py:262
 #: venv/lib/python3.10/site-packages/click/exceptions.py:262
@@ -287,6 +292,7 @@ msgid "Option {name!r} requires an argument."
 msgid_plural "Option {name!r} requires {nargs} arguments."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: env/lib/python3.9/site-packages/click/shell_completion.py:318
 #: venv/lib/python3.10/site-packages/click/shell_completion.py:318
@@ -341,6 +347,7 @@ msgid "{value!r} is not {choice}."
 msgid_plural "{value!r} is not one of {choices}."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: env/lib/python3.9/site-packages/click/types.py:394
 #: venv/lib/python3.10/site-packages/click/types.py:394
@@ -348,6 +355,7 @@ msgid "{value!r} does not match the format {format}."
 msgid_plural "{value!r} does not match the formats {formats}."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: env/lib/python3.9/site-packages/click/types.py:414
 #: venv/lib/python3.10/site-packages/click/types.py:414
@@ -420,6 +428,7 @@ msgid "{len_type} values are required, but {len_value} was given."
 msgid_plural "{len_type} values are required, but {len_value} were given."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: env/lib/python3.9/site-packages/flask_wtf/file.py:55
 #: env/lib/python3.9/site-packages/wtforms/validators.py:293
@@ -463,6 +472,7 @@ msgid "Field must be at least %(min)d character long."
 msgid_plural "Field must be at least %(min)d characters long."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: env/lib/python3.9/site-packages/wtforms/validators.py:151
 #: venv/lib/python3.10/site-packages/wtforms/validators.py:151
@@ -471,6 +481,7 @@ msgid "Field cannot be longer than %(max)d character."
 msgid_plural "Field cannot be longer than %(max)d characters."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: env/lib/python3.9/site-packages/wtforms/validators.py:157
 #: venv/lib/python3.10/site-packages/wtforms/validators.py:157
@@ -479,6 +490,7 @@ msgid "Field must be exactly %(max)d character long."
 msgid_plural "Field must be exactly %(max)d characters long."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: env/lib/python3.9/site-packages/wtforms/validators.py:163
 #: venv/lib/python3.10/site-packages/wtforms/validators.py:163
@@ -603,6 +615,7 @@ msgid "'%(value)s' is not a valid choice for this field."
 msgid_plural "'%(value)s' are not valid choices for this field."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: env/lib/python3.9/site-packages/wtforms/fields/datetime.py:51
 #: venv/lib/python3.10/site-packages/wtforms/fields/datetime.py:52
