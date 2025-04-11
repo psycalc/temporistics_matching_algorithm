@@ -20,9 +20,8 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
-    # Если хотите в режиме тестирования использовать именно переменную окружения,
-    # убедитесь, что она определена в .env
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "sqlite:///test.db")
+    # Завжди використовуємо SQLite для тестів, щоб не залежати від PostgreSQL
+    SQLALCHEMY_DATABASE_URI = os.environ.get("USE_TEST_DB_URL", "sqlite:///test.db")
     WTF_CSRF_ENABLED = False
     SECRET_KEY = "testsecretkey"
 

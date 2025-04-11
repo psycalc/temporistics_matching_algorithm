@@ -32,9 +32,9 @@
 
     {% if form %}
         <div class="language-switcher">
-            <form action="{{ url_for('main.change_language') }}" method="post">
-                {{ form.csrf_token }}
-                <select name="language" onchange="this.form.submit()">
+            <form id="languageForm" action="{{ url_for('main.change_language') }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <select id="languageSelect" name="language" onchange="submitLanguageForm()">
                     <option value="en" {% if g.locale == 'en' %}selected{% endif %}>English</option>
                     <option value="fr" {% if g.locale == 'fr' %}selected{% endif %}>Français</option>
                     <option value="es" {% if g.locale == 'es' %}selected{% endif %}>Español</option>
@@ -49,5 +49,10 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+    function submitLanguageForm() {
+        document.getElementById('languageForm').submit();
+    }
+    </script>
 </body>
 </html>

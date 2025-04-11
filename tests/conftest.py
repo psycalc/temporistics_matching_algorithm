@@ -1,27 +1,143 @@
 # tests/conftest.py
 import pytest
 import os
-from app import create_app, db
+import sys
+import tempfile
+import random
+import string
+from datetime import datetime
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy import MetaData, Table, Column, Integer, String, ForeignKey, Float
+from sqlalchemy.ext.declarative import declarative_base
+
+from app import create_app
+from app.extensions import db
 from flask_migrate import Migrate, upgrade
 
+from app.models import User, UserType
+import pytest
+import threading
+import socket
+from werkzeug.serving import make_server
+
+# Створюємо екземпляр Migrate для тестування
 migrate = Migrate()
 
 @pytest.fixture(scope="session")
 def db_url():
-    return os.environ.get("DATABASE_URL", "postgresql://testuser:password@db:5432/testdb")
+    if "USE_TEST_DB_URL" in os.environ:
+        # Использовать указанный URL для тестов
+        return os.environ["USE_TEST_DB_URL"]
+    else:
+        # Создать временную SQLite БД
+        # Используем tempfile.mkstemp - это создаёт
+        # уникальный для каждой сессии файл
+        # Отлично подходит для парралельного запуска
+        # нескольких тестов
+        _, db_path = tempfile.mkstemp()
+        return f"sqlite:///{db_path}"
 
 @pytest.fixture(scope="session")
 def app(db_url):
     application = create_app("testing")
     application.config["SQLALCHEMY_DATABASE_URI"] = db_url
     application.config["TESTING"] = True
+    
+    # Створюємо власний engine і таблиці для тестування
+    engine = create_engine(db_url)
+    metadata = MetaData()
+    
+    # Визначаємо таблиці
+    users = Table('users', metadata,
+        Column('id', Integer, primary_key=True),
+        Column('username', String(80), unique=True),
+        Column('email', String(120), unique=True),
+        Column('password_hash', String(128)),
+        Column('type_id', Integer, ForeignKey('user_type.id')),
+        Column('profile_image', String(200)),
+        Column('latitude', Float),
+        Column('longitude', Float)
+    )
+    
+    user_type = Table('user_type', metadata,
+        Column('id', Integer, primary_key=True),
+        Column('typology_name', String(50)),
+        Column('type_value', String(50))
+    )
+    
+    # Створюємо таблиці
     with application.app_context():
+        # Ініціалізуємо міграції
         migrate.init_app(application, db)
-        upgrade()
-        # Создаём таблицы, которых нет в миграциях (например, user_type)
-        db.create_all()
+        metadata.create_all(engine)
+    
     yield application
+
+# Створюємо фікстуру для live_server
+class LiveServer:
+    def __init__(self, app, port):
+        self.app = app
+        self.port = port
+        self.server = make_server('localhost', port, app)
+        self.thread = threading.Thread(target=self.server.serve_forever)
+        self.thread.daemon = True
+
+    def start(self):
+        self.thread.start()
+
+    def stop(self):
+        self.server.shutdown()
+        self.thread.join()
+
+    @property
+    def url(self):
+        return f'http://localhost:{self.port}'
+
+def get_free_port():
+    """Знаходить вільний порт для запуску сервера."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(('0.0.0.0', 0))
+        return s.getsockname()[1]
+
+@pytest.fixture(scope='function')
+def live_server(app):
+    """Запускає тестовий сервер у окремому потоці."""
+    port = get_free_port()
+    server = LiveServer(app, port)
+    server.start()
+    yield server
+    server.stop()
+
+@pytest.fixture(scope="function")
+def test_db(app):
+    with app.app_context():
+        print("Creating tables for test...")
+        db.create_all()  # Створюємо всі таблиці перед тестом
+        print("Tables created...")
+        # Для SQLAlchemy 2.0 потрібно використовувати text() для текстових запитів
+        from sqlalchemy import text
+        engine = db.engine
+        with engine.connect() as connection:
+            result = connection.execute(text("SELECT name FROM sqlite_master WHERE type='table';"))
+            tables = [row[0] for row in result]
+            print(f"Tables in database: {tables}")
+        yield db
+        db.session.remove()
+        db.drop_all()  # Видаляємо таблиці після тесту
+        print("Tables dropped...")
 
 @pytest.fixture(scope="function")
 def client(app):
     return app.test_client()
+
+# В тестах используем так:
+# def test_something(client, app):
+#    with app.app_context():
+#        test_someting
+#    assert ...
+
+@pytest.fixture(scope="function")
+def client_with_ctx(app, db):
+    with app.app_context():
+        yield app.test_client()

@@ -12,6 +12,9 @@
     - [Routes and Forms](#routes-and-forms)
 4. [Testing](#testing)
 5. [Installation and Run](#installation-and-run)
+    - [Локальний запуск](#локальний-запуск)
+    - [Запуск у Docker](#запуск-у-docker)
+    - [Запуск тестів](#запуск-тестів)
 6. [Additional Information](#additional-information)
 
 ---
@@ -87,16 +90,108 @@ A high test coverage (~93%) confirms that the theoretical ideas are correctly mi
 
 ## Installation and Run
 
-Prerequisites: Python 3.10+, Flask, pytest, and other dependencies listed in `requirements.txt`.
+### Локальний запуск
+
+1. **Підготовка**:
+   - Переконайтеся, що у вас встановлено Python 3.10 або новіше
+   - Встановіть залежності:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Налаштування середовища**:
+   - Створіть файл `.env` у корені проекту (якщо його ще немає)
+   - Налаштуйте необхідні змінні середовища (приклад):
+   ```
+   FLASK_CONFIG=development
+   SECRET_KEY=your-secret-key
+   DATABASE_URL=sqlite:///site.db  # Для розробки можна використовувати SQLite
+   BABEL_DEFAULT_LOCALE=uk
+   BABEL_DEFAULT_TIMEZONE=Europe/Kiev
+   LANGUAGES=en,fr,es,uk
+   ```
+
+3. **Запуск сервера розробки**:
+   ```bash
+   python run.py
+   ```
+   Додаток буде доступний за адресою http://localhost:5000
+
+### Запуск у Docker
+
+1. **Використання Docker Compose**:
+   ```bash
+   docker-compose up
+   ```
+   Цей команда запустить базу даних PostgreSQL та веб-додаток.
+
+2. **Запуск тільки веб-додатку**:
+   ```bash
+   docker-compose up web
+   ```
+
+### Запуск тестів
+
+#### Основні команди для запуску тестів
+
+1. **Налаштування середовища для тестів**:
+   ```bash
+   export PYTHONPATH="$PYTHONPATH:$(pwd)"
+   export USE_TEST_DB_URL="sqlite:///test.db" 
+   export FLASK_CONFIG=testing
+   ```
+
+2. **Запуск усіх тестів**:
+   ```bash
+   python -m pytest
+   ```
+
+3. **Запуск конкретного тесту**:
+   ```bash
+   python -m pytest tests/test_localization.py::test_language_affects_content
+   ```
+
+4. **Запуск тестів із певного файлу**:
+   ```bash
+   python -m pytest tests/test_models.py
+   ```
+
+5. **Запуск тестів із більш детальним виводом**:
+   ```bash
+   python -m pytest -xvs tests/test_localization.py
+   ```
+
+6. **Запуск Selenium тестів**:
+   ```bash
+   python -m pytest -m selenium
+   ```
+   
+   Для запуску Selenium тестів переконайтеся, що у вас встановлено:
+   - Chrome браузер
+   - ChromeDriver (відповідної версії)
+
+#### Альтернативний запуск тестів через скрипт
+
+Для тестів Selenium можна використовувати скрипт:
+```bash
+bash run_selenium_tests.sh
+```
+
+#### Запуск тестів у Docker
 
 ```bash
-# Install dependencies
-pip install -r requirements.txt
+docker-compose up test
+```
 
-# Run tests
-python -m pytest --maxfail=1 --disable-warnings -q
+#### Примітки щодо тестування
 
-# Start the application (development mode)
-export FLASK_APP=app
-export FLASK_ENV=development
-flask run
+- Для тестів використовується SQLite замість PostgreSQL, щоб уникнути залежності від зовнішньої бази даних.
+- Під час запуску тестів створюються тимчасові таблиці, які видаляються після виконання тестів.
+- Якщо ви змінюєте структуру бази даних, переконайтеся, що ви також оновили відповідні тести.
+- Високий рівень покриття тестами (~93%) підтверджує, що теоретичні ідеї проекту коректно реалізовані у коді.
+
+## Additional Information
+
+This project is developed by [Your Name] and is licensed under the [License Name].
+
+For more information, please visit the project repository on [GitHub](https://github.com/yourusername/psychological-calculator) or contact the developer at [your.email@example.com].

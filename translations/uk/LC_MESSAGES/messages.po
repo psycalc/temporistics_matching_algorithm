@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-04-04 21:54+0300\n"
+"POT-Creation-Date: 2025-04-04 23:49+0300\n"
 "PO-Revision-Date: 2025-04-04 21:56+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: uk\n"
@@ -18,6 +18,72 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
+
+#: app/forms.py:15 app/forms.py:46 app/forms.py:55
+#: app/templates/profile.html:24
+msgid "Type Value"
+msgstr "Значення типу"
+
+#: app/forms.py:18 app/forms.py:43
+msgid "Username"
+msgstr "Ім'я користувача"
+
+#: app/forms.py:19 app/forms.py:37 app/forms.py:44 app/forms.py:53
+#: app/templates/profile.html:14
+msgid "Email"
+msgstr "Електронна пошта"
+
+#: app/forms.py:20 app/forms.py:38
+msgid "Password"
+msgstr "Пароль"
+
+#: app/forms.py:21
+msgid "Confirm Password"
+msgstr "Підтвердження пароля"
+
+#: app/forms.py:23 app/forms.py:49 app/templates/profile.html:6
+msgid "Profile Image"
+msgstr "Зображення профілю"
+
+#: app/forms.py:23 app/forms.py:49
+msgid "Images only!"
+msgstr "Тільки зображення!"
+
+#: app/forms.py:24 app/templates/login.html:35
+msgid "Sign Up"
+msgstr "Зареєструватися"
+
+#: app/forms.py:29
+msgid "That username is already taken. Please choose a different one."
+msgstr "Це ім'я користувача вже зайняте. Будь ласка, виберіть інше."
+
+#: app/forms.py:34
+msgid "That email is already registered. Please choose a different one."
+msgstr "Ця електронна адреса вже зареєстрована. Будь ласка, виберіть іншу."
+
+#: app/forms.py:39
+msgid "Remember Me"
+msgstr "Запам'ятати мене"
+
+#: app/forms.py:40 app/templates/base.html:19
+msgid "Login"
+msgstr "Увійти"
+
+#: app/forms.py:45 app/forms.py:54 app/templates/profile.html:19
+msgid "Typology Name"
+msgstr "Назва типології"
+
+#: app/forms.py:47 app/forms.py:56
+msgid "Latitude"
+msgstr "Широта"
+
+#: app/forms.py:48 app/forms.py:57
+msgid "Longitude"
+msgstr "Довгота"
+
+#: app/forms.py:50 app/forms.py:58
+msgid "Save Changes"
+msgstr "Зберегти зміни"
 
 #: app/templates/base.html:4
 msgid "Psychological Calculator"
@@ -43,10 +109,6 @@ msgstr "Сумісні поблизу"
 msgid "Register"
 msgstr "Реєстрація"
 
-#: app/templates/base.html:19
-msgid "Login"
-msgstr "Увійти"
-
 #: app/templates/login.html:8
 msgid "Log In"
 msgstr "Вхід у систему"
@@ -55,34 +117,14 @@ msgstr "Вхід у систему"
 msgid "Need an account?"
 msgstr "Потрібен обліковий запис?"
 
-#: app/templates/login.html:35
-msgid "Sign Up"
-msgstr "Зареєструватися"
-
 #: app/templates/profile.html:4
 #, python-format
 msgid "%(username)s's Profile"
 msgstr "Профіль користувача %(username)s"
 
-#: app/templates/profile.html:6
-msgid "Profile Image"
-msgstr "Зображення профілю"
-
 #: app/templates/profile.html:8
 msgid "Default Profile Image"
 msgstr "Зображення профілю за замовчуванням"
-
-#: app/templates/profile.html:14
-msgid "Email"
-msgstr "Електронна пошта"
-
-#: app/templates/profile.html:19
-msgid "Typology Name"
-msgstr "Назва типології"
-
-#: app/templates/profile.html:24
-msgid "Type Value"
-msgstr "Значення типу"
 
 #: app/templates/register.html:14
 msgid "Join Today"
@@ -99,6 +141,102 @@ msgstr "Вже маєте обліковий запис?"
 #: app/templates/register.html:56
 msgid "Sign In"
 msgstr "Увійти"
+
+#: app/typologies/typology_socionics.py:41
+msgid "Seeker (ILE)"
+msgstr ""
+
+#: app/typologies/typology_socionics.py:42
+msgid "Analyst (LII)"
+msgstr ""
+
+#: app/typologies/typology_socionics.py:43
+msgid "Enthusiast (ESE)"
+msgstr ""
+
+#: app/typologies/typology_socionics.py:44
+msgid "Mediator (SEI)"
+msgstr ""
+
+#: app/typologies/typology_socionics.py:46
+msgid ""
+"The first quadra (Alpha) in socionics is defined by the aspects of "
+"Intuition of Possibilities, Structural Logic, Ethics of Emotions, and "
+"Sensation of Sensations. Its representatives value new opportunities and "
+"theories, inspiration, fun, and care for comfort."
+msgstr ""
+
+#: app/typologies/typology_socionics.py:52
+msgid "Mentor (EIE)"
+msgstr ""
+
+#: app/typologies/typology_socionics.py:53
+msgid "Marshal (SLE)"
+msgstr ""
+
+#: app/typologies/typology_socionics.py:54
+msgid "Inspector (LSI)"
+msgstr ""
+
+#: app/typologies/typology_socionics.py:55
+msgid "Lyricist (IEI)"
+msgstr ""
+
+#: app/typologies/typology_socionics.py:57
+msgid ""
+"The second quadra (Beta) in socionics is known as the Embodiers. The "
+"mission of the Embodiers quadra is to transform the initial concept into "
+"a complete ideology and implement new orders by creating corresponding "
+"organizational structures."
+msgstr ""
+
+#: app/typologies/typology_socionics.py:63
+msgid "Politician (SEE)"
+msgstr ""
+
+#: app/typologies/typology_socionics.py:64
+msgid "Entrepreneur (LIE)"
+msgstr ""
+
+#: app/typologies/typology_socionics.py:65
+msgid "Critic (ILI)"
+msgstr ""
+
+#: app/typologies/typology_socionics.py:66
+msgid "Guardian (ESI)"
+msgstr ""
+
+#: app/typologies/typology_socionics.py:68
+msgid ""
+"The third quadra (Gamma) in socionics is known as the Reformers. The "
+"mission of the Reformers quadra is to remove the accumulated "
+"contradictions from the previous stage through criticism of admitted "
+"mistakes and carry out reform of rigid structures that have outlived "
+"their usefulness."
+msgstr ""
+
+#: app/typologies/typology_socionics.py:74
+msgid "Administrator (LSE)"
+msgstr ""
+
+#: app/typologies/typology_socionics.py:75
+msgid "Master (SLI)"
+msgstr ""
+
+#: app/typologies/typology_socionics.py:76
+msgid "Advisor (IEE)"
+msgstr ""
+
+#: app/typologies/typology_socionics.py:77
+msgid "Humanist (EII)"
+msgstr ""
+
+#: app/typologies/typology_socionics.py:79
+msgid ""
+"The fourth quadra (Delta) in socionics is known as the Perfectors. The "
+"mission of the Perfectors quadra is to bring the initial but reformed "
+"idea to exhaustion through improvement."
+msgstr ""
 
 #: env/lib/python3.9/site-packages/click/_termui_impl.py:518
 #: venv/lib/python3.10/site-packages/click/_termui_impl.py:518

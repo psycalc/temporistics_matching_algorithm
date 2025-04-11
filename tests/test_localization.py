@@ -36,7 +36,7 @@ def test_change_language_cookie(client, app):
             cookie_header = response.request.headers.get('Cookie', '')
             assert f'locale={lang}' in cookie_header, f"Cookie не встановлено для мови {lang}"
 
-def test_language_affects_content(client, app):
+def test_language_affects_content(client, app, test_db):
     """Перевіряє, що зміна мови впливає на вміст сторінки."""
     with app.app_context():
         # Створюємо користувача для входу
@@ -44,8 +44,8 @@ def test_language_affects_content(client, app):
         email = unique_email("localization_user")
         user = User(username=username, email=email)
         user.set_password("testpassword")
-        db.session.add(user)
-        db.session.commit()
+        test_db.session.add(user)
+        test_db.session.commit()
         
         # Заходимо як користувач
         client.post("/login", data={
@@ -82,7 +82,7 @@ def test_language_cookie_preserved(client, app):
         cookie_header = response.request.headers.get('Cookie', '')
         assert 'locale=uk' in cookie_header, "Cookie не збережено при переході на сторінку логіну"
 
-def test_translated_content_displayed(client, app):
+def test_translated_content_displayed(client, app, test_db):
     """Перевіряє, що переклади відображаються на сторінках."""
     with app.app_context():
         # Створюємо користувача для входу
@@ -90,8 +90,8 @@ def test_translated_content_displayed(client, app):
         email = unique_email("translation_tester")
         user = User(username=username, email=email)
         user.set_password("testpassword")
-        db.session.add(user)
-        db.session.commit()
+        test_db.session.add(user)
+        test_db.session.commit()
         
         # Встановлюємо українську мову спочатку
         client.post("/change_language", data={"language": "uk"}, follow_redirects=True)

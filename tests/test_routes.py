@@ -11,14 +11,14 @@ def test_index_route(client):
     response = client.get("/")
     assert response.status_code == 302
 
-def test_login(client, app):
+def test_login(client, app, test_db):
     with app.app_context():
         username = unique_username("loginuser")
         email = unique_email("loginuser")
         user = User(username=username, email=email)
         user.set_password("testpassword")
-        db.session.add(user)
-        db.session.commit()
+        test_db.session.add(user)
+        test_db.session.commit()
 
         response = client.post("/login", data={
             "email": email,

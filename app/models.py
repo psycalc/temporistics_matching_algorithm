@@ -1,4 +1,4 @@
-from . import db
+from .extensions import db
 from flask_login import UserMixin
 from passlib.hash import bcrypt
 from sqlalchemy.orm import relationship

@@ -2,10 +2,25 @@
 
 {% block content %}
 <div class="content-section">
+    <!-- Додавання тестового блоку для перевірки перекладів -->
+    <div style="background-color: #f8f9fa; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc;">
+        <p><strong>Тестовий контейнер для переводів:</strong></p>
+        <ul>
+            <li>Login (без "_"): Login</li>
+            <li>Login (з "_"): {{ _('Login') }}</li>
+            <li>Login (з custom "_"): {{ gettext('Login') }}</li>
+            <li>Email (з "_"): {{ _('Email') }}</li>
+            <li>Email (з custom "_"): {{ gettext('Email') }}</li>
+            <li>Password (з "_"): {{ _('Password') }}</li>
+            <li>Password (з custom "_"): {{ gettext('Password') }}</li>
+            <li>Поточна локаль: {{ current_locale }}</li>
+        </ul>
+    </div>
+
     <form method="POST" action="">
         {{ form.hidden_tag() }}
         <fieldset class="form-group">
-            <legend class="border-bottom mb-4">{{ _('Log In') }}</legend>
+            <legend class="border-bottom mb-4">{{ gettext('Log In') }}</legend>
             <div class="form-group">
                 {{ form.email.label(class="form-control-label") }}
                 {{ form.email(class="form-control form-control-lg") }}
@@ -22,7 +37,7 @@
             </div>
             <div class="form-group">
                 {{ form.remember() }}
-                {{ form.remember.label }}
+                {{ form.remember.label(text=gettext('Remember Me')) }}
             </div>
         </fieldset>
         <div class="form-group">
@@ -31,8 +46,8 @@
     </form>
     <div class="border-top pt-3">
         <small class="text-muted">
-            {{ _('Need an account?') }}
-            <a href="{{ url_for('main.register') }}">{{ _('Sign Up') }}</a>
+            {{ gettext('Need an account?') }}
+            <a href="{{ url_for('main.register') }}">{{ gettext('Sign Up') }}</a>
         </small>
     </div>
 </div>

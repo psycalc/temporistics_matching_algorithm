@@ -2,7 +2,8 @@ from flask import (Blueprint, render_template, request, jsonify, current_app, re
 from flask_login import login_user, logout_user, login_required, current_user
 from .forms import RegistrationForm, LoginForm, ProfileForm, EditProfileForm
 from .models import User, UserType
-from . import db, login_manager
+from .extensions import db
+from . import login_manager
 from .services import get_types_by_typology, calculate_relationship
 from .typologies import (
     TypologyTemporistics,
@@ -83,16 +84,47 @@ def index():
 @main.route("/change_language", methods=["POST"])
 def change_language():
     COOKIE_NAME = "locale"
-    COOKIE_EXPIRATION = 60 * 60 * 24 * 30
+    COOKIE_EXPIRATION = 60 * 60 * 24 * 30  # 30 днів
     language = request.form.get("language")
+    
+    # Розширене логування
+    current_app.logger.info("=" * 50)
+    current_app.logger.info("ЗМІНА МОВИ ЗАПИТАНА")
+    current_app.logger.info(f"Запитувана мова: {language}")
+    current_app.logger.info(f"Поточні cookie: {request.cookies}")
+    current_app.logger.info(f"Метод запиту: {request.method}")
+    current_app.logger.info(f"Всі form дані: {request.form}")
+    current_app.logger.info(f"Заголовки запиту: {request.headers}")
+    current_app.logger.info(f"Підтримувані мови: {current_app.config['LANGUAGES']}")
+    
     if language and language in current_app.config["LANGUAGES"]:
+        # Створюємо відповідь
         response = make_response(redirect(url_for("main.index")))
-        response.set_cookie(COOKIE_NAME, language, max_age=COOKIE_EXPIRATION)
+        # Встановлюємо cookie з чітко визначеним шляхом і доменом
+        response.set_cookie(
+            COOKIE_NAME, 
+            language, 
+            max_age=COOKIE_EXPIRATION,
+            path="/",         # Для всього сайту
+            httponly=False,   # Доступний для JavaScript
+            secure=request.is_secure,  # Якщо HTTPS, ставимо secure
+            samesite="Lax"    # Дозволяє cookie при переході з інших сайтів
+        )
+        
+        # Додаємо заголовки для запобігання кешуванню
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        
+        current_app.logger.info(f"Cookie встановлено: {COOKIE_NAME}={language}, max_age={COOKIE_EXPIRATION}")
+        current_app.logger.info(f"Всі заголовки відповіді: {response.headers}")
+        current_app.logger.info("=" * 50)
         return response
     else:
         current_app.logger.error(
-            f"Failed to change language. Supported languages: {current_app.config['LANGUAGES']}"
+            f"Помилка зміни мови. Мова '{language}' не підтримується. Підтримувані мови: {current_app.config['LANGUAGES']}"
         )
+        current_app.logger.info("=" * 50)
         return (
             jsonify(
                 {
