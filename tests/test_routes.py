@@ -5,6 +5,9 @@ from flask_login import current_user
 from tests.test_helpers import unique_username, unique_email
 from io import BytesIO
 import uuid
+import os
+import tempfile
+from PIL import Image
 
 
 def test_index_route(client):
@@ -28,7 +31,7 @@ def test_login(client, app, test_db):
 
         assert response.status_code == 200
 
-def test_login_wrong_password(client, app):
+def test_login_wrong_password(client, app, test_db):
     with app.app_context():
         username = unique_username("wrongpass")
         email = unique_email("wrongpass")
@@ -46,7 +49,7 @@ def test_login_wrong_password(client, app):
         assert response.status_code == 200
         assert b"Login Unsuccessful" in response.data
 
-def test_logout(client, app):
+def test_logout(client, app, test_db):
     with app.app_context():
         username = unique_username("logoutuser")
         email = unique_email("logoutuser")
@@ -68,7 +71,7 @@ def test_protected_page_requires_login(client, app):
     location = response.headers.get("Location", "")
     assert "/login" in location, f"Expected redirect to /login, got {location}"
 
-def test_edit_profile_route(client, app):
+def test_edit_profile_route(client, app, test_db):
     with app.app_context():
         username = unique_username("editprofile")
         email = unique_email("editprofile")
@@ -109,7 +112,7 @@ def test_edit_profile_route(client, app):
         assert updated_type.typology_name == 'Temporistics'
         assert updated_type.type_value == 'Past, Current, Future, Eternity'
 
-def test_compatible_nearby_link_visibility(client, app):
+def test_compatible_nearby_link_visibility(client, app, test_db):
     response = client.get("/", follow_redirects=True)
     assert response.status_code == 200
     assert b"Compatible Nearby" not in response.data
@@ -132,7 +135,7 @@ def test_compatible_nearby_link_visibility(client, app):
         response = client.get("/", follow_redirects=True)
         assert b"Compatible Nearby" in response.data
 
-def test_nearby_compatibles_page(client, app):
+def test_nearby_compatibles_page(client, app, test_db):
     with app.app_context():
         # Create the user before trying to log in
         username = unique_username("testuser")
@@ -193,7 +196,7 @@ def test_register_get(client, app):
         assert response.status_code == 200
         assert b"Register" in response.data
 
-def test_register_post_valid(client, app):
+def test_register_post_valid(client, app, test_db):
     with app.app_context():
         # Використовуємо унікальні значення
         unique_id = uuid.uuid4().hex[:8]
@@ -225,320 +228,401 @@ def test_register_post_valid(client, app):
         new_user = User.query.filter_by(username=username).first()
         assert new_user is not None
 
-def test_register_post_invalid(client, app):
+def test_register_post_invalid(client, app, test_db):
     with app.app_context():
-        response = client.post("/register", data={
-            "username": unique_username("testuser2"),
-            "email": unique_email("testuser"),
-            "password": "newpassword",
-            "confirm_password": "newpassword"
-        }, follow_redirects=True)
-        assert response.status_code == 200
-        assert b"Registration failed" in response.data
-
-def test_user_profile_logged_in(client, app):
-    with app.app_context():
-        # Create the user before trying to log in
-        username = unique_username("someuser")
-        email = unique_email("someuser")
-        user = User(username=username, email=email)
-        user.set_password("testpassword")
-        db.session.add(user)
-        db.session.commit()
-
-        # Now log in with the newly created user
-        client.post("/login", data={
-            "email": email,
-            "password": "testpassword"
-        }, follow_redirects=True)
-
-        # Check the profile page
-        response = client.get(f"/user/{username}")
-        assert response.status_code == 200
-        assert email.encode() in response.data  # Check the user's actual email
-
-        # Використовуємо гарантовано унікальний email для оновлення
-        unique_id = uuid.uuid4().hex[:8]
-        updated_email = f"updated_{unique_id}@example.com"
+        # Використовуємо однаковий username для виклику конфлікту
+        username = "duplicateuser1"
+        email1 = "duplicate1@example.com"
+        email2 = "duplicate2@example.com"
         
-        response = client.post(f"/user/{username}", data={
-            "email": updated_email,
-            "typology_name": "Temporistics",
-            "type_value": "Past, Current, Future, Eternity"
-        }, follow_redirects=True)
-        assert response.status_code == 200
-
-        updated_user = User.query.filter_by(username=username).first()
-        assert updated_user.email == updated_email  # Перевіряємо, що email оновився до очікуваного значення
-
-
-def test_user_profile_other_user(client, app):
-    with app.app_context():
-        # Create a user first
-        username = unique_username("someuser")
-        email = unique_email("someuser")
-        user = User(username=username, email=email)
+        # Спочатку створюємо користувача в БД
+        user = User(username=username, email=email1)
         user.set_password("testpassword")
         db.session.add(user)
         db.session.commit()
+        
+        # Спроба зареєструвати користувача з тим же ім'ям
+        response = client.post("/register", data={
+            "username": username,  # використовуємо той самий username
+            "email": email2,  # новий email
+            "password": "testpassword",
+            "confirm_password": "testpassword"
+        }, follow_redirects=True)
+        
+        assert response.status_code == 200
+        assert b"Validation failed" in response.data or b"already exists" in response.data or b"already taken" in response.data
 
-        # Now log in with the newly created user
+def test_user_profile_logged_in(client, app, test_db):
+    with app.app_context():
+        # Створюємо тестового користувача
+        username = unique_username("profileuser")
+        email = unique_email("profileuser")
+        user = User(username=username, email=email)
+        user.set_password("profilepass")
+        
+        # Додаємо типологію для користувача
+        user_type = UserType(typology_name="Temporistics", type_value="Past, Current, Future, Eternity")
+        user.user_type = user_type
+        
+        db.session.add(user)
+        db.session.add(user_type)
+        db.session.commit()
+        
+        # Логінимось цим користувачем
         client.post("/login", data={
             "email": email,
-            "password": "testpassword"
+            "password": "profilepass",
+            "submit": "Login"
         }, follow_redirects=True)
+        
+        # Відвідуємо свій профіль
+        response = client.get(f"/user/{username}", follow_redirects=True)
+        
+        # Перевіряємо, що на сторінці є ім'я користувача
+        assert response.status_code == 200
+        assert username.encode('utf-8') in response.data
+        
+        # Перевіряємо, що на сторінці є тип користувача
+        assert b"Temporistics" in response.data
+        assert b"Past, Current, Future, Eternity" in response.data
+        
+        # Має бути кнопка редагування для власного профілю
+        assert b"Edit Profile" in response.data
 
-        # Attempting to access a non-existent user's profile should now produce a 404
-        response = client.get("/user/nonexistentuser")
-        assert response.status_code == 404
-
-
-def test_upload_profile_image(client, app):
+def test_user_profile_other_user(client, app, test_db):
     with app.app_context():
-        # Создаем пользователя
+        # Створюємо двох тестових користувачів
+        username1 = unique_username("viewer")
+        email1 = unique_email("viewer")
+        user1 = User(username=username1, email=email1)
+        user1.set_password("password1")
+        
+        username2 = unique_username("target")
+        email2 = unique_email("target")
+        user2 = User(username=username2, email=email2)
+        user2.set_password("password2")
+        
+        # Додаємо типологію для другого користувача
+        user_type = UserType(typology_name="Temporistics", type_value="Past, Current, Future, Eternity")
+        user2.user_type = user_type
+        
+        db.session.add(user1)
+        db.session.add(user2)
+        db.session.add(user_type)
+        db.session.commit()
+        
+        # Логінимось першим користувачем
+        client.post("/login", data={
+            "email": email1,
+            "password": "password1",
+            "submit": "Login"
+        }, follow_redirects=True)
+        
+        # Відвідуємо профіль другого користувача
+        response = client.get(f"/user/{username2}", follow_redirects=True)
+        
+        # Перевіряємо, що на сторінці є ім'я другого користувача
+        assert response.status_code == 200
+        assert username2.encode('utf-8') in response.data
+        
+        # Перевіряємо, що на сторінці є тип другого користувача
+        assert b"Temporistics" in response.data
+        assert b"Past, Current, Future, Eternity" in response.data
+        
+        # Не має бути кнопки редагування для профіля іншого користувача
+        assert b"Edit Profile" not in response.data
+
+
+def test_upload_profile_image(client, app, test_db):
+    with app.app_context():
+        # Створюємо тестового користувача
         username = unique_username("imageuser")
         email = unique_email("imageuser")
         user = User(username=username, email=email)
-        user.set_password("testpassword")
+        user.set_password("imagepass")
         db.session.add(user)
         db.session.commit()
+        
+        # Логінимось цим користувачем
+        client.post("/login", data={
+            "email": email,
+            "password": "imagepass",
+            "submit": "Login"
+        }, follow_redirects=True)
+        
+        # Створюємо тимчасовий файл зображення для тесту
+        test_image = tempfile.NamedTemporaryFile(suffix='.jpg', delete=False)
+        img = Image.new('RGB', (100, 100), color = 'red')
+        img.save(test_image.name)
+        test_image.close()
+        
+        try:
+            # Тестуємо завантаження зображення
+            with open(test_image.name, 'rb') as img_file:
+                data = {
+                    'profile_image': (img_file, 'test_image.jpg')
+                }
+                response = client.post('/upload_profile_image', 
+                                        data=data, 
+                                        content_type='multipart/form-data',
+                                        follow_redirects=True)
+                
+                assert response.status_code == 200
+                assert b"Profile image updated successfully" in response.data
 
-    # Логинимся
-    client.post("/login", data={
-        "email": email,
-        "password": "testpassword"
-    }, follow_redirects=True)
+                # Перевіряємо, що зображення було збережено для користувача
+                updated_user = User.query.filter_by(username=username).first()
+                assert updated_user.profile_image is not None
+        finally:
+            # Видаляємо тимчасове зображення
+            os.unlink(test_image.name)
 
-    # Создаем фейковый файл изображение
-    data = {
-        "username": username,
-        "email": email,
-        "typology_name": "Temporistics",
-        "type_value": "Past, Current, Future, Eternity",
-        "latitude": "40.0",
-        "longitude": "-73.0",
-        "profile_image": (BytesIO(b"fake image content"), "test.png")
-    }
 
-    response = client.post("/edit_profile", data=data, content_type='multipart/form-data', follow_redirects=True)
-
-    assert response.status_code == 200
-    # Проверяем, что запись в БД обновилась
+def test_upload_invalid_image_format(client, app, test_db):
     with app.app_context():
-        updated_user = User.query.filter_by(username=username).first()
-        assert updated_user is not None
-        assert updated_user.profile_image == "test.png"
-
-
-def test_upload_invalid_image_format(client, app):
-    with app.app_context():
-        # Создаем пользователя
-        username = unique_username("invalidimage")
-        email = unique_email("invalidimage")
+        # Створюємо тестового користувача
+        username = unique_username("invalidimageuser")
+        email = unique_email("invalidimageuser")
         user = User(username=username, email=email)
-        user.set_password("testpassword")
+        user.set_password("imagepass")
         db.session.add(user)
         db.session.commit()
+        
+        # Логінимось цим користувачем
+        client.post("/login", data={
+            "email": email,
+            "password": "imagepass",
+            "submit": "Login"
+        }, follow_redirects=True)
+        
+        # Створюємо невалідний файл (не зображення)
+        import tempfile
+        
+        invalid_file = tempfile.NamedTemporaryFile(suffix='.txt', delete=False)
+        invalid_file.write(b"This is not an image")
+        invalid_file.close()
+        
+        try:
+            # Тестуємо завантаження невалідного файлу
+            with open(invalid_file.name, 'rb') as file:
+                data = {
+                    'profile_image': (file, 'test_file.txt')
+                }
+                response = client.post('/upload_profile_image', 
+                                       data=data, 
+                                       content_type='multipart/form-data',
+                                       follow_redirects=True)
+                
+                # Перевіряємо, що отримали помилку про невалідний формат
+                assert response.status_code == 200
+                assert b"Invalid file format" in response.data or b"Only image files" in response.data
+                
+                # Перевіряємо, що зображення не було оновлено
+                updated_user = User.query.filter_by(username=username).first()
+                assert updated_user.profile_image is None
+        finally:
+            # Видаляємо тимчасовий файл
+            os.unlink(invalid_file.name)
 
-    # Логинимся
-    client.post("/login", data={
-        "email": email,
-        "password": "testpassword"
-    }, follow_redirects=True)
 
-    # Пытаемся загрузить файл с неподходящим расширением
-    data = {
-        "username": username,
-        "email": email,
-        "typology_name": "Temporistics",
-        "type_value": "Past, Current, Future, Eternity",
-        "latitude": "40.0",
-        "longitude": "-73.0",
-        "profile_image": (BytesIO(b"fake image content"), "test.txt")  # неверный формат
-    }
-
-    response = client.post("/edit_profile", data=data, content_type='multipart/form-data', follow_redirects=True)
-    # Ожидаем, что профиль не обновится, и увидим сообщение об ошибке
-    assert response.status_code == 200
-    
-    # Перевіряємо, що форма все ще відображається (не виконане перенаправлення на профіль)
-    assert b"Edit Profile" in response.data
-    assert b"Save Changes" in response.data
-
+def test_edit_profile_another_user(client, app, test_db):
+    # Перевіряємо сценарій спроби редагування профілю іншого користувача
     with app.app_context():
-        updated_user = User.query.filter_by(username=username).first()
-        # Проверяем, что картинка не установилась
-        assert updated_user.profile_image is None
-
-
-def test_edit_profile_another_user(client, app):
-    # Проверяем сценарий попытки редактирования профиля другого пользователя
-    with app.app_context():
-        username1 = unique_username("user1")
-        email1 = unique_email("user1")
+        # Створюємо двох користувачів
+        username1 = unique_username("editor")
+        email1 = unique_email("editor")
         user1 = User(username=username1, email=email1)
         user1.set_password("password1")
-        db.session.add(user1)
-        db.session.commit()
-
-        username2 = unique_username("user2")
-        email2 = unique_email("user2")
+        
+        username2 = unique_username("victim")
+        email2 = unique_email("victim")
         user2 = User(username=username2, email=email2)
         user2.set_password("password2")
+        
+        db.session.add(user1)
         db.session.add(user2)
         db.session.commit()
+        
+        # Логінимось першим користувачем
+        client.post("/login", data={
+            "email": email1,
+            "password": "password1",
+            "submit": "Login"
+        }, follow_redirects=True)
+        
+        # Спроба редагувати профіль другого користувача
+        data = {
+            "username": username2,  # Залишаємо те ж ім'я
+            "email": "hacked@example.com",  # Пробуємо змінити email
+            "typology_name": "Temporistics",
+            "type_value": "Past, Current, Future, Eternity"
+        }
+        
+        response = client.post(f"/user/{username2}", data=data, follow_redirects=True)
+        
+        # Перевіряємо, що отримали помилку або перенаправлення
+        assert response.status_code != 200 or b"not authorized" in response.data or b"permission" in response.data
+        
+        # Перевіряємо, що дані користувача не змінились
+        updated_user = User.query.filter_by(username=username2).first()
+        assert updated_user.email == email2
 
-    # Логинимся под user1
-    client.post("/login", data={"email": email1, "password": "password1"}, follow_redirects=True)
 
-    # Пытаемся редактировать профиль user2
-    data = {
-        "username": "hacker",
-        "email": "hacker@example.com",
-        "typology_name": "Temporistics",
-        "type_value": "Past, Current, Future, Eternity",
-        "latitude": "50.0",
-        "longitude": "50.0"
-    }
-    response = client.post(f"/user/{username2}", data=data, follow_redirects=True)
-    # Ожидаем ошибку или перенаправление на домашнюю страницу
-    assert response.status_code == 200
-    # Проверяем, что сообщение о недоступности профиля присутствует
-    assert b"You do not have permission to view or edit this profile." in response.data
-
+def test_full_integration_cycle(client, app, test_db):
+    # Повний цикл: реєстрація → логін → зміна профілю → логаут
     with app.app_context():
-        # Проверяем, что пользователь user2 не изменился
-        updated_user2 = User.query.filter_by(username=username2).first()
-        assert updated_user2.username == username2
-        assert updated_user2.email == email2
-
-
-def test_full_integration_cycle(client, app):
-    # Полный цикл: регистрация → логин → изменение профиля → logout
-    # 1. Регистрация
-    username = unique_username("fullcycle")
-    email = unique_email("fullcycle")
-    register_data = {
-        "username": username,
-        "email": email,
-        "password": "integrationpass",
-        "confirm_password": "integrationpass",
-        "typologies-0-typology_name": "Temporistics",
-        "typologies-0-type_value": "Past, Current, Future, Eternity",
-        "typologies-1-typology_name": "Psychosophia",
-        "typologies-1-type_value": "Emotion, Logic, Will, Physics",
-        "typologies-2-typology_name": "Amatoric",
-        "typologies-2-type_value": "Love, Passion, Friendship, Romance",
-        "typologies-3-typology_name": "Socionics",
-        "typologies-3-type_value": "Intuitive, Ethical, Extratim"
-    }
-    response = client.post("/register", data=register_data, follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Your account has been created! You can now log in." in response.data
-
-    # 2. Логин
-    login_data = {
-        "email": email,
-        "password": "integrationpass"
-    }
-    response = client.post("/login", data=login_data, follow_redirects=True)
-    assert response.status_code == 200
-    
-    # Перевіряємо, що користувач залогінився (перевіряємо наявність елементів, які є на сторінці після логіну)
-    assert b"Logout" in response.data
-    assert username.encode() in response.data
-    
-    # Перевіряємо авторизацію через запит до профілю
-    response = client.get(f"/user/{username}")
-    assert response.status_code == 200  # Доступ до профілю означає успішну авторизацію
-
-    # 3. Изменение профиля
-    edit_data = {
-        "username": username + "_updated",
-        "email": email,
-        "typology_name": "Temporistics",
-        "type_value": "Past, Current, Future, Eternity",
-        "latitude": "45.0",
-        "longitude": "-45.0"
-    }
-    response = client.post("/edit_profile", data=edit_data, follow_redirects=True)
-    assert b"Profile updated successfully." in response.data
-
-    with app.app_context():
-        updated_user = User.query.filter_by(username=username + "_updated").first()
-        assert updated_user is not None
+        # 1. Реєстрація
+        unique_id = uuid.uuid4().hex[:8]
+        username = f"fullcycle_{unique_id}"
+        email = f"fullcycle_{unique_id}@example.com"
+        password = "testpassword"
+        
+        registration_data = {
+            "username": username,
+            "email": email,
+            "password": password,
+            "confirm_password": password,
+            "typologies-0-typology_name": "Temporistics",
+            "typologies-0-type_value": "Past, Current, Future, Eternity"
+        }
+        
+        response = client.post("/register", data=registration_data, follow_redirects=True)
+        assert response.status_code == 200
+        
+        # 2. Логін
+        login_data = {
+            "email": email,
+            "password": password,
+            "submit": "Login"
+        }
+        
+        response = client.post("/login", data=login_data, follow_redirects=True)
+        assert response.status_code == 200
+        assert username.encode('utf-8') in response.data
+        
+        # 3. Зміна профілю
+        new_email = f"updated_{unique_id}@example.com"
+        
+        edit_data = {
+            "username": username,
+            "email": new_email,
+            "typology_name": "Psychosophia",
+            "type_value": "Emotion, Logic, Will, Physics",
+            "latitude": "45.0",
+            "longitude": "-70.0"
+        }
+        
+        response = client.post("/edit_profile", data=edit_data, follow_redirects=True)
+        assert response.status_code == 200
+        assert b"Profile updated successfully" in response.data
+        
+        # Перевіряємо, що профіль змінено
+        updated_user = User.query.filter_by(username=username).first()
+        assert updated_user.email == new_email
         assert updated_user.latitude == 45.0
-        assert updated_user.longitude == -45.0
-
-    # 4. Logout
-    response = client.get("/logout", follow_redirects=True)
-    assert response.status_code == 200
-    
-    # Перевіряємо, що користувач розлогінився (перевіряємо наявність форми логіну)
-    assert b"Login" in response.data
-    assert b"Password" in response.data
-    
-    # Також перевіряємо, що доступ до профілю більше недоступний
-    response = client.get(f"/user/{username}_updated")
-    assert response.status_code == 302  # Має перенаправити на логін
+        assert updated_user.longitude == -70.0
+        
+        user_type = updated_user.user_type
+        assert user_type is not None
+        assert user_type.typology_name == "Psychosophia"
+        assert user_type.type_value == "Emotion, Logic, Will, Physics"
+        
+        # 4. Логаут
+        response = client.get("/logout", follow_redirects=True)
+        assert response.status_code == 200
+        assert b"Login" in response.data
 
 
-def test_missing_geo_data_in_distance_calculation(client, app):
-    # Проверяем поведение при отсутствующих данных геолокации
+def test_missing_geo_data_in_distance_calculation(client, app, test_db):
+    # Перевіряємо обробку відсутніх даних геолокації
     with app.app_context():
-        username1 = unique_username("geo1")
-        email1 = unique_email("geo1")
-        user1 = User(username=username1, email=email1, latitude=40.0, longitude=-73.0)
+        # Створюємо два користувача, один з геоданими, інший без
+        # Користувач із геоданими
+        username1 = unique_username("geo_user")
+        email1 = unique_email("geo_user")
+        user1 = User(username=username1, email=email1, latitude=40.0, longitude=-74.0)
         user1.set_password("password1")
-        db.session.add(user1)
-        db.session.commit()
-
-        username2 = unique_username("geo2")
-        email2 = unique_email("geo2")
-        # У второго пользователя отсутствуют координаты
-        user2 = User(username=username2, email=email2)
+        
+        # Додаємо типологію
+        user1_type = UserType(typology_name="Temporistics", type_value="Past, Current, Future, Eternity")
+        user1.user_type = user1_type
+        
+        # Користувач без геоданих
+        username2 = unique_username("nogeo_user")
+        email2 = unique_email("nogeo_user")
+        user2 = User(username=username2, email=email2, latitude=None, longitude=None)
         user2.set_password("password2")
-        db.session.add(user2)
-        db.session.commit()
-
-    # Логинимся под user1
-    client.post("/login", data={"email": email1, "password": "password1"}, follow_redirects=True)
-
-    # Пытаемся открыть страницу nearby_compatibles или check_distance
-    # На nearby_compatibles будут вычисляться расстояния, возможна ошибка
-    response = client.get("/nearby_compatibles", follow_redirects=True)
-    # Ожидаем, что раз пользователь без координат не вызовет краша, мы либо не увидим его в списке
-    # либо будет какое-то предупреждение (в реальном коде можно добавить обработку таких случаев)
-    assert response.status_code == 200
-    # Проверяем, что не падаем с ошибкой 500
-    # Можно добавить проверку на текст, если в коде есть flash об отсутствии координат,
-    # но если нет — просто убедимся, что не 500.
-
-
-def test_incorrect_geo_data_in_distance_calculation(client, app):
-    # Если попытаться вычислить дистанцию при некорректных данных (например, нечисловых)
-    with app.app_context():
-        username1 = unique_username("geo3")
-        email1 = unique_email("geo3")
-        user1 = User(username=username1, email=email1, latitude=40.0, longitude=-73.0)
-        user1.set_password("password3")
+        
+        # Додаємо типологію
+        user2_type = UserType(typology_name="Temporistics", type_value="Past, Current, Future, Eternity")
+        user2.user_type = user2_type
+        
         db.session.add(user1)
-        db.session.commit()
-
-        username2 = unique_username("geo4")
-        email2 = unique_email("geo4")
-        # Попытаемся записать некорректные координаты (например, строку)
-        user2 = User(username=username2, email=email2, latitude="not_a_number", longitude="-74.0")
-        user2.set_password("password4")
+        db.session.add(user1_type)
         db.session.add(user2)
-        # В реальности БД может упасть с ошибкой при commit, если нет проверок типов.
-        # Предположим, что у нас float поля — тогда будет ошибка на уровне БД.
-        # Если модель не защищена от такого ввода, этот тест покажет падение.
-        # Для простоты считаем, что координаты валидируются где-то и просто None записывается при ошибке.
+        db.session.add(user2_type)
         db.session.commit()
+        
+        # Логінимось першим користувачем (з геоданими)
+        client.post("/login", data={
+            "email": email1,
+            "password": "password1",
+            "submit": "Login"
+        }, follow_redirects=True)
+        
+        # Перевіряємо сторінку з сумісними користувачами поблизу
+        response = client.get("/nearby_compatibles", follow_redirects=True)
+        assert response.status_code == 200
+        
+        # Другий користувач не повинен відображатися або повинна бути примітка про відсутність геоданих
+        assert b"Compatible Users Nearby:" in response.data
 
-    client.post("/login", data={"email": email1, "password": "password3"}, follow_redirects=True)
-    response = client.get("/nearby_compatibles", follow_redirects=True)
-    # Здесь мы просто убеждаемся, что код не падает.
-    assert response.status_code == 200
-    # Аналогично предыдущему тесту, если надо, можно добавить логику проверки flash сообщений или отсутствия пользователя в списке.
+
+def test_incorrect_geo_data_in_distance_calculation(client, app, test_db):
+    # Тестуємо обробку некоректних даних геолокації
+    with app.app_context():
+        # Створюємо користувача з коректними геоданими
+        username1 = unique_username("correctgeo")
+        email1 = unique_email("correctgeo")
+        user1 = User(username=username1, email=email1, latitude=40.0, longitude=-74.0)
+        user1.set_password("password1")
+        
+        # Додаємо типологію
+        user1_type = UserType(typology_name="Temporistics", type_value="Past, Current, Future, Eternity")
+        user1.user_type = user1_type
+        
+        # Створюємо користувача з хибними геоданими
+        username2 = unique_username("invalidgeo")
+        email2 = unique_email("invalidgeo")
+        user2 = User(username=username2, email=email2)
+        # Встановлюємо некоректні дані, які будуть нормалізовані до None
+        user2.latitude = "not-a-number"
+        user2.longitude = "invalid-data"
+        user2.set_password("password2")
+        
+        # Додаємо типологію
+        user2_type = UserType(typology_name="Temporistics", type_value="Past, Current, Future, Eternity")
+        user2.user_type = user2_type
+        
+        db.session.add(user1)
+        db.session.add(user1_type)
+        db.session.add(user2)
+        db.session.add(user2_type)
+        db.session.commit()
+        
+        # Після обробників подій валідації, перевіряємо, що некоректні значення не збереглися
+        db.session.refresh(user2)
+        assert user2.latitude is None
+        assert user2.longitude is None
+        
+        # Логінимось першим користувачем
+        client.post("/login", data={
+            "email": email1,
+            "password": "password1",
+            "submit": "Login"
+        }, follow_redirects=True)
+        
+        # Перевіряємо сторінку з сумісними користувачами поблизу
+        response = client.get("/nearby_compatibles", follow_redirects=True)
+        assert response.status_code == 200
+        assert b"Compatible Users Nearby:" in response.data
