@@ -708,3 +708,118 @@ def test_compatible_users_nearby_display(client, app, test_db):
         
         # Перевіряємо, що заголовок списку сумісних користувачів присутній
         assert b"Compatible Users Nearby:" in response.data
+
+def test_max_distance_in_edit_profile(client, app, test_db):
+    """Тест перевіряє, що користувач може встановити максимальну прийнятну відстань через форму редагування профілю"""
+    with app.app_context():
+        # Створюємо тестового користувача
+        username = unique_username("distanceuser")
+        email = unique_email("distanceuser")
+        user = User(username=username, email=email)
+        user.set_password("distancepass")
+        db.session.add(user)
+        db.session.commit()
+        
+        # Логінимося цим користувачем
+        client.post("/login", data={
+            "email": email,
+            "password": "distancepass",
+            "submit": "Login"
+        }, follow_redirects=True)
+        
+        # Перевіряємо початкове значення max_distance
+        db.session.refresh(user)
+        assert user.max_distance is None or user.max_distance == 50.0  # значення за замовчуванням
+        
+        # Оновлюємо профіль із новим значенням max_distance
+        response = client.post('/edit_profile', data={
+            'username': username,
+            'email': email,
+            'typology_name': 'Temporistics',
+            'type_value': 'Past, Current, Future, Eternity',
+            'latitude': '50.45',
+            'longitude': '30.52',
+            'max_distance': '25.5'  # нове значення
+        }, follow_redirects=True)
+        
+        # Перевіряємо успішність оновлення
+        assert response.status_code == 200
+        assert b"Profile updated successfully" in response.data
+        
+        # Перевіряємо, що значення max_distance оновлено в БД
+        db.session.refresh(user)
+        assert user.max_distance == 25.5
+
+def test_filter_nearby_by_max_distance(client, app, test_db):
+    """Тест перевіряє, що функція nearby_compatibles враховує максимальну прийнятну відстань користувача"""
+    with app.app_context():
+        # Створюємо першого користувача (активного)
+        username1 = unique_username("maxdistuser")
+        email1 = unique_email("maxdistuser")
+        user1 = User(username=username1, email=email1, latitude=50.4501, longitude=30.5234, max_distance=5.0)  # Київ, макс. 5 км
+        user1.set_password("testpassword1")
+        
+        # Встановлюємо тип для першого користувача
+        user1_type = UserType(typology_name="Temporistics", type_value="Past, Current, Future, Eternity")
+        user1.user_type = user1_type
+        
+        db.session.add(user1)
+        db.session.add(user1_type)
+        db.session.commit()
+        
+        # Створюємо другого користувача (близько - в межах 5 км)
+        username2 = unique_username("closeuser")
+        email2 = unique_email("closeuser")
+        user2 = User(username=username2, email=email2, latitude=50.4520, longitude=30.5300)  # Близько (~0.5 км)
+        user2.set_password("testpassword2")
+        
+        # Встановлюємо той самий тип для другого користувача (для гарантованої сумісності)
+        user2_type = UserType(typology_name="Temporistics", type_value="Past, Current, Future, Eternity")
+        user2.user_type = user2_type
+        
+        db.session.add(user2)
+        db.session.add(user2_type)
+        
+        # Створюємо третього користувача (далеко - поза межами 5 км)
+        username3 = unique_username("faruser")
+        email3 = unique_email("faruser")
+        user3 = User(username=username3, email=email3, latitude=50.5200, longitude=30.6000)  # Далеко (~10-15 км)
+        user3.set_password("testpassword3")
+        
+        # Встановлюємо той самий тип для третього користувача (для гарантованої сумісності)
+        user3_type = UserType(typology_name="Temporistics", type_value="Past, Current, Future, Eternity")
+        user3.user_type = user3_type
+        
+        db.session.add(user3)
+        db.session.add(user3_type)
+        db.session.commit()
+        
+        # Логінимося першим користувачем
+        response = client.post("/login", data={
+            "email": email1,
+            "password": "testpassword1",
+            "submit": "Login"
+        }, follow_redirects=True)
+        assert response.status_code == 200
+        
+        # Переходимо на сторінку сумісних поруч
+        response = client.get("/nearby_compatibles", follow_redirects=True)
+        assert response.status_code == 200
+        
+        # Перевіряємо, що близький користувач є на сторінці
+        assert username2.encode('utf-8') in response.data
+        
+        # Перевіряємо, що далекий користувач відсутній на сторінці
+        assert username3.encode('utf-8') not in response.data
+        
+        # Змінюємо максимальну відстань на більшу, щоб включити далекого користувача
+        user1.max_distance = 20.0
+        db.session.commit()
+        
+        # Переходимо на сторінку сумісних поруч знову
+        response = client.get("/nearby_compatibles", follow_redirects=True)
+        assert response.status_code == 200
+        
+        # Тепер обидва користувачі повинні бути на сторінці
+        assert username2.encode('utf-8') in response.data
+        assert username3.encode('utf-8') in response.data

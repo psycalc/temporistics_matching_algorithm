@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Compatible Users Nearby:</h1>
+<p>Your maximum acceptable distance: {{ current_user.max_distance|default(50, true) }} km</p>
 {% if compatible_list %}
   <ul>
     {% for user, dist in compatible_list %}

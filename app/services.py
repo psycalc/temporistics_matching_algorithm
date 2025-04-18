@@ -50,7 +50,7 @@ def calculate_relationship(user1, user2, typology):
     comfort_score, _ = typology_instance.get_comfort_score(relationship_type)
     return relationship_type, comfort_score
 
-def update_user_profile(user, username, email, typology_name, type_value, latitude, longitude):
+def update_user_profile(user, username, email, typology_name, type_value, latitude, longitude, max_distance=None):
     user.username = username
     user.email = email
     if user.user_type:
@@ -68,6 +68,11 @@ def update_user_profile(user, username, email, typology_name, type_value, latitu
 
     user.latitude = latitude
     user.longitude = longitude
+    
+    # Оновлюємо максимальну прийнятну відстань, якщо вона вказана
+    if max_distance is not None:
+        user.max_distance = max_distance
+    
     db.session.commit()
 
 def haversine_distance(lat1, lon1, lat2, lon2):
@@ -93,7 +98,15 @@ def get_distance_if_compatible(user1, user2):
     relationship_type, comfort_score = calculate_relationship(user1.user_type.type_value, user2.user_type.type_value, user1.user_type.typology_name)
     if comfort_score <= 50:
         raise ValueError("Users are not compatible enough to consider meeting")
-    return get_users_distance(user1, user2)
+    
+    # Отримуємо відстань між користувачами
+    distance = get_users_distance(user1, user2)
+    
+    # Перевіряємо, чи відстань не перевищує максимальну прийнятну відстань для першого користувача
+    if user1.max_distance is not None and distance > user1.max_distance:
+        raise ValueError(f"User is too far away (distance: {distance:.2f} km, max: {user1.max_distance:.2f} km)")
+    
+    return distance
 
 def get_typology_instance(typology_name):
     typology_classes = {

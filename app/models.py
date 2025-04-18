@@ -21,6 +21,9 @@ class User(UserMixin, db.Model):
     # Add latitude/longitude fields since tests assume their presence
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
+    
+    # Додаємо поле для зберігання максимальної прийнятної відстані (в км)
+    max_distance = Column(Float, nullable=True, default=50.0)
 
     def set_password(self, password):
         self.password_hash = bcrypt.hash(password)
@@ -65,6 +68,18 @@ def validate_user_coordinates(mapper, connection, target):
         except (ValueError, TypeError):
             # Якщо не вдається перетворити в число, встановлюємо None
             target.longitude = None
+    
+    # Валідуємо максимальну відстань
+    if target.max_distance is not None:
+        try:
+            # Переконуємося, що це дійсно число
+            target.max_distance = float(target.max_distance)
+            # Перевіряємо, що відстань не від'ємна
+            if target.max_distance < 0:
+                target.max_distance = 50.0  # Значення за замовчуванням
+        except (ValueError, TypeError):
+            # Якщо не вдається перетворити в число, встановлюємо значення за замовчуванням
+            target.max_distance = 50.0
 
 event.listen(UserType, 'before_insert', validate_user_type)
 event.listen(UserType, 'before_update', validate_user_type)

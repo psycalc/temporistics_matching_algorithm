@@ -278,6 +278,7 @@ def edit_profile():
             type_value=form.type_value.data,
             latitude=form.latitude.data,
             longitude=form.longitude.data,
+            max_distance=form.max_distance.data,
         )
 
         if form.profile_image.data:

@@ -49,7 +49,8 @@ def app(db_url):
         Column('type_id', Integer, ForeignKey('user_type.id')),
         Column('profile_image', String(200)),
         Column('latitude', Float),
-        Column('longitude', Float)
+        Column('longitude', Float),
+        Column('max_distance', Float, default=50.0)
     )
     
     user_type = Table('user_type', metadata,
