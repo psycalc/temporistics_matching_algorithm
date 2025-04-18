@@ -8,35 +8,56 @@
     <div>
       <label for="username">Username</label>
       {{ form.username(class="form-control") }}
+      {% for error in form.username.errors %}
+        <span class="text-danger">{{ error }}</span>
+      {% endfor %}
     </div>
 
     <div>
       <label for="email">Email</label>
       {{ form.email(class="form-control") }}
+      {% for error in form.email.errors %}
+        <span class="text-danger">{{ error }}</span>
+      {% endfor %}
     </div>
 
     <div>
       <label for="typology_name">Typology Name</label>
       {{ form.typology_name(class="form-control") }}
+      {% for error in form.typology_name.errors %}
+        <span class="text-danger">{{ error }}</span>
+      {% endfor %}
     </div>
 
     <div>
       <label for="type_value">Type Value</label>
       {{ form.type_value(class="form-control") }}
+      {% for error in form.type_value.errors %}
+        <span class="text-danger">{{ error }}</span>
+      {% endfor %}
     </div>
 
     <div>
       <label for="latitude">Latitude</label>
       {{ form.latitude(class="form-control") }}
+      {% for error in form.latitude.errors %}
+        <span class="text-danger">{{ error }}</span>
+      {% endfor %}
     </div>
 
     <div>
       <label for="longitude">Longitude</label>
       {{ form.longitude(class="form-control") }}
+      {% for error in form.longitude.errors %}
+        <span class="text-danger">{{ error }}</span>
+      {% endfor %}
     </div>
     <div>
       <label for="profile_image">Profile Image</label>
       {{ form.profile_image(class="form-control") }}
+      {% for error in form.profile_image.errors %}
+        <span class="text-danger">{{ error }}</span>
+      {% endfor %}
     </div>
     <div>
       {{ form.submit(class="btn btn-primary") }}

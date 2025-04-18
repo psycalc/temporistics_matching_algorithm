@@ -307,6 +307,10 @@ def edit_profile():
         db.session.commit()
         flash("Profile updated successfully.", "success")
         return redirect(url_for("main.user_profile", username=current_user.username))
+    else:
+        # Логування помилок валідації
+        if form.errors:
+            print(f"Form validation failed: {form.errors}")
 
     # If not a POST or form not valid, just display the form
     return render_template("edit_profile.html", form=form)
