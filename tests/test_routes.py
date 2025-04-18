@@ -1,5 +1,5 @@
 import pytest
-from app import db
+from app.extensions import db
 from app.models import User, UserType
 from flask_login import current_user
 from tests.test_helpers import unique_username, unique_email

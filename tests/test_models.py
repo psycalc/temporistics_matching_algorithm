@@ -1,5 +1,5 @@
 import pytest
-from app import db
+from app.extensions import db
 from app.models import User, UserType
 import sqlalchemy.exc
 from tests.test_helpers import unique_username, unique_email

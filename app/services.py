@@ -6,9 +6,11 @@ from .typologies import (
     TypologyAmatoric,
     TypologySocionics,
 )
+from flask import current_app
 
-@cache.memoize(timeout=3600)  # Cache the result for 1 hour
 def get_types_by_typology(typology_name):
+    """Отримання всіх типів для заданої типології.
+    У тестовому середовищі не використовує кешування."""
     typology_classes = {
         "Temporistics": TypologyTemporistics,
         "Psychosophia": TypologyPsychosophia,
@@ -18,6 +20,17 @@ def get_types_by_typology(typology_name):
     typology_class = typology_classes.get(typology_name)
     if not typology_class:
         return None
+    
+    # Перевіряємо, чи знаходимося в тестовому середовищі
+    if current_app.config.get('TESTING', False) or current_app.config.get('CACHE_TYPE') == 'NullCache':
+        return typology_class().get_all_types()
+    else:
+        # Використовуємо кешування лише в не-тестовому середовищі
+        return _get_types_cached(typology_name, typology_class)
+
+@cache.memoize(timeout=3600)  # Cache the result for 1 hour
+def _get_types_cached(typology_name, typology_class):
+    """Кешована версія отримання типів."""
     return typology_class().get_all_types()
 
 def calculate_relationship(user1, user2, typology):

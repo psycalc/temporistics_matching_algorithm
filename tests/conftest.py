@@ -26,17 +26,9 @@ migrate = Migrate()
 
 @pytest.fixture(scope="session")
 def db_url():
-    if "USE_TEST_DB_URL" in os.environ:
-        # Использовать указанный URL для тестов
-        return os.environ["USE_TEST_DB_URL"]
-    else:
-        # Создать временную SQLite БД
-        # Используем tempfile.mkstemp - это создаёт
-        # уникальный для каждой сессии файл
-        # Отлично подходит для парралельного запуска
-        # нескольких тестов
-        _, db_path = tempfile.mkstemp()
-        return f"sqlite:///{db_path}"
+    """URL для з'єднання з базою даних."""
+    # Пробуємо спочатку підключитися через localhost, це працює надійніше в WSL2
+    return "postgresql://testuser:password@localhost:5432/testdb"
 
 @pytest.fixture(scope="session")
 def app(db_url):
@@ -115,13 +107,25 @@ def test_db(app):
         print("Creating tables for test...")
         db.create_all()  # Створюємо всі таблиці перед тестом
         print("Tables created...")
+        
+        # Перевіряємо, який тип бази даних використовується
+        engine = db.engine
+        dialect = engine.dialect.name
+        
         # Для SQLAlchemy 2.0 потрібно використовувати text() для текстових запитів
         from sqlalchemy import text
-        engine = db.engine
         with engine.connect() as connection:
-            result = connection.execute(text("SELECT name FROM sqlite_master WHERE type='table';"))
-            tables = [row[0] for row in result]
-            print(f"Tables in database: {tables}")
+            if dialect == 'postgresql':
+                # Для PostgreSQL
+                result = connection.execute(text("SELECT table_name FROM information_schema.tables WHERE table_schema='public';"))
+                tables = [row[0] for row in result]
+                print(f"Tables in database (PostgreSQL): {tables}")
+            else:
+                # Помилка, якщо не PostgreSQL
+                tables = [f"Error: Found non-PostgreSQL database ({dialect})"]
+                print(f"Error: Only PostgreSQL is supported, but found: {dialect}")
+                raise ValueError(f"Only PostgreSQL is supported, but found: {dialect}")
+            
         yield db
         db.session.remove()
         db.drop_all()  # Видаляємо таблиці після тесту

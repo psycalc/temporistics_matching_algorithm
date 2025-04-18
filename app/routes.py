@@ -2,8 +2,7 @@ from flask import (Blueprint, render_template, request, jsonify, current_app, re
 from flask_login import login_user, logout_user, login_required, current_user
 from .forms import RegistrationForm, LoginForm, ProfileForm, EditProfileForm
 from .models import User, UserType
-from .extensions import db
-from . import login_manager
+from .extensions import db, login_manager
 from .services import get_types_by_typology, calculate_relationship
 from .typologies import (
     TypologyTemporistics,

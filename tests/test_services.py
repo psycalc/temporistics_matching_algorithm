@@ -1,6 +1,6 @@
 import pytest
 from app.services import get_types_by_typology, calculate_relationship
-from app import db
+from app.extensions import db
 from app.models import User, UserType
 from tests.test_helpers import unique_username, unique_email
 import uuid
@@ -49,7 +49,8 @@ def test_calculate_relationship_empty_input(app, test_db):
             calculate_relationship("", "Future", "Temporistics")
 
 def test_get_distance_if_compatible(app, test_db):
-    from app.models import User, UserType, db
+    from app.models import User, UserType
+    from app.extensions import db
     from app.services import get_distance_if_compatible
     import pytest
 

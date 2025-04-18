@@ -9,7 +9,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "you-will-never-guess")
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "sqlite:///site.db")
+    # Підтримка як звичайного URL, так і Docker URL (для контейнерів)
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DOCKER_DATABASE_URL", os.environ.get("DATABASE_URL", "postgresql://testuser:password@localhost:5432/testdb"))
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     CACHE_TYPE = "simple"
     CACHE_DEFAULT_TIMEOUT = 300
@@ -23,8 +24,11 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
-    # Завжди використовуємо SQLite для тестів, щоб не залежати від PostgreSQL
-    SQLALCHEMY_DATABASE_URI = os.environ.get("USE_TEST_DB_URL", "sqlite:///test.db")
+    # Використовуємо PostgreSQL для тестів
+    # Спочатку перевіряємо USE_TEST_DB_URL, потім DATABASE_URL, інакше використовуємо localhost
+    SQLALCHEMY_DATABASE_URI = os.environ.get("USE_TEST_DB_URL", 
+                            os.environ.get("DATABASE_URL", 
+                            "postgresql://testuser:password@localhost:5432/testdb"))
     WTF_CSRF_ENABLED = False
     SECRET_KEY = "testsecretkey"
     # Використовуємо окрему папку для тестових завантажень
