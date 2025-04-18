@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# Скрипт для запуску додатку і тестів локально
+# Підтримує запуск всіх тестів із зупинкою на першому поломаному тесті
+# Використання: ./run_local.sh [опції]
+#
+# Приклади:
+#   ./run_local.sh                     - запуск додатку і базових тестів
+#   ./run_local.sh --tests-only        - запуск тільки базових тестів
+#   ./run_local.sh --all-tests         - запуск всіх тестів, включаючи selenium
+#   ./run_local.sh --all-tests-exit-first - запуск всіх тестів з зупинкою на першому поломаному
+#   ./run_local.sh --exit-first        - запуск базових тестів з зупинкою на першому поломаному
+
 # Функція для перевірки чи запущено процес на певному порту
 check_port() {
     local port=$1
@@ -55,9 +66,28 @@ run_tests() {
     
     export FLASK_CONFIG=testing
     
-    # Запуск тестів з детальним виводом
-    echo "Запускаємо всі тести..."
-    python -m pytest -xvs  # зупиняється на першій помилці (-x), з детальним виводом (-v) і виводом print statements (-s)
+    # Додаткові змінні середовища для локалізації та Selenium-тестів
+    export BABEL_DEFAULT_LOCALE=uk
+    export BABEL_DEFAULT_TIMEZONE=Europe/Kiev
+    export LANGUAGES=en,fr,es,uk
+    export BABEL_TRANSLATION_DIRECTORIES="translations;locales"
+    
+    # Параметри запуску тестів
+    PYTEST_ARGS="-v -s"  # детальний вивід (-v) і вивід print statements (-s)
+    
+    # Додаємо параметр зупинки на першій помилці, якщо потрібно
+    if [ "$EXIT_FIRST" = true ]; then
+        PYTEST_ARGS="$PYTEST_ARGS -x"
+    fi
+    
+    if [ "$ALL_TESTS" = true ]; then
+        echo "Запускаємо всі можливі тести (включаючи selenium)..."
+        python -m pytest $PYTEST_ARGS tests/
+    else
+        echo "Запускаємо стандартні тести..."
+        # Виключаємо selenium-тести за замовчуванням
+        python -m pytest $PYTEST_ARGS -k "not selenium"
+    fi
     
     TEST_EXIT_CODE=$?
     if [ $TEST_EXIT_CODE -eq 0 ]; then
@@ -70,8 +100,17 @@ run_tests() {
 }
 
 # Парсинг аргументів
+# Доступні опції:
+# --no-tests         - запустити тільки додаток без тестів
+# --tests-only       - запустити тільки тести без додатку
+# --exit-first       - зупинитися на першому поломаному тесті
+# --all-tests        - запустити всі тести, включаючи selenium-тести
+# --all-tests-exit-first - запустити всі тести і зупинитися на першому поломаному
+
 RUN_TESTS=true
 RUN_APP=true
+EXIT_FIRST=false
+ALL_TESTS=false
 
 for arg in "$@"; do
     case $arg in
@@ -82,6 +121,19 @@ for arg in "$@"; do
         --tests-only)
             RUN_APP=false
             RUN_TESTS=true
+            shift
+            ;;
+        --exit-first)
+            EXIT_FIRST=true
+            shift
+            ;;
+        --all-tests-exit-first)
+            ALL_TESTS=true
+            EXIT_FIRST=true
+            shift
+            ;;
+        --all-tests)
+            ALL_TESTS=true
             shift
             ;;
     esac

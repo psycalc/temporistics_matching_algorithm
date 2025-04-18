@@ -45,12 +45,15 @@ def app(db_url):
         Column('id', Integer, primary_key=True),
         Column('username', String(80), unique=True),
         Column('email', String(120), unique=True),
-        Column('password_hash', String(128)),
+        Column('password_hash', String(128), nullable=True),
         Column('type_id', Integer, ForeignKey('user_type.id')),
         Column('profile_image', String(200)),
         Column('latitude', Float),
         Column('longitude', Float),
-        Column('max_distance', Float, default=50.0)
+        Column('max_distance', Float, default=50.0),
+        Column('google_id', String(256), nullable=True),
+        Column('github_id', String(256), nullable=True),
+        Column('avatar_url', String(512), nullable=True)
     )
     
     user_type = Table('user_type', metadata,

@@ -26,6 +26,14 @@ def create_app(config_name="development"):
     # Застосовуємо конфігурацію
     app.config.from_object(config_dict[config_name])
     
+    # Налаштування OAuth для локальної розробки
+    if config_name == "development":
+        app.config["GOOGLE_CLIENT_ID"] = os.environ.get("GOOGLE_CLIENT_ID")
+        app.config["GOOGLE_CLIENT_SECRET"] = os.environ.get("GOOGLE_CLIENT_SECRET")
+        app.config["GITHUB_CLIENT_ID"] = os.environ.get("GITHUB_CLIENT_ID")
+        app.config["GITHUB_CLIENT_SECRET"] = os.environ.get("GITHUB_CLIENT_SECRET")
+        app.config["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  # Дозволяє використовувати OAuth без HTTPS
+    
     # Мультимовність
     app.logger.info(f"BABEL_TRANSLATION_DIRECTORIES: {app.config.get('BABEL_TRANSLATION_DIRECTORIES', 'translations')}")
     app.logger.info(f"BABEL_DEFAULT_LOCALE: {app.config.get('BABEL_DEFAULT_LOCALE', 'en')}")
@@ -48,6 +56,10 @@ def create_app(config_name="development"):
     # Регіструємо blueprint'и
     from app.routes import main
     app.register_blueprint(main)
+    
+    # Ініціалізуємо OAuth
+    from app.oauth import OAuth
+    OAuth.register_oauth_blueprints(app)
     
     # Debug налаштування
     if app.debug:

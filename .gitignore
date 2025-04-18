@@ -66,3 +66,4 @@ app/test.db
 instance/test.db
 test.db
 instance/test.db
+.env.example

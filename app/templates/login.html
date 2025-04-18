@@ -47,6 +47,20 @@
             {{ form.submit(class="btn btn-outline-info") }}
         </div>
     </form>
+    
+    <!-- OAuth Авторизація -->
+    <div class="border-top pt-3 mb-3">
+        <p class="text-muted">{{ gettext('Or sign in with:') }}</p>
+        <div class="d-flex justify-content-around">
+            <a href="{{ url_for('google.login') }}" class="btn btn-danger">
+                <i class="fa fa-google"></i> Google
+            </a>
+            <a href="{{ url_for('github.login') }}" class="btn btn-dark">
+                <i class="fa fa-github"></i> GitHub
+            </a>
+        </div>
+    </div>
+    
     <div class="border-top pt-3">
         <small class="text-muted">
             {{ gettext('Need an account?') }}
