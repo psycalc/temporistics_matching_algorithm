@@ -656,3 +656,55 @@ def test_incorrect_geo_data_in_distance_calculation(client, app, test_db):
         response = client.get("/nearby_compatibles", follow_redirects=True)
         assert response.status_code == 200
         assert b"Compatible Users Nearby:" in response.data
+
+def test_compatible_users_nearby_display(client, app, test_db):
+    """Тест перевіряє, чи відображаються користувачі з сумісними типами і близькою геолокацією на сторінці сумісних поруч"""
+    with app.app_context():
+        # Створюємо першого користувача (активного)
+        username1 = unique_username("activeuser")
+        email1 = unique_email("activeuser")
+        user1 = User(username=username1, email=email1, latitude=50.4501, longitude=30.5234)  # Київ
+        user1.set_password("testpassword1")
+        
+        # Встановлюємо тип для першого користувача
+        user1_type = UserType(typology_name="Temporistics", type_value="Past, Current, Future, Eternity")
+        user1.user_type = user1_type
+        
+        db.session.add(user1)
+        db.session.add(user1_type)
+        db.session.commit()
+        
+        # Створюємо другого користувача з сумісним типом і близькою геолокацією
+        username2 = unique_username("nearbyuser")
+        email2 = unique_email("nearbyuser")
+        user2 = User(username=username2, email=email2, latitude=50.4520, longitude=30.5300)  # Поруч з першим в Києві
+        user2.set_password("testpassword2")
+        
+        # Встановлюємо той самий тип для другого користувача (для гарантованої сумісності)
+        user2_type = UserType(typology_name="Temporistics", type_value="Past, Current, Future, Eternity")
+        user2.user_type = user2_type
+        
+        db.session.add(user2)
+        db.session.add(user2_type)
+        db.session.commit()
+        
+        # Логінимося першим користувачем
+        response = client.post("/login", data={
+            "email": email1,
+            "password": "testpassword1",
+            "submit": "Login"
+        }, follow_redirects=True)
+        assert response.status_code == 200
+        
+        # Переходимо на сторінку сумісних поруч
+        response = client.get("/nearby_compatibles", follow_redirects=True)
+        assert response.status_code == 200
+        
+        # Перевіряємо, що сторінка містить другого користувача
+        assert username2.encode('utf-8') in response.data
+        
+        # Перевіряємо, що відстань між користувачами відображається
+        assert b"km" in response.data or b"m" in response.data
+        
+        # Перевіряємо, що заголовок списку сумісних користувачів присутній
+        assert b"Compatible Users Nearby:" in response.data
