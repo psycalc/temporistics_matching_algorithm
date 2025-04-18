@@ -98,11 +98,42 @@ def get_free_port():
 
 @pytest.fixture(scope='function')
 def live_server(app):
-    """Запускає тестовий сервер у окремому потоці."""
+    """Запускає тестовий сервер у окремому потоці та ініціалізує базу даних."""
+    # Ініціалізуємо базу даних перед запуском сервера
+    with app.app_context():
+        print("Creating tables for LiveServer test...")
+        db.create_all()  # Створюємо всі таблиці перед тестом
+        
+        # Перевіряємо, який тип бази даних використовується
+        engine = db.engine
+        dialect = engine.dialect.name
+        
+        # Для SQLAlchemy 2.0 потрібно використовувати text() для текстових запитів
+        from sqlalchemy import text
+        with engine.connect() as connection:
+            if dialect == 'postgresql':
+                # Для PostgreSQL
+                result = connection.execute(text("SELECT table_name FROM information_schema.tables WHERE table_schema='public';"))
+                tables = [row[0] for row in result]
+                print(f"Tables in LiveServer database (PostgreSQL): {tables}")
+            else:
+                # Помилка, якщо не PostgreSQL
+                tables = [f"Error: Found non-PostgreSQL database ({dialect})"]
+                print(f"Error: Only PostgreSQL is supported, but found: {dialect}")
+                raise ValueError(f"Only PostgreSQL is supported, but found: {dialect}")
+
+    # Запускаємо сервер
     port = get_free_port()
     server = LiveServer(app, port)
     server.start()
     yield server
+    
+    # Прибираємо за собою після завершення тесту
+    with app.app_context():
+        db.session.remove()
+        db.drop_all()  # Видаляємо таблиці після тесту
+        print("LiveServer tables dropped...")
+    
     server.stop()
 
 @pytest.fixture(scope="function")

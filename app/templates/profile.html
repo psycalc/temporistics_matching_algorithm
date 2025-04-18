@@ -2,6 +2,11 @@
 
 {% block content %}
   <h2>{{ _("Profile of") }} {{ user.username }}</h2>
+  {% if can_edit %}
+    <div class="edit-profile-link">
+      <a href="{{ url_for('main.edit_profile') }}" class="btn btn-secondary">{{ _('Edit Profile') }}</a>
+    </div>
+  {% endif %}
   {% if user.profile_image %}
     <img src="{{ url_for('static', filename='uploads/' ~ user.profile_image) }}" alt="{{ _('Profile Image') }}" style="width: 150px; height: 150px; border-radius: 50%;">
   {% else %}

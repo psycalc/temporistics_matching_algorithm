@@ -71,8 +71,9 @@ def test_get_distance_if_compatible(app, test_db):
         email2 = f"u2_{unique_id}@example.com"
         
         # Create two users with this user type
+        # Встановлюємо max_distance більше ніж відстань між координатами
         user1 = User(username=username1, email=email1,
-                     latitude=40.0, longitude=-73.0, user_type=user_type)
+                     latitude=40.0, longitude=-73.0, user_type=user_type, max_distance=150.0)
         user1.set_password("pass1")
 
         user2 = User(username=username2, email=email2,

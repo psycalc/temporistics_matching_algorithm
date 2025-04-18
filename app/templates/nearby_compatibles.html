@@ -5,7 +5,7 @@
 {% if compatible_list %}
   <ul>
     {% for user, dist in compatible_list %}
-      <li>
+      <li class="user-card">
         <strong>{{ user.username }}</strong> ({{ user.email }}): {{ dist|round(2) }} km away
       </li>
     {% endfor %}
