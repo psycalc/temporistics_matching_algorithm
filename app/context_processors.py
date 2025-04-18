@@ -6,7 +6,13 @@ def custom_gettext(message):
     """Функція перекладу, яка буде використовуватися у шаблонах."""
     try:
         from flask_babel import gettext as _
-        return _(message)
+        current_app.logger.info(f"[TRANSLATION] Translating: '{message}' with locale: {str(get_locale())}")
+        translated = _(message)
+        if translated == message:
+            current_app.logger.warning(f"[TRANSLATION] No translation found for: '{message}' with locale: {str(get_locale())}")
+        else:
+            current_app.logger.info(f"[TRANSLATION] Translated: '{message}' -> '{translated}'")
+        return translated
     except Exception as e:
         current_app.logger.error(f"[TRANSLATION] Помилка перекладу: {e}")
         return message

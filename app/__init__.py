@@ -27,7 +27,7 @@ def create_app(config_name=None):
         os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
     # Налаштування шляху для перекладів
-    app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
+    app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations;locales'
     app.logger.setLevel(logging.INFO)
     app.logger.info(f"BABEL_TRANSLATION_DIRECTORIES: {app.config.get('BABEL_TRANSLATION_DIRECTORIES')}")
     app.logger.info(f"BABEL_DEFAULT_LOCALE: {app.config.get('BABEL_DEFAULT_LOCALE')}")
@@ -46,9 +46,12 @@ def create_app(config_name=None):
         # Спочатку перевіряємо наявність мови в cookies
         locale = request.cookies.get('locale')
         
-        # Логування для діагностики
+        # Розширене логування для діагностики
         current_app.logger.info(f"BABEL: Cookie locale: {locale}")
         current_app.logger.info(f"BABEL: Supported languages: {app.config['LANGUAGES']}")
+        current_app.logger.info(f"BABEL: Request path: {request.path}")
+        current_app.logger.info(f"BABEL: Request accept_languages: {request.accept_languages}")
+        current_app.logger.info(f"BABEL: Current translation directories: {app.config.get('BABEL_TRANSLATION_DIRECTORIES')}")
         
         # Якщо мова є в cookies і вона підтримується
         if locale and locale in app.config['LANGUAGES']:

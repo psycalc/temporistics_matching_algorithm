@@ -14,6 +14,9 @@
             <li>Password (з "_"): {{ _('Password') }}</li>
             <li>Password (з custom "_"): {{ gettext('Password') }}</li>
             <li>Поточна локаль: {{ current_locale }}</li>
+            <li>Значення з HTML lang: <span id="htmlLang"></span></li>
+            <li>Cookie locale: <span id="cookieLocale"></span></li>
+            <li>Шлях перекладів: {{ c_('Translations Path') }}</li>
         </ul>
     </div>
 
@@ -51,4 +54,20 @@
         </small>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('htmlLang').textContent = document.documentElement.lang;
+    
+    // Отримання значення cookie
+    function getCookie(name) {
+        let matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
+    }
+    
+    document.getElementById('cookieLocale').textContent = getCookie('locale') || 'не встановлено';
+});
+</script>
 {% endblock %}

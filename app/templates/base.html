@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{ current_locale }}">
 <head>
     <title>{% block title %}{{ _('Psychological Calculator') }}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
@@ -35,10 +35,10 @@
             <form id="languageForm" action="{{ url_for('main.change_language') }}" method="post">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <select id="languageSelect" name="language" onchange="submitLanguageForm()">
-                    <option value="en" {% if g.locale == 'en' %}selected{% endif %}>English</option>
-                    <option value="fr" {% if g.locale == 'fr' %}selected{% endif %}>Français</option>
-                    <option value="es" {% if g.locale == 'es' %}selected{% endif %}>Español</option>
-                    <option value="uk" {% if g.locale == 'uk' %}selected{% endif %}>Українська</option>
+                    <option value="en" {% if current_locale == 'en' %}selected{% endif %}>English</option>
+                    <option value="fr" {% if current_locale == 'fr' %}selected{% endif %}>Français</option>
+                    <option value="es" {% if current_locale == 'es' %}selected{% endif %}>Español</option>
+                    <option value="uk" {% if current_locale == 'uk' %}selected{% endif %}>Українська</option>
                 </select>
             </form>
         </div>
