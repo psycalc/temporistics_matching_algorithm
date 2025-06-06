@@ -42,6 +42,15 @@ This application is built with **Flask** and lets users choose psychological "ty
 - **Templates & Static Assets** under `app/templates/` provide the interface; translations live in `translations/` and `locales/`.
 - **Tests** in `tests/` cover algorithms, routes, models, localization, and Selenium end-to-end cases with about 93% coverage.
 
+### UX/UI Improvements
+
+Recent updates introduce accessibility and responsive design best practices:
+
+- Added `<meta charset>` and viewport tags for mobile-friendly rendering.
+- Navigation now uses semantic roles and supports keyboard skipping with a "Skip to main content" link.
+- Flash messages announce updates with `role="alert"` for screen readers.
+- Inputs feature placeholder text, and styles adapt to smaller screens.
+
 ### Getting Started
 
 1. Install dependencies: `pip install -r requirements.txt`.
