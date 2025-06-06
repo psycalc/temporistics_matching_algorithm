@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField, PasswordField, SubmitField, BooleanField, SelectField,
-    FieldList, FormField, HiddenField, FloatField
+    FieldList, FormField, HiddenField, FloatField, IntegerField
 )
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 from app.models import User
@@ -66,3 +66,23 @@ class LanguageForm(FlaskForm):
         ('es', 'Español'),
         ('uk', 'Українська')
     ])
+
+
+class WeightsForm(FlaskForm):
+    temporistics = FloatField(_l("Temporistics"), default=1.0)
+    psychosophia = FloatField(_l("Psychosophia"), default=1.0)
+    amatoric = FloatField(_l("Amatoric"), default=1.0)
+    socionics = FloatField(_l("Socionics"), default=1.0)
+    submit = SubmitField(_l("Save Weights"))
+
+
+class ComfortScoreForm(FlaskForm):
+    typology = SelectField(_l("Typology"), choices=[
+        ('Temporistics', 'Temporistics'),
+        ('Psychosophia', 'Psychosophia'),
+        ('Amatoric', 'Amatoric'),
+        ('Socionics', 'Socionics')
+    ])
+    relationship_type = StringField(_l("Relationship Type"), validators=[DataRequired()])
+    score = IntegerField(_l("Score"), validators=[DataRequired()])
+    submit_score = SubmitField(_l("Save Score"))
