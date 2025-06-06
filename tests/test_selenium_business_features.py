@@ -12,6 +12,9 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException, TimeoutException
+
+if not os.environ.get("RUN_SELENIUM"):
+    pytest.skip("Skipping selenium tests; RUN_SELENIUM not set", allow_module_level=True)
 from tests.test_helpers import unique_username, unique_email
 
 @pytest.fixture(scope="function")
@@ -24,18 +27,13 @@ def driver():
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
     
+    chrome_options.binary_location = '/usr/bin/chromium-browser'
     try:
-        print("Створення екземпляру Chrome за допомогою ChromeDriverManager")
-        service = Service(ChromeDriverManager().install())
+        service = Service('/usr/bin/chromedriver')
         driver = webdriver.Chrome(service=service, options=chrome_options)
     except WebDriverException as e:
-        print(f"Помилка при ініціалізації ChromeDriver: {e}")
-        try:
-            print("Спроба створення драйвера без ChromeDriverManager")
-            driver = webdriver.Chrome(options=chrome_options)
-        except WebDriverException as e:
-            print(f"Помилка при ініціалізації Chrome: {e}")
-            raise
+        print(f"Помилка при ініціалізації Chrome: {e}")
+        raise
     
     print("ChromeDriver успішно ініціалізовано")
     
