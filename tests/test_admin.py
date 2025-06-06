@@ -21,3 +21,5 @@ def test_admin_page_access(client, app, test_db):
         response = client.get('/admin/', follow_redirects=True)
         assert response.status_code == 200
         assert b'Typology Weights' in response.data
+        assert b'Enable Typologies' in response.data
+

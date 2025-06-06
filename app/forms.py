@@ -76,6 +76,14 @@ class WeightsForm(FlaskForm):
     submit = SubmitField(_l("Save Weights"))
 
 
+class TypologyStatusForm(FlaskForm):
+    temporistics_enabled = BooleanField(_l("Temporistics"), default=True)
+    psychosophia_enabled = BooleanField(_l("Psychosophia"), default=True)
+    amatoric_enabled = BooleanField(_l("Amatoric"), default=True)
+    socionics_enabled = BooleanField(_l("Socionics"), default=True)
+    submit_status = SubmitField(_l("Save Status"))
+
+
 class ComfortScoreForm(FlaskForm):
     typology = SelectField(_l("Typology"), choices=[
         ('Temporistics', 'Temporistics'),

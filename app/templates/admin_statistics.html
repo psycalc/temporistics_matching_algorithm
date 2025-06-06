@@ -21,6 +21,24 @@
 </form>
 <hr>
 <form method="post">
+    {{ status_form.hidden_tag() }}
+    <h3>Enable Typologies</h3>
+    <div>
+        {{ status_form.temporistics_enabled.label }} {{ status_form.temporistics_enabled() }}
+    </div>
+    <div>
+        {{ status_form.psychosophia_enabled.label }} {{ status_form.psychosophia_enabled() }}
+    </div>
+    <div>
+        {{ status_form.amatoric_enabled.label }} {{ status_form.amatoric_enabled() }}
+    </div>
+    <div>
+        {{ status_form.socionics_enabled.label }} {{ status_form.socionics_enabled() }}
+    </div>
+    {{ status_form.submit_status() }}
+</form>
+<hr>
+<form method="post">
     {{ score_form.hidden_tag() }}
     <h3>Comfort Score</h3>
     <div>

@@ -9,6 +9,7 @@ BASE_DIR = os.environ.get(
     os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "data"),
 )
 WEIGHTS_FILE = os.environ.get("WEIGHTS_FILE", os.path.join(BASE_DIR, "typology_weights.json"))
+STATUS_FILE = os.environ.get("STATUS_FILE", os.path.join(BASE_DIR, "typology_status.json"))
 
 
 def get_data_path(filename: str) -> str:
@@ -35,6 +36,28 @@ def update_typology_weight(typology_name: str, new_weight: float) -> None:
     weights[typology_name] = new_weight
     with open(WEIGHTS_FILE, "w") as f:
         json.dump(weights, f, indent=2)
+
+
+def load_typology_status() -> Dict[str, bool]:
+    if not os.path.exists(STATUS_FILE):
+        status = {
+            "Temporistics": True,
+            "Psychosophia": True,
+            "Amatoric": True,
+            "Socionics": True,
+        }
+        with open(STATUS_FILE, "w") as f:
+            json.dump(status, f, indent=2)
+        return status
+    with open(STATUS_FILE) as f:
+        return json.load(f)
+
+
+def update_typology_status(typology_name: str, enabled: bool) -> None:
+    status = load_typology_status()
+    status[typology_name] = enabled
+    with open(STATUS_FILE, "w") as f:
+        json.dump(status, f, indent=2)
 
 
 def update_comfort_score(typology_name: str, relationship_type: str, new_score: int) -> None:
