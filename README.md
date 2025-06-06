@@ -2,20 +2,24 @@
 
 **Table of Contents:**
 1. [Project Description](#project-description)
-2. [Theoretical Foundations](#theoretical-foundations)
+2. [Repository Overview](#repository-overview)
+   - [Key Components](#key-components)
+   - [Getting Started](#getting-started)
+   - [Next Steps for Exploration](#next-steps-for-exploration)
+3. [Theoretical Foundations](#theoretical-foundations)
     - [Temporistics (Time)](#temporistics-time)
     - [Psychosophy (Personality Aspects)](#psychosophy-personality-aspects)
     - [Socionics (Modeling of Information)](#socionics-modeling-of-information)
-3. [Implementation in Code](#implementation-in-code)
+4. [Implementation in Code](#implementation-in-code)
     - [Typology Classes](#typology-classes)
     - [Services and Data Validation](#services-and-data-validation)
     - [Routes and Forms](#routes-and-forms)
-4. [Testing](#testing)
-5. [Installation and Run](#installation-and-run)
+5. [Testing](#testing)
+6. [Installation and Run](#installation-and-run)
     - [Локальний запуск](#локальний-запуск)
     - [Запуск у Docker](#запуск-у-docker)
     - [Запуск тестів](#запуск-тестів)
-6. [Additional Information](#additional-information)
+7. [Additional Information](#additional-information)
 
 ---
 
@@ -24,6 +28,33 @@
 This project integrates theoretical concepts from three typologies (Temporistics, Psychosophy, and Socionics) and implements them in a web application. Users can select their types, calculate relationships between types, and view the "comfort score" of these interactions.
 
 The main goal is to demonstrate how theoretical models of perception (time, personality aspects, information) can be transformed into practical code, tested thoroughly, and presented through a web interface.
+
+## Repository Overview
+
+This application is built with **Flask** and lets users choose psychological "types" from different typologies to calculate how compatible two types are.
+
+### Key Components
+
+- **App factory & configuration** (`create_app`, `run.py`) initialize Flask extensions, register blueprints, and configure optional OAuth providers.
+- **Models** (`User`, `UserType` and OAuth token storage) store user data and validate type selections.
+- **Routes & Forms** handle registration, login, profile editing, and relationship calculations.
+- **Typology logic** in `app/typologies/` and helper functions in `services.py` implement the Temporistics, Psychosophy, and other rules.
+- **Templates & Static Assets** under `app/templates/` provide the interface; translations live in `translations/` and `locales/`.
+- **Tests** in `tests/` cover algorithms, routes, models, localization, and Selenium end-to-end cases with about 93% coverage.
+
+### Getting Started
+
+1. Install dependencies: `pip install -r requirements.txt`.
+2. Create a `.env` file or rely on the defaults in `config.py`.
+3. Run `./run_local.sh` and open `http://localhost:5001/` in your browser.
+
+### Next Steps for Exploration
+
+- Review `app/__init__.py` to understand how blueprints are registered.
+- Study the typology algorithms in `app/typologies/`.
+- Look into OAuth configuration in `app/oauth.py`.
+- Explore the test suite under `tests/` for usage examples.
+- Check `translations/` to see how localization is added.
 
 ## Theoretical Foundations
 
