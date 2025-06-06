@@ -194,6 +194,8 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
     form = LoginForm()
+    google_enabled = 'google' in current_app.blueprints
+    github_enabled = 'github' in current_app.blueprints
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user and user.check_password(form.password.data):
@@ -207,8 +209,20 @@ def login():
                 print("Form validation failed:", form.errors)
             # Flash the message and render the template in the same request
             flash("Login Unsuccessful", "danger")
-            return render_template("login.html", title="Login", form=form)
-    return render_template("login.html", title="Login", form=form)
+            return render_template(
+                "login.html",
+                title="Login",
+                form=form,
+                google_enabled=google_enabled,
+                github_enabled=github_enabled,
+            )
+    return render_template(
+        "login.html",
+        title="Login",
+        form=form,
+        google_enabled=google_enabled,
+        github_enabled=github_enabled,
+    )
 
 @main.route("/logout")
 @login_required

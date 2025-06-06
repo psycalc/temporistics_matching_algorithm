@@ -10,6 +10,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException
 
+if not os.environ.get("RUN_SELENIUM"):
+    pytest.skip("Skipping selenium tests; RUN_SELENIUM not set", allow_module_level=True)
+
 # Перелік текстів, які мають бути присутні на сторінці для кожної мови
 # Варто адаптувати під фактичні тексти на вашому сайті
 EXPECTED_TEXTS = {
@@ -29,20 +32,14 @@ def driver():
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--remote-debugging-port=9222")
-    
-    # Ініціалізуємо веб-драйвер з деяким вищим рівнем логування помилок
+    chrome_options.binary_location = '/usr/bin/chromium-browser'
+
     try:
-        print("Спроба створити екземпляр Chrome за допомогою ChromeDriverManager")
-        service = Service(ChromeDriverManager().install())
+        service = Service('/usr/bin/chromedriver')
         driver = webdriver.Chrome(service=service, options=chrome_options)
     except WebDriverException as e:
-        print(f"Помилка при ініціалізації ChromeDriver з ChromeDriverManager: {e}")
-        try:
-            print("Спроба створити екземпляр Chrome без ChromeDriverManager")
-            driver = webdriver.Chrome(options=chrome_options)
-        except WebDriverException as e:
-            print(f"Помилка при ініціалізації ChromeDriver: {e}")
-            raise
+        print(f"Помилка при ініціалізації ChromeDriver: {e}")
+        raise
     
     print("ChromeDriver успішно ініціалізовано")
     
