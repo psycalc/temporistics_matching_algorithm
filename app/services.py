@@ -1,4 +1,5 @@
 import math
+from flask import current_app
 from .extensions import db, cache
 from .typologies import (
     TypologyTemporistics,
@@ -6,18 +7,20 @@ from .typologies import (
     TypologyAmatoric,
     TypologySocionics,
 )
-from flask import current_app
+
+# Central registry for available typologies. This allows us to reuse the same
+# mapping across helper functions instead of redefining it in each place.
+TYPOLOGY_CLASSES = {
+    "Temporistics": TypologyTemporistics,
+    "Psychosophia": TypologyPsychosophia,
+    "Amatoric": TypologyAmatoric,
+    "Socionics": TypologySocionics,
+}
 
 def get_types_by_typology(typology_name):
     """Отримання всіх типів для заданої типології.
     У тестовому середовищі не використовує кешування."""
-    typology_classes = {
-        "Temporistics": TypologyTemporistics,
-        "Psychosophia": TypologyPsychosophia,
-        "Amatoric": TypologyAmatoric,
-        "Socionics": TypologySocionics,
-    }
-    typology_class = typology_classes.get(typology_name)
+    typology_class = TYPOLOGY_CLASSES.get(typology_name)
     if not typology_class:
         return None
     
@@ -36,13 +39,7 @@ def _get_types_cached(typology_name, typology_class):
 def calculate_relationship(user1, user2, typology):
     if not user1 or not user2:
         raise ValueError("User types cannot be empty")
-    typology_classes = {
-        "Temporistics": TypologyTemporistics,
-        "Psychosophia": TypologyPsychosophia,
-        "Amatoric": TypologyAmatoric,
-        "Socionics": TypologySocionics,
-    }
-    typology_class = typology_classes.get(typology)
+    typology_class = TYPOLOGY_CLASSES.get(typology)
     if typology_class is None:
         raise ValueError(f"Invalid typology: {typology}")
     typology_instance = typology_class()
@@ -109,13 +106,7 @@ def get_distance_if_compatible(user1, user2):
     return distance
 
 def get_typology_instance(typology_name):
-    typology_classes = {
-        "Temporistics": TypologyTemporistics,
-        "Psychosophia": TypologyPsychosophia,
-        "Amatoric": TypologyAmatoric,
-        "Socionics": TypologySocionics,
-    }
-    typology_class = typology_classes.get(typology_name)
+    typology_class = TYPOLOGY_CLASSES.get(typology_name)
     if typology_class is None:
         return None
     return typology_class()
