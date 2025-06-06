@@ -48,3 +48,23 @@ def test_calculate_weighted_compatibility(tmp_path, monkeypatch):
     user2 = {"Temporistics": "Past, Current, Future, Eternity"}
     score = su.calculate_weighted_compatibility(user1, user2)
     assert score == 95
+
+
+def test_load_typology_status_creates_file(tmp_path, monkeypatch):
+    status_file = tmp_path / "status.json"
+    monkeypatch.setenv("STATUS_FILE", str(status_file))
+    importlib.reload(su)
+    status = su.load_typology_status()
+    assert status["Temporistics"] is True
+    assert status_file.exists()
+
+
+def test_update_typology_status(tmp_path, monkeypatch):
+    status_file = tmp_path / "status.json"
+    monkeypatch.setenv("STATUS_FILE", str(status_file))
+    importlib.reload(su)
+    su.load_typology_status()
+    su.update_typology_status("Temporistics", False)
+    with open(status_file) as f:
+        data = json.load(f)
+    assert data["Temporistics"] is False

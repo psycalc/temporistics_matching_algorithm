@@ -17,6 +17,7 @@ from app.services import get_distance_if_compatible
 from werkzeug.utils import secure_filename
 import os
 from .routes_helper import handle_profile_image_upload, update_user_typology
+from .statistics_utils import load_typology_status
 
 main = Blueprint("main", __name__)
 
@@ -28,8 +29,8 @@ class EmptyForm(FlaskForm):
     csrf_token = HiddenField()
 
 def get_available_typologies():
-    # Возвращает список доступных типологий
-    return ["Temporistics", "Psychosophia", "Amatoric", "Socionics"]
+    status = load_typology_status()
+    return [name for name, enabled in status.items() if enabled]
 
 def is_safe_url(target):
     ref_url = urlparse(request.host_url)
