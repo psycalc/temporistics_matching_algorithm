@@ -15,10 +15,26 @@ class TypologyTypeForm(FlaskForm):
     type_value = SelectField(_l("Type Value"), validators=[DataRequired()], choices=[])
 
 class RegistrationForm(FlaskForm):
-    username = StringField(_l("Username"), validators=[DataRequired(), Length(min=2, max=20)])
-    email = StringField(_l("Email"), validators=[DataRequired(), Email()])
-    password = PasswordField(_l("Password"), validators=[DataRequired()])
-    confirm_password = PasswordField(_l("Confirm Password"), validators=[DataRequired(), EqualTo("password")])
+    username = StringField(
+        _l("Username"),
+        validators=[DataRequired(), Length(min=2, max=20)],
+        render_kw={"placeholder": _l("Username")}
+    )
+    email = StringField(
+        _l("Email"),
+        validators=[DataRequired(), Email()],
+        render_kw={"placeholder": _l("Email")}
+    )
+    password = PasswordField(
+        _l("Password"),
+        validators=[DataRequired()],
+        render_kw={"placeholder": _l("Password")}
+    )
+    confirm_password = PasswordField(
+        _l("Confirm Password"),
+        validators=[DataRequired(), EqualTo("password")],
+        render_kw={"placeholder": _l("Confirm Password")}
+    )
     typologies = FieldList(FormField(TypologyTypeForm))
     profile_image = FileField(_l("Profile Image"), validators=[FileAllowed(['jpg', 'png', 'jpeg'], _l('Images only!'))])
     submit = SubmitField(_l("Sign Up"))
@@ -34,8 +50,16 @@ class RegistrationForm(FlaskForm):
             raise ValidationError(_l("That email is already registered. Please choose a different one."))
 
 class LoginForm(FlaskForm):
-    email = StringField(_l("Email"), validators=[DataRequired(), Email()])
-    password = PasswordField(_l("Password"), validators=[DataRequired()])
+    email = StringField(
+        _l("Email"),
+        validators=[DataRequired(), Email()],
+        render_kw={"placeholder": _l("Email")}
+    )
+    password = PasswordField(
+        _l("Password"),
+        validators=[DataRequired()],
+        render_kw={"placeholder": _l("Password")}
+    )
     remember = BooleanField(_l("Remember Me"))
     submit = SubmitField(_l("Login"))
 
