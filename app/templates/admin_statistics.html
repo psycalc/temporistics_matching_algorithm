@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Statistics Admin</h2>
+<form method="post">
+    {{ weights_form.hidden_tag() }}
+    <h3>Typology Weights</h3>
+    <div>
+        {{ weights_form.temporistics.label }} {{ weights_form.temporistics() }}
+    </div>
+    <div>
+        {{ weights_form.psychosophia.label }} {{ weights_form.psychosophia() }}
+    </div>
+    <div>
+        {{ weights_form.amatoric.label }} {{ weights_form.amatoric() }}
+    </div>
+    <div>
+        {{ weights_form.socionics.label }} {{ weights_form.socionics() }}
+    </div>
+    {{ weights_form.submit() }}
+</form>
+<hr>
+<form method="post">
+    {{ score_form.hidden_tag() }}
+    <h3>Comfort Score</h3>
+    <div>
+        {{ score_form.typology.label }} {{ score_form.typology() }}
+    </div>
+    <div>
+        {{ score_form.relationship_type.label }} {{ score_form.relationship_type() }}
+    </div>
+    <div>
+        {{ score_form.score.label }} {{ score_form.score() }}
+    </div>
+    {{ score_form.submit_score() }}
+</form>
+{% endblock %}

@@ -55,7 +55,9 @@ def create_app(config_name="development"):
     
     # Регіструємо blueprint'и
     from app.routes import main
+    from app.admin import admin_bp
     app.register_blueprint(main)
+    app.register_blueprint(admin_bp)
     
     # Ініціалізуємо OAuth, окрім тестового оточення. У тестах залежність
     # flask-dance може бути відсутня, тому пропускаємо реєстрацію OAuth

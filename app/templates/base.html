@@ -16,6 +16,7 @@
                 <a class="nav-item nav-link" href="{{ url_for('main.user_profile', username=current_user.username) }}">{{ _('Profile') }}</a>
               <!-- Добавляем новый пункт меню для списка совместимых пользователей поблизости -->
         <a class="nav-item nav-link" href="{{ url_for('main.nearby_compatibles') }}">{{ _('Compatible Nearby') }}</a>
+        <a class="nav-item nav-link" href="{{ url_for('admin.statistics') }}">Admin</a>
       {% else %}
                 <a class="nav-item nav-link" href="{{ url_for('main.register') }}">{{ _('Register') }}</a>
                 <a class="nav-item nav-link" href="{{ url_for('main.login') }}">{{ _('Login') }}</a>
