@@ -27,6 +27,14 @@ migrate = Migrate()
 @pytest.fixture(scope="session")
 def db_url():
     """URL для з'єднання з базою даних."""
+    env_url = os.environ.get("TEST_DB_URL")
+    if env_url:
+        return env_url
+
+    db_type = os.environ.get("TEST_DB", "postgresql").lower()
+    if db_type == "sqlite":
+        return "sqlite:///:memory:"
+
     # Пробуємо спочатку підключитися через localhost, це працює надійніше в WSL2
     return "postgresql://testuser:password@localhost:5432/testdb"
 
@@ -112,15 +120,14 @@ def live_server(app):
         from sqlalchemy import text
         with engine.connect() as connection:
             if dialect == 'postgresql':
-                # Для PostgreSQL
                 result = connection.execute(text("SELECT table_name FROM information_schema.tables WHERE table_schema='public';"))
-                tables = [row[0] for row in result]
-                print(f"Tables in LiveServer database (PostgreSQL): {tables}")
+            elif dialect == 'sqlite':
+                result = connection.execute(text("SELECT name FROM sqlite_master WHERE type='table';"))
             else:
-                # Помилка, якщо не PostgreSQL
-                tables = [f"Error: Found non-PostgreSQL database ({dialect})"]
-                print(f"Error: Only PostgreSQL is supported, but found: {dialect}")
-                raise ValueError(f"Only PostgreSQL is supported, but found: {dialect}")
+                raise ValueError(f"Unsupported database dialect: {dialect}")
+
+            tables = [row[0] for row in result]
+            print(f"Tables in LiveServer database ({dialect}): {tables}")
 
     # Запускаємо сервер
     port = get_free_port()
@@ -151,15 +158,14 @@ def test_db(app):
         from sqlalchemy import text
         with engine.connect() as connection:
             if dialect == 'postgresql':
-                # Для PostgreSQL
                 result = connection.execute(text("SELECT table_name FROM information_schema.tables WHERE table_schema='public';"))
-                tables = [row[0] for row in result]
-                print(f"Tables in database (PostgreSQL): {tables}")
+            elif dialect == 'sqlite':
+                result = connection.execute(text("SELECT name FROM sqlite_master WHERE type='table';"))
             else:
-                # Помилка, якщо не PostgreSQL
-                tables = [f"Error: Found non-PostgreSQL database ({dialect})"]
-                print(f"Error: Only PostgreSQL is supported, but found: {dialect}")
-                raise ValueError(f"Only PostgreSQL is supported, but found: {dialect}")
+                raise ValueError(f"Unsupported database dialect: {dialect}")
+
+            tables = [row[0] for row in result]
+            print(f"Tables in database ({dialect}): {tables}")
             
         yield db
         db.session.remove()
