@@ -58,6 +58,8 @@ def app(db_url):
         Column('profile_image', String(200)),
         Column('latitude', Float),
         Column('longitude', Float),
+        Column('city', String(100)),
+        Column('country', String(100)),
         Column('max_distance', Float, default=50.0),
         Column('google_id', String(256), nullable=True),
         Column('github_id', String(256), nullable=True),

@@ -52,6 +52,16 @@
         <span class="text-danger">{{ error }}</span>
       {% endfor %}
     </div>
+
+    <div>
+      <label for="city">City</label>
+      {{ form.city(class="form-control") }}
+    </div>
+
+    <div>
+      <label for="country">Country</label>
+      {{ form.country(class="form-control") }}
+    </div>
     
     <div>
       <label for="max_distance">Maximum Acceptable Distance (km)</label>

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Type Distribution</h2>
+<canvas id="cityChart" style="max-width:600px"></canvas>
+<canvas id="countryChart" style="max-width:600px"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+var cityData = {{ city_data|tojson }};
+var countryData = {{ country_data|tojson }};
+
+function buildChart(ctx, data){
+    return new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.labels,
+            datasets: data.datasets
+        },
+        options: {responsive: true, scales:{y:{beginAtZero:true}}}
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+    buildChart(document.getElementById('cityChart').getContext('2d'), cityData);
+    buildChart(document.getElementById('countryChart').getContext('2d'), countryData);
+});
+</script>
+{% endblock %}

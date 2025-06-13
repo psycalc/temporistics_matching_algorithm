@@ -21,6 +21,8 @@ class User(UserMixin, db.Model):
     # Add latitude/longitude fields since tests assume their presence
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
+    city = Column(String(100), nullable=True)
+    country = Column(String(100), nullable=True)
     
     # Додаємо поле для зберігання максимальної прийнятної відстані (в км)
     max_distance = Column(Float, nullable=True, default=50.0)

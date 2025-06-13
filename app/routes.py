@@ -155,7 +155,8 @@ def register():
 
     if request.method == "POST":
         if form.validate_on_submit():
-            user = User(username=form.username.data, email=form.email.data)
+            user = User(username=form.username.data, email=form.email.data,
+                        city=form.city.data, country=form.country.data)
             user.set_password(form.password.data)
             db.session.add(user)
 
@@ -293,6 +294,8 @@ def edit_profile():
             type_value=form.type_value.data,
             latitude=form.latitude.data,
             longitude=form.longitude.data,
+            city=form.city.data,
+            country=form.country.data,
             max_distance=form.max_distance.data,
         )
 
