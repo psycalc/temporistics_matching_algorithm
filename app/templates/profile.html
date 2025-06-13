@@ -31,6 +31,16 @@
     </div>
 
     <div>
+      <label for="city">{{ _('City') }}</label>
+      {{ form.city(class="form-control") }}
+    </div>
+
+    <div>
+      <label for="country">{{ _('Country') }}</label>
+      {{ form.country(class="form-control") }}
+    </div>
+
+    <div>
       {{ form.submit(class="btn btn-primary") }}
     </div>
   </form>

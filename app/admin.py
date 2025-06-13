@@ -1,6 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from .forms import WeightsForm, ComfortScoreForm, TypologyStatusForm
+from sqlalchemy import func
+from .extensions import db
+from .models import User, UserType
 from .statistics_utils import (
     load_typology_weights,
     update_typology_weight,
@@ -65,3 +68,39 @@ def statistics():
         score_form=score_form,
         status_form=status_form,
     )
+
+
+@admin_bp.route('/distribution')
+@login_required
+def distribution():
+    city_results = (
+        db.session.query(User.city, UserType.type_value, func.count(User.id))
+        .join(UserType, User.type_id == UserType.id)
+        .filter(User.city.isnot(None))
+        .group_by(User.city, UserType.type_value)
+        .all()
+    )
+    country_results = (
+        db.session.query(User.country, UserType.type_value, func.count(User.id))
+        .join(UserType, User.type_id == UserType.id)
+        .filter(User.country.isnot(None))
+        .group_by(User.country, UserType.type_value)
+        .all()
+    )
+
+    def prepare_chart_data(results):
+        labels = sorted({r[0] for r in results})
+        types = sorted({r[1] for r in results})
+        datasets = []
+        for t in types:
+            data = []
+            for label in labels:
+                count = next((r[2] for r in results if r[0] == label and r[1] == t), 0)
+                data.append(count)
+            datasets.append({'label': t, 'data': data})
+        return {'labels': labels, 'datasets': datasets}
+
+    city_data = prepare_chart_data(city_results)
+    country_data = prepare_chart_data(country_results)
+
+    return render_template('admin_distribution.html', city_data=city_data, country_data=country_data)

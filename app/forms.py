@@ -37,6 +37,8 @@ class RegistrationForm(FlaskForm):
     )
     typologies = FieldList(FormField(TypologyTypeForm))
     profile_image = FileField(_l("Profile Image"), validators=[FileAllowed(['jpg', 'png', 'jpeg'], _l('Images only!'))])
+    city = StringField(_l("City"))
+    country = StringField(_l("Country"))
     submit = SubmitField(_l("Sign Up"))
 
     def validate_username(self, username):
@@ -70,6 +72,8 @@ class EditProfileForm(FlaskForm):
     type_value = StringField(_l("Type Value"), validators=[DataRequired()])
     latitude = FloatField(_l("Latitude"), validators=[DataRequired()])
     longitude = FloatField(_l("Longitude"), validators=[DataRequired()])
+    city = StringField(_l("City"))
+    country = StringField(_l("Country"))
     max_distance = FloatField(_l("Maximum Acceptable Distance (km)"), validators=[])
     profile_image = FileField(_l("Profile Image"), validators=[FileAllowed(['jpg', 'png', 'jpeg'], _l('Images only!'))])
     submit = SubmitField(_l("Save Changes"))
@@ -80,6 +84,8 @@ class ProfileForm(FlaskForm):
     type_value = StringField(_l("Type Value"), validators=[DataRequired()])
     latitude = FloatField(_l("Latitude"), validators=[])
     longitude = FloatField(_l("Longitude"), validators=[])
+    city = StringField(_l("City"))
+    country = StringField(_l("Country"))
     max_distance = FloatField(_l("Maximum Acceptable Distance (km)"), validators=[])
     submit = SubmitField(_l("Save Changes"))
 
