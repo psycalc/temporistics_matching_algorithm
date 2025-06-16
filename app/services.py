@@ -1,5 +1,26 @@
 """Compatibility layer for service functions."""
 
+import math
+from flask import current_app
+from .extensions import db, cache
+from .typologies import (
+    TypologyTemporistics,
+    TypologyPsychosophia,
+    TypologyAmatoric,
+    TypologySocionics,
+    TypologyIQ,
+)
+
+# Central registry for available typologies. This allows us to reuse the same
+# mapping across helper functions instead of redefining it in each place.
+TYPOLOGY_CLASSES = {
+    "Temporistics": TypologyTemporistics,
+    "Psychosophia": TypologyPsychosophia,
+    "Amatoric": TypologyAmatoric,
+    "Socionics": TypologySocionics,
+    "IQ": TypologyIQ,
+}
+
 from .domain_services import (
     get_types_by_typology,
     calculate_relationship,
@@ -8,7 +29,6 @@ from .domain_services import (
     get_distance_if_compatible,
     get_typology_instance,
 )
-
 
 from .repositories.user_repository import update_user_profile
 
@@ -30,7 +50,6 @@ def create_user_type(typology_name, type_value, commit=True):
     from .models import UserType
 
     user_type = UserType(typology_name=typology_name, type_value=type_value)
-    db = __import__("app.extensions", fromlist=["db"]).db
     db.session.add(user_type)
     if commit:
         db.session.commit()
@@ -48,7 +67,5 @@ def assign_user_type(user, typology_name, type_value, commit=True):
         user_type = create_user_type(typology_name, type_value, commit=False)
         user.type_id = user_type.id
     if commit:
-        db = __import__("app.extensions", fromlist=["db"]).db
         db.session.commit()
-
 

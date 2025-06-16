@@ -23,6 +23,7 @@ def load_typology_weights() -> Dict[str, float]:
             "Psychosophia": 1.0,
             "Amatoric": 1.0,
             "Socionics": 1.0,
+            "IQ": 1.0,
         }
         with open(WEIGHTS_FILE, "w") as f:
             json.dump(weights, f, indent=2)
@@ -45,6 +46,7 @@ def load_typology_status() -> Dict[str, bool]:
             "Psychosophia": True,
             "Amatoric": True,
             "Socionics": True,
+            "IQ": True,
         }
         with open(STATUS_FILE, "w") as f:
             json.dump(status, f, indent=2)

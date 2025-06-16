@@ -61,8 +61,8 @@ run_tests() {
     # Configure the testing environment
     export PYTHONPATH="$PYTHONPATH:$(pwd)"
     
-    # Use PostgreSQL for tests
-    export USE_TEST_DB_URL="postgresql://testuser:password@localhost:5432/testdb"
+    # Use SQLite for tests unless USE_TEST_DB_URL is already set
+    export USE_TEST_DB_URL="${USE_TEST_DB_URL:-sqlite:///test.db}"
     
     export FLASK_CONFIG=testing
     
