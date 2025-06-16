@@ -53,6 +53,7 @@ def calculate_relationship(user1, user2, typology):
 
 
 def haversine_distance(lat1, lon1, lat2, lon2):
+    """Return the distance in kilometers between two geographic coordinates."""
     R = 6371.0
     lat1_rad, lon1_rad = math.radians(lat1), math.radians(lon1)
     lat2_rad, lon2_rad = math.radians(lat2), math.radians(lon2)
@@ -65,6 +66,7 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 
 
 def get_users_distance(user1, user2):
+    """Return the distance between two users based on their coordinates."""
     if (
         user1.latitude is None
         or user1.longitude is None
