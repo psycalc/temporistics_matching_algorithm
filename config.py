@@ -29,6 +29,15 @@ class Config:
     ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
     LOCAL_MODEL_PATH = os.environ.get("LOCAL_MODEL_PATH")
 
+    # Session security defaults
+    SESSION_COOKIE_SECURE = settings.get("SESSION_COOKIE_SECURE", False)
+    SESSION_COOKIE_HTTPONLY = settings.get("SESSION_COOKIE_HTTPONLY", True)
+    SESSION_COOKIE_SAMESITE = settings.get("SESSION_COOKIE_SAMESITE", "Lax")
+
+    # Content Security Policy for Talisman
+    CONTENT_SECURITY_POLICY = "default-src 'self'"
+    TALISMAN_FORCE_HTTPS = False
+
 class DevelopmentConfig(Config):
     DEBUG = True
     GOOGLE_CLIENT_ID = settings.get("GOOGLE_CLIENT_ID")
@@ -55,6 +64,22 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
+    # Require explicit secrets in production
+    SECRET_KEY = settings.get("SECRET_KEY")
+    SQLALCHEMY_DATABASE_URI = settings.get(
+        "DOCKER_DATABASE_URL", settings.get("DATABASE_URL")
+    )
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "Lax"
+    TALISMAN_FORCE_HTTPS = True
+
+    @staticmethod
+    def init_app(app):
+        if not app.config.get("SECRET_KEY"):
+            raise RuntimeError("SECRET_KEY must be set in production")
+        if not app.config.get("SQLALCHEMY_DATABASE_URI"):
+            raise RuntimeError("DATABASE_URL must be set in production")
 
 config_dict = {
     "development": DevelopmentConfig,
