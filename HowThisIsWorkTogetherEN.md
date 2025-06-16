@@ -1,5 +1,7 @@
 ## General Summary: Temporistics, Psychosophy and Socionics
 
+These notes provide an accessible introduction for readers who may not be familiar with the underlying typologies. They are intended as a simplified summary rather than a comprehensive or final solution to the complex question of human compatibility.
+
 ### **1. Temporistics: Induction and Deduction of Time**
 Temporistics operates with four aspects of time: **Past**, **Current**, **Future** and **Eternity**. These aspects manifest inductively or deductively depending on their position in a type:
 - **Positions 1 and 4 (deductive):** a person acts according to established principles and an overall picture of time.

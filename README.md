@@ -29,6 +29,8 @@ This project integrates theoretical concepts from three typologies (Temporistics
 
 The main goal is to demonstrate how theoretical models of perception (time, personality aspects, information) can be transformed into practical code, tested thoroughly, and presented through a web interface.
 
+> **Note for newcomers:** The typologies used in this project are exploratory models rather than a definitive scientific solution for human compatibility. They provide a framework for experiments and may be extended with new typologies in the future. If you're new to these concepts, see [HowThisIsWorkTogetherEN.md](HowThisIsWorkTogetherEN.md) for a beginner-friendly overview of each typology and where conflicts between them often arise.
+
 ## Repository Overview
 
 This application is built with **Flask** and lets users choose psychological "types" from different typologies to calculate how compatible two types are.
