@@ -192,3 +192,16 @@ def test_temporistics_get_time_periods_short():
     """Check that temporal aspects are shortened to initials."""
     short = TypologyTemporistics.get_time_periods_short(["Past", "Current", "Future", "Eternity"])
     assert short == ["P", "C", "F", "E"]
+
+
+def test_typology_iq_basic():
+    from app.typologies.typology_iq import TypologyIQ
+
+    typ = TypologyIQ()
+    all_types = typ.get_all_types()
+    assert all_types == ["Aspiring", "Balanced", "Insightful"]
+    assert typ.determine_relationship_type("Aspiring", "Aspiring") == "Identity"
+    assert typ.determine_relationship_type("Aspiring", "Balanced") == "Complementary"
+    assert typ.determine_relationship_type("Aspiring", "Insightful") == "Contrast"
+    shortened = typ.shorten_type(all_types)
+    assert shortened == ["A", "B", "I"]

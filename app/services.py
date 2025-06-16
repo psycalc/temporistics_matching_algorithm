@@ -6,6 +6,7 @@ from .typologies import (
     TypologyPsychosophia,
     TypologyAmatoric,
     TypologySocionics,
+    TypologyIQ,
 )
 
 # Central registry for available typologies. This allows us to reuse the same
@@ -15,6 +16,7 @@ TYPOLOGY_CLASSES = {
     "Psychosophia": TypologyPsychosophia,
     "Amatoric": TypologyAmatoric,
     "Socionics": TypologySocionics,
+    "IQ": TypologyIQ,
 }
 
 def get_types_by_typology(typology_name):
