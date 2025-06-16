@@ -857,3 +857,17 @@ def test_profession_visibility_in_nearby(client, app, test_db):
         assert response.status_code == 200
         assert username2.encode() in response.data
         assert b"Doctor" not in response.data
+
+
+def test_chat_route(client, app, test_db):
+    with app.app_context():
+        username = unique_username("chat")
+        email = unique_email("chat")
+        user = User(username=username, email=email)
+        user.set_password("chatpass")
+        db.session.add(user)
+        db.session.commit()
+
+        client.post("/login", data={"email": email, "password": "chatpass"}, follow_redirects=True)
+        response = client.get("/chat", follow_redirects=True)
+        assert response.status_code == 200

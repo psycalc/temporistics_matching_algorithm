@@ -18,6 +18,7 @@ from werkzeug.utils import secure_filename
 import os
 from .routes_helper import handle_profile_image_upload, update_user_typology
 from .statistics_utils import load_typology_status
+import openai
 
 main = Blueprint("main", __name__)
 
@@ -391,3 +392,33 @@ def nearby_compatibles():
 
     # Передаем в шаблон список кортежей (пользователь, расстояние)
     return render_template("nearby_compatibles.html", compatible_list=compatible_list)
+
+
+@main.route("/chat")
+@login_required
+def chat():
+    return render_template("chat.html")
+
+
+@main.route("/chat_api", methods=["POST"])
+@login_required
+def chat_api():
+    data = request.get_json()
+    message = data.get("message", "") if data else ""
+    if not message:
+        return jsonify({"reply": "No message provided."}), 400
+    api_key = current_app.config.get("OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        return jsonify({"reply": "OpenAI API key not configured."})
+    try:
+        openai.api_key = api_key
+        response = openai.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": message}],
+            temperature=0.7,
+        )
+        reply = response.choices[0].message.content.strip()
+    except Exception as e:
+        current_app.logger.error(f"OpenAI error: {e}")
+        reply = "Sorry, I cannot respond right now."
+    return jsonify({"reply": reply})
