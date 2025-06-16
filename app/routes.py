@@ -155,8 +155,14 @@ def register():
 
     if request.method == "POST":
         if form.validate_on_submit():
-            user = User(username=form.username.data, email=form.email.data,
-                        city=form.city.data, country=form.country.data)
+            user = User(
+                username=form.username.data,
+                email=form.email.data,
+                city=form.city.data,
+                country=form.country.data,
+                profession=form.profession.data,
+                profession_visible=form.show_profession.data,
+            )
             user.set_password(form.password.data)
             db.session.add(user)
 
@@ -244,6 +250,10 @@ def user_profile(username):
         if user.user_type:
             form.typology_name.data = user.user_type.typology_name
             form.type_value.data = user.user_type.type_value
+        form.city.data = user.city
+        form.country.data = user.country
+        form.profession.data = user.profession
+        form.show_profession.data = user.profession_visible
 
     if form.validate_on_submit():
         # Логування даних для діагностики
@@ -253,6 +263,10 @@ def user_profile(username):
         
         # Оновлення email
         user.email = form.email.data
+        user.city = form.city.data
+        user.country = form.country.data
+        user.profession = form.profession.data
+        user.profession_visible = form.show_profession.data
         current_app.logger.info(f"Email after update: {user.email}")
         
         # Оновлення типології
@@ -296,6 +310,8 @@ def edit_profile():
             longitude=form.longitude.data,
             city=form.city.data,
             country=form.country.data,
+            profession=form.profession.data,
+            profession_visible=form.show_profession.data,
             max_distance=form.max_distance.data,
         )
 

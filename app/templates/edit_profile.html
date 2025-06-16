@@ -62,6 +62,16 @@
       <label for="country">Country</label>
       {{ form.country(class="form-control") }}
     </div>
+
+    <div>
+      <label for="profession">Profession</label>
+      {{ form.profession(class="form-control") }}
+    </div>
+
+    <div class="form-check">
+      {{ form.show_profession(class="form-check-input") }}
+      {{ form.show_profession.label(class="form-check-label") }}
+    </div>
     
     <div>
       <label for="max_distance">Maximum Acceptable Distance (km)</label>

@@ -41,6 +41,16 @@
     </div>
 
     <div>
+      <label for="profession">{{ _('Profession') }}</label>
+      {{ form.profession(class="form-control") }}
+    </div>
+
+    <div class="form-check">
+      {{ form.show_profession(class="form-check-input") }}
+      {{ form.show_profession.label(class="form-check-label") }}
+    </div>
+
+    <div>
       {{ form.submit(class="btn btn-primary") }}
     </div>
   </form>

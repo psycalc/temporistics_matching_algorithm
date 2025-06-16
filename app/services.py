@@ -47,7 +47,8 @@ def calculate_relationship(user1, user2, typology):
     comfort_score, _ = typology_instance.get_comfort_score(relationship_type)
     return relationship_type, comfort_score
 
-def update_user_profile(user, username, email, typology_name, type_value, latitude, longitude, city=None, country=None, max_distance=None):
+def update_user_profile(user, username, email, typology_name, type_value, latitude, longitude,
+                        city=None, country=None, profession=None, profession_visible=None, max_distance=None):
     user.username = username
     user.email = email
     if user.user_type:
@@ -69,6 +70,10 @@ def update_user_profile(user, username, email, typology_name, type_value, latitu
         user.city = city
     if country is not None:
         user.country = country
+    if profession is not None:
+        user.profession = profession
+    if profession_visible is not None:
+        user.profession_visible = profession_visible
     
     # Оновлюємо максимальну прийнятну відстань, якщо вона вказана
     if max_distance is not None:

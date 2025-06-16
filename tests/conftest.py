@@ -8,7 +8,7 @@ import string
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
-from sqlalchemy import MetaData, Table, Column, Integer, String, ForeignKey, Float
+from sqlalchemy import MetaData, Table, Column, Integer, String, ForeignKey, Float, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
 from app import create_app
@@ -60,6 +60,8 @@ def app(db_url):
         Column('longitude', Float),
         Column('city', String(100)),
         Column('country', String(100)),
+        Column('profession', String(120)),
+        Column('profession_visible', Boolean, default=True),
         Column('max_distance', Float, default=50.0),
         Column('google_id', String(256), nullable=True),
         Column('github_id', String(256), nullable=True),
