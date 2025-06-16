@@ -19,5 +19,5 @@ if [ "$RUN_TESTS" = "1" ]; then
 else
     wait_for_db
     flask db upgrade  # Применяем миграции перед запуском сервера
-    exec flask run --host=0.0.0.0
+    exec flask run --host="${FLASK_RUN_HOST:-127.0.0.1}"
 fi

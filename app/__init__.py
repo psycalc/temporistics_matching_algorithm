@@ -7,11 +7,13 @@ from config import config_dict
 from flask_babel import Babel, _
 from flask_caching import Cache
 from flask_wtf.csrf import CSRFProtect
+from flask_talisman import Talisman
 
 # Змінні оточення вже завантажує Dynaconf у config.py
 cache = Cache()
 babel = Babel()
 csrf = CSRFProtect()
+talisman = Talisman()
 
 def create_app(config_name="development"):
     app = Flask(__name__)
@@ -23,6 +25,9 @@ def create_app(config_name="development"):
     
     # Застосовуємо конфігурацію
     app.config.from_object(config_dict[config_name])
+    cfg_cls = config_dict[config_name]
+    if hasattr(cfg_cls, "init_app"):
+        cfg_cls.init_app(app)
     
     # OAuth налаштування завантажуються через конфігураційні класи
     
@@ -44,6 +49,11 @@ def create_app(config_name="development"):
     babel.init_app(app)
     login_manager.init_app(app)
     csrf.init_app(app)
+    talisman.init_app(
+        app,
+        content_security_policy=app.config.get("CONTENT_SECURITY_POLICY"),
+        force_https=app.config.get("TALISMAN_FORCE_HTTPS", False),
+    )
     
     # Регіструємо blueprint'и
     from app.routes import main

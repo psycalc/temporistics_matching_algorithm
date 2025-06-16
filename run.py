@@ -28,7 +28,7 @@ if __name__ == "__main__":
         logging.warning(
             "Running in DEBUG mode. Make sure this is not enabled in production!"
         )
-    host = os.getenv("FLASK_RUN_HOST", "0.0.0.0")
+    host = os.getenv("FLASK_RUN_HOST", "127.0.0.1")
     port = os.getenv("FLASK_RUN_PORT", "5000")
 
     try:

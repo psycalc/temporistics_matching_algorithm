@@ -19,6 +19,10 @@ COPY . .
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# Create a non-root user for running the application
+RUN useradd -m appuser
+USER appuser
+
 # Expose port and set environment variables
 EXPOSE 5000
 ENV FLASK_APP run.py

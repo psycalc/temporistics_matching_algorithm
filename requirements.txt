@@ -26,4 +26,7 @@ anthropic==0.54.0
 transformers==4.41.1
 dynaconf==3.2.11
 
+# Security headers
+Flask-Talisman==1.1.0
+
 socionics==1.0
