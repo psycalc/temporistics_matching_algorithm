@@ -50,6 +50,7 @@ Recent updates introduce accessibility and responsive design best practices:
 - Navigation now uses semantic roles and supports keyboard skipping with a "Skip to main content" link.
 - Flash messages announce updates with `role="alert"` for screen readers.
 - Inputs feature placeholder text, and styles adapt to smaller screens.
+- The interface now loads **Bootstrap 5** for consistent styling across forms and navigation.
 
 ### Getting Started
 
