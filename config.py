@@ -35,8 +35,16 @@ class Config:
     SESSION_COOKIE_SAMESITE = settings.get("SESSION_COOKIE_SAMESITE", "Lax")
 
     # Content Security Policy for Talisman
-    CONTENT_SECURITY_POLICY = "default-src 'self'"
-    TALISMAN_FORCE_HTTPS = False
+    # CSP can be overridden via CONTENT_SECURITY_POLICY environment variable
+    CONTENT_SECURITY_POLICY = settings.get(
+        "CONTENT_SECURITY_POLICY",
+        "default-src 'self'; script-src 'self'; style-src 'self'; "
+        "img-src 'self' data:; object-src 'none'; frame-ancestors 'none'; "
+        "base-uri 'self'; form-action 'self'",
+    )
+
+    # Force HTTPS by default; can be disabled for development via env var
+    TALISMAN_FORCE_HTTPS = settings.get("TALISMAN_FORCE_HTTPS", True)
 
 class DevelopmentConfig(Config):
     DEBUG = True
@@ -45,6 +53,7 @@ class DevelopmentConfig(Config):
     GITHUB_CLIENT_ID = settings.get("GITHUB_CLIENT_ID")
     GITHUB_CLIENT_SECRET = settings.get("GITHUB_CLIENT_SECRET")
     OAUTHLIB_INSECURE_TRANSPORT = "1"
+    TALISMAN_FORCE_HTTPS = False
 
 class TestingConfig(Config):
     TESTING = True
@@ -61,10 +70,12 @@ class TestingConfig(Config):
     SECRET_KEY = "testsecretkey"
     # Використовуємо окрему папку для тестових завантажень
     UPLOAD_FOLDER = os.path.join(basedir, 'tests', 'uploads')
+    TALISMAN_FORCE_HTTPS = False
 
 class ProductionConfig(Config):
     DEBUG = False
     # Require explicit secrets in production
+    # Prefer fetching them from a dedicated secret manager (Vault, AWS SSM, etc.)
     SECRET_KEY = settings.get("SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = settings.get(
         "DOCKER_DATABASE_URL", settings.get("DATABASE_URL")

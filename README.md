@@ -287,6 +287,18 @@ docker-compose up test
 - If you change the database structure, update the tests accordingly.
 - High coverage (~93%) confirms the theoretical ideas are well reflected in code.
 
+## Security and secret management
+
+`config.py` relies on **Dynaconf** to load variables from a `.env` file and the
+environment. While this is convenient for local development, production
+deployments should store secrets in a dedicated vault such as **HashiCorp
+Vault** or **AWS SSM**. Dynaconf will read these values from environment
+variables, so no code changes are needed when switching to a secret manager.
+
+The application uses **Flask‑Talisman** with a strict Content Security Policy
+and HTTPS enabled by default. To disable HTTPS enforcement during local testing,
+set `TALISMAN_FORCE_HTTPS=false` in your environment.
+
 ## Additional Information
 
 This project is developed by [Your Name] and is licensed under the [License Name].
