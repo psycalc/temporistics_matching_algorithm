@@ -43,6 +43,7 @@ This application is built with **Flask** and lets users choose psychological "ty
 - **Typology logic** in `app/typologies/` and helper functions in `services.py` implement the Temporistics, Psychosophy, and other rules.
 - **Templates & Static Assets** under `app/templates/` provide the interface; translations live in `translations/` and `locales/`.
 - **Tests** in `tests/` cover algorithms, routes, models, localization, and Selenium end-to-end cases with about 93% coverage.
+- **Chat interface** (`/chat`) lets logged-in users talk to an OpenAI-powered assistant with optional voice input.
 
 ### UX/UI Improvements
 
