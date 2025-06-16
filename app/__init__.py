@@ -5,12 +5,10 @@ from flask import Flask, request, g, url_for
 from datetime import datetime
 from config import config_dict
 from flask_babel import Babel, _
-from dotenv import load_dotenv
 from flask_caching import Cache
 from flask_wtf.csrf import CSRFProtect
 
-# Загрузимо змінні оточення з .env файлу
-load_dotenv()
+# Змінні оточення вже завантажує Dynaconf у config.py
 cache = Cache()
 babel = Babel()
 csrf = CSRFProtect()
@@ -26,13 +24,7 @@ def create_app(config_name="development"):
     # Застосовуємо конфігурацію
     app.config.from_object(config_dict[config_name])
     
-    # Налаштування OAuth для локальної розробки
-    if config_name == "development":
-        app.config["GOOGLE_CLIENT_ID"] = os.environ.get("GOOGLE_CLIENT_ID")
-        app.config["GOOGLE_CLIENT_SECRET"] = os.environ.get("GOOGLE_CLIENT_SECRET")
-        app.config["GITHUB_CLIENT_ID"] = os.environ.get("GITHUB_CLIENT_ID")
-        app.config["GITHUB_CLIENT_SECRET"] = os.environ.get("GITHUB_CLIENT_SECRET")
-        app.config["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  # Дозволяє використовувати OAuth без HTTPS
+    # OAuth налаштування завантажуються через конфігураційні класи
     
     # Мультимовність
     app.logger.info(f"BABEL_TRANSLATION_DIRECTORIES: {app.config.get('BABEL_TRANSLATION_DIRECTORIES', 'translations')}")
