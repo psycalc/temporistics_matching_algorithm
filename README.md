@@ -6,20 +6,21 @@
    - [Key Components](#key-components)
    - [Getting Started](#getting-started)
    - [Next Steps for Exploration](#next-steps-for-exploration)
-3. [Theoretical Foundations](#theoretical-foundations)
+3. [Architecture Overview](#architecture-overview)
+4. [Theoretical Foundations](#theoretical-foundations)
     - [Temporistics (Time)](#temporistics-time)
     - [Psychosophy (Personality Aspects)](#psychosophy-personality-aspects)
     - [Socionics (Modeling of Information)](#socionics-modeling-of-information)
-4. [Implementation in Code](#implementation-in-code)
+5. [Implementation in Code](#implementation-in-code)
     - [Typology Classes](#typology-classes)
     - [Services and Data Validation](#services-and-data-validation)
     - [Routes and Forms](#routes-and-forms)
-5. [Testing](#testing)
-6. [Installation and Run](#installation-and-run)
+6. [Testing](#testing)
+7. [Installation and Run](#installation-and-run)
     - [Local Run](#local-run)
     - [Running with Docker](#running-with-docker)
     - [Running Tests](#running-tests)
-7. [Additional Information](#additional-information)
+8. [Additional Information](#additional-information)
 
 ---
 
@@ -68,6 +69,12 @@ Recent updates introduce accessibility and responsive design best practices:
 - Look into OAuth configuration in `app/oauth.py`.
 - Explore the test suite under `tests/` for usage examples.
 - Check `translations/` to see how localization is added.
+
+## Architecture Overview
+
+The project follows a standard Flask blueprint structure with a dedicated service layer and typology modules.
+For a detailed description and diagrams of how requests move through these components, see
+[ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Theoretical Foundations
 
