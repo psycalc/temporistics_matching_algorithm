@@ -180,6 +180,14 @@ new random values for the variables above and updates your `.env` file.
 Add a monthly cron job, e.g. `0 0 1 * * /usr/bin/python /path/to/rotate_secrets.py`,
 to rotate secrets regularly.
 
+To fine‑tune compatibility values during research, use `adjust_comfort_score.py`:
+
+```bash
+python adjust_comfort_score.py Psychosophia "Identity/Philia" 75 --data-dir data
+```
+
+This updates the corresponding JSON file with the provided score.
+
 3. **Run the development server**:
 
    Recommended approach using `run_local.sh`:
