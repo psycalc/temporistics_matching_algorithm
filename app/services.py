@@ -47,22 +47,39 @@ def calculate_relationship(user1, user2, typology):
     comfort_score, _ = typology_instance.get_comfort_score(relationship_type)
     return relationship_type, comfort_score
 
-def update_user_profile(user, username, email, typology_name, type_value, latitude, longitude,
-                        city=None, country=None, profession=None, profession_visible=None, max_distance=None):
-    user.username = username
-    user.email = email
+
+def create_user_type(typology_name, type_value, commit=True):
+    """Create a new ``UserType`` instance and optionally commit it."""
+    from .models import UserType
+    user_type = UserType(
+        typology_name=typology_name,
+        type_value=type_value,
+    )
+    db.session.add(user_type)
+    if commit:
+        db.session.commit()
+    else:
+        # Ensure ID is available without committing the whole transaction
+        db.session.flush()
+    return user_type
+
+
+def assign_user_type(user, typology_name, type_value, commit=True):
+    """Assign or update ``user.user_type`` with the provided values."""
     if user.user_type:
         user.user_type.typology_name = typology_name
         user.user_type.type_value = type_value
     else:
-        from app.models import UserType
-        user_type = UserType(
-            typology_name=typology_name,
-            type_value=type_value
-        )
-        db.session.add(user_type)
-        db.session.commit()
+        user_type = create_user_type(typology_name, type_value, commit=False)
         user.type_id = user_type.id
+    if commit:
+        db.session.commit()
+
+def update_user_profile(user, username, email, typology_name, type_value, latitude, longitude,
+                        city=None, country=None, profession=None, profession_visible=None, max_distance=None):
+    user.username = username
+    user.email = email
+    assign_user_type(user, typology_name, type_value, commit=False)
 
     user.latitude = latitude
     user.longitude = longitude

@@ -6,7 +6,8 @@ from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_login import current_user, login_user
 from sqlalchemy.orm.exc import NoResultFound
 from .extensions import db
-from .models import User, UserType
+from .models import User
+from .services import create_user_type
 
 # Створюємо SQLAlchemy моделі для зберігання OAuth токенів
 class OAuth:
@@ -89,12 +90,11 @@ class OAuth:
                         user.avatar_url = google_info["picture"]
                     
                     # Створюємо базовий тип користувача
-                    user_type = UserType(
+                    user_type = create_user_type(
                         typology_name="Temporistics",
-                        type_value="Past, Current, Future, Eternity"
+                        type_value="Past, Current, Future, Eternity",
+                        commit=False
                     )
-                    db.session.add(user_type)
-                    db.session.flush()
                     user.type_id = user_type.id
                     
                     db.session.add(user)
@@ -167,12 +167,11 @@ class OAuth:
                         user.avatar_url = github_info["avatar_url"]
                     
                     # Створюємо базовий тип користувача
-                    user_type = UserType(
+                    user_type = create_user_type(
                         typology_name="Temporistics",
-                        type_value="Past, Current, Future, Eternity"
+                        type_value="Past, Current, Future, Eternity",
+                        commit=False
                     )
-                    db.session.add(user_type)
-                    db.session.flush()
                     user.type_id = user_type.id
                     
                     db.session.add(user)
