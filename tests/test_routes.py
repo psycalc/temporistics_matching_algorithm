@@ -217,7 +217,7 @@ def test_register_post_valid(client, app, test_db):
             "typologies-2-typology_name": "Amatoric",
             "typologies-2-type_value": "Love, Passion, Friendship, Romance",
             "typologies-3-typology_name": "Socionics",
-            "typologies-3-type_value": "Intuitive, Ethical, Extratim"
+            "typologies-3-type_value": "Seeker (ILE)"
         }, follow_redirects=True)
         assert response.status_code == 200
         
