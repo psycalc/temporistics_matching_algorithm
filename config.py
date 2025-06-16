@@ -18,6 +18,15 @@ class Config:
     BABEL_DEFAULT_TIMEZONE = os.environ.get("BABEL_DEFAULT_TIMEZONE", "UTC")
     LANGUAGES = os.environ.get("LANGUAGES", "en,fr,es,uk").split(",")
     UPLOAD_FOLDER = os.path.join(basedir, 'app', 'static', 'uploads')
+    CHAT_PROVIDER = os.environ.get("CHAT_PROVIDER", "openai")
+    OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo")
+    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+    HUGGINGFACE_MODEL = os.environ.get("HUGGINGFACE_MODEL", "google/flan-t5-small")
+    HUGGINGFACE_API_TOKEN = os.environ.get("HUGGINGFACE_API_TOKEN")
+    GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-pro")
+    GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+    ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-3-haiku-20240307")
+    ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 
 class DevelopmentConfig(Config):
     DEBUG = True
