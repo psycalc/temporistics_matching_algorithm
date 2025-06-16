@@ -17,6 +17,7 @@ from app.services import get_distance_if_compatible
 from werkzeug.utils import secure_filename
 import os
 from .routes_helper import handle_profile_image_upload, update_user_typology
+from .services import create_user_type, assign_user_type
 from .statistics_utils import load_typology_status
 import openai
 
@@ -169,12 +170,11 @@ def register():
 
             last_user_type = None
             for subform in form.typologies:
-                ut = UserType(
+                ut = create_user_type(
                     typology_name=subform.typology_name.data,
                     type_value=subform.type_value.data,
+                    commit=False
                 )
-                db.session.add(ut)
-                db.session.flush()  # get ID without full commit
                 last_user_type = ut
 
             if last_user_type:
@@ -214,7 +214,9 @@ def login():
             return redirect(next_page) if next_page else redirect(url_for("main.index"))
         else:
             if request.method == "POST":
-                print("Form validation failed:", form.errors)
+                current_app.logger.debug(
+                    f"Login form validation failed: {form.errors}"
+                )
             # Flash the message and render the template in the same request
             flash("Login Unsuccessful", "danger")
             return render_template(
@@ -271,14 +273,10 @@ def user_profile(username):
         current_app.logger.info(f"Email after update: {user.email}")
         
         # Оновлення типології
-        if not user.user_type:
-            user.user_type = UserType(
-                typology_name=form.typology_name.data,
-                type_value=form.type_value.data,
-            )
-        else:
-            user.user_type.typology_name = form.typology_name.data
-            user.user_type.type_value = form.type_value.data
+        assign_user_type(user,
+                        typology_name=form.typology_name.data,
+                        type_value=form.type_value.data,
+                        commit=False)
             
         try:
             db.session.commit()
@@ -345,7 +343,9 @@ def edit_profile():
     else:
         # Логування помилок валідації
         if form.errors:
-            print(f"Form validation failed: {form.errors}")
+            current_app.logger.debug(
+                f"Edit profile form validation failed: {form.errors}"
+            )
 
     # If not a POST or form not valid, just display the form
     return render_template("edit_profile.html", form=form)

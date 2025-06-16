@@ -9,7 +9,7 @@ from .domain_services import (
     get_typology_instance,
 )
 
-# update_user_profile is now located in app.repositories.user_repository
+
 from .repositories.user_repository import update_user_profile
 
 __all__ = [
@@ -21,3 +21,4 @@ __all__ = [
     "get_typology_instance",
     "update_user_profile",
 ]
+

@@ -2,8 +2,7 @@
 import os
 from flask import current_app, flash
 from werkzeug.utils import secure_filename
-from app.extensions import db
-from app.models import UserType
+from app.services import assign_user_type
 
 def handle_profile_image_upload(file, user):
     if not file:
@@ -30,12 +29,5 @@ def handle_profile_image_upload(file, user):
     return True
 
 def update_user_typology(user, typology_name, type_value):
-    if user.user_type:
-        user.user_type.typology_name = typology_name
-        user.user_type.type_value = type_value
-    else:
-        user_type = UserType(typology_name=typology_name, type_value=type_value)
-        db.session.add(user_type)
-        db.session.commit()
-        user.type_id = user_type.id
-    db.session.commit()
+    """Backward-compatible wrapper around :func:`assign_user_type`."""
+    assign_user_type(user, typology_name, type_value)
