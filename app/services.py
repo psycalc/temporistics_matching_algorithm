@@ -41,5 +41,36 @@ __all__ = [
     "get_distance_if_compatible",
     "get_typology_instance",
     "update_user_profile",
+    "create_user_type",
+    "assign_user_type",
 ]
+
+
+def create_user_type(typology_name, type_value, commit=True):
+    """Create a :class:`~app.models.UserType` and optionally commit it."""
+    from .models import UserType
+
+    user_type = UserType(
+        typology_name=typology_name,
+        type_value=type_value,
+    )
+    db.session.add(user_type)
+    if commit:
+        db.session.commit()
+    else:
+        # Ensure the new ``id`` is available for further use without committing
+        db.session.flush()
+    return user_type
+
+
+def assign_user_type(user, typology_name, type_value, commit=True):
+    """Assign or update ``user.user_type`` with the provided values."""
+    if user.user_type:
+        user.user_type.typology_name = typology_name
+        user.user_type.type_value = type_value
+    else:
+        user_type = create_user_type(typology_name, type_value, commit=False)
+        user.type_id = user_type.id
+    if commit:
+        db.session.commit()
 

@@ -6,6 +6,7 @@ from .typologies import (
     TypologyPsychosophia,
     TypologyAmatoric,
     TypologySocionics,
+    TypologyIQ,
 )
 
 
@@ -16,6 +17,7 @@ TYPOLOGY_CLASSES = {
     "Psychosophia": TypologyPsychosophia,
     "Amatoric": TypologyAmatoric,
     "Socionics": TypologySocionics,
+    "IQ": TypologyIQ,
 }
 
 
