@@ -25,6 +25,14 @@ def test_typology_temporistics_invalid_quadra(typology):
     with pytest.raises(ValueError):
         typology.get_quadra_types("NonExistentQuadra")
 
+def test_typology_temporistics_all_types():
+    """Typology should generate all 24 unique time aspect combinations."""
+    typology = TypologyTemporistics()
+    all_types = typology.get_all_types()
+    assert len(all_types) == 24
+    assert len(set(all_types)) == 24
+    assert "Past, Current, Future, Eternity" in all_types
+
 def test_typology_temporistics_relationships(typology):
     all_types = typology.get_all_types()
     assert len(all_types) > 0
@@ -172,3 +180,15 @@ def test_temporistics_detailed_relationships():
     assert relationship in ["Heterotemporality", "Neutrality", "Therapy-Misunderstanding"]
     score, desc = temporistics.get_comfort_score(relationship)
     assert score > 40
+
+def test_typology_temporistics_quadra_description():
+    """Ensure quadra descriptions are returned for valid names."""
+    typology = TypologyTemporistics()
+    description = typology.get_quadra_description("Antipodes")
+    assert "one-plane" in description
+
+
+def test_temporistics_get_time_periods_short():
+    """Check that temporal aspects are shortened to initials."""
+    short = TypologyTemporistics.get_time_periods_short(["Past", "Current", "Future", "Eternity"])
+    assert short == ["P", "C", "F", "E"]
