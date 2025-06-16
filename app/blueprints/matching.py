@@ -1,8 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, current_app, flash
 from flask_login import login_required
 from ..services import get_types_by_typology, calculate_relationship
-import openai
-import os
+from ..chat_providers import get_chat_provider
 
 matching_bp = Blueprint('matching', __name__)
 
@@ -50,18 +49,10 @@ def chat_api():
     message = data.get('message', '') if data else ''
     if not message:
         return jsonify({'reply': 'No message provided.'}), 400
-    api_key = current_app.config.get('OPENAI_API_KEY') or os.environ.get('OPENAI_API_KEY')
-    if not api_key:
-        return jsonify({'reply': 'OpenAI API key not configured.'})
+    provider = get_chat_provider()
     try:
-        openai.api_key = api_key
-        response = openai.chat.completions.create(
-            model='gpt-3.5-turbo',
-            messages=[{'role': 'user', 'content': message}],
-            temperature=0.7,
-        )
-        reply = response.choices[0].message.content.strip()
+        reply = provider.reply(message)
     except Exception as e:
-        current_app.logger.error(f'OpenAI error: {e}')
+        current_app.logger.error(f'Chat provider error: {e}')
         reply = 'Sorry, I cannot respond right now.'
     return jsonify({'reply': reply})

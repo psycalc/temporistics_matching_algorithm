@@ -154,6 +154,17 @@ A high test coverage (~93%) confirms that the theoretical ideas are correctly mi
    BABEL_DEFAULT_LOCALE=en
    BABEL_DEFAULT_TIMEZONE=Europe/Kiev
    LANGUAGES=en,fr,es,uk
+   # Chat configuration
+   CHAT_PROVIDER=openai               # "openai", "huggingface", "gemini", "anthropic", "localhf"
+   OPENAI_MODEL=gpt-3.5-turbo
+   OPENAI_API_KEY=your-openai-key
+   HUGGINGFACE_MODEL=google/flan-t5-small
+   HUGGINGFACE_API_TOKEN=your-hf-token
+   GEMINI_MODEL=gemini-pro
+   GEMINI_API_KEY=your-gemini-key
+   ANTHROPIC_MODEL=claude-3-haiku-20240307
+   ANTHROPIC_API_KEY=your-anthropic-key
+   LOCAL_MODEL_PATH=/path/to/local/model
    ```
 
 3. **Run the development server**:
