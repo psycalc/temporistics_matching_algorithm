@@ -168,8 +168,13 @@ A high test coverage (~93%) confirms that the theoretical ideas are correctly mi
    GEMINI_API_KEY=your-gemini-key
    ANTHROPIC_MODEL=claude-3-haiku-20240307
    ANTHROPIC_API_KEY=your-anthropic-key
-   LOCAL_MODEL_PATH=/path/to/local/model
-   ```
+  LOCAL_MODEL_PATH=/path/to/local/model
+  ```
+
+To automate key changes, run `python rotate_secrets.py` which generates
+new random values for the variables above and updates your `.env` file.
+Add a monthly cron job, e.g. `0 0 1 * * /usr/bin/python /path/to/rotate_secrets.py`,
+to rotate secrets regularly.
 
 3. **Run the development server**:
 
