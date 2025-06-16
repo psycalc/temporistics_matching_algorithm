@@ -9,6 +9,7 @@ from .typology_temporistics import TypologyTemporistics
 from .typology_psychosophia import TypologyPsychosophia
 from .typology_amatoric import TypologyAmatoric
 from .typology_socionics import TypologySocionics
+from .typology_iq import TypologyIQ
 
 # List all the classes that should be available when importing the package
 __all__ = [
@@ -16,6 +17,7 @@ __all__ = [
     "TypologyPsychosophia",
     "TypologyAmatoric",
     "TypologySocionics",
+    "TypologyIQ",
 ]
 
 # This allows the classes to be imported directly from the package

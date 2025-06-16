@@ -14,3 +14,10 @@ def test_calculate_temporistics_type_future_priority():
     answers = ["C", "C", "B", "A"]
     result = calculate_temporistics_type(answers)
     assert result.startswith("Future")
+
+
+def test_calculate_temporistics_type_invalid_answer():
+    """Invalid options should raise ValueError."""
+    answers = ["A", "X", "C", "D"]
+    with pytest.raises(ValueError):
+        calculate_temporistics_type(answers)

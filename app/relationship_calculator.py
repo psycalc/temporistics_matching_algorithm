@@ -5,6 +5,7 @@ from .typologies.typology_temporistics import TypologyTemporistics
 from .typologies.typology_psychosophia import TypologyPsychosophia
 from .typologies.typology_amatoric import TypologyAmatoric
 from .typologies.typology_socionics import TypologySocionics
+from .typologies.typology_iq import TypologyIQ
 
 
 # Function to load relationship data from a JSON file
@@ -223,6 +224,7 @@ def main():
         "Psychosophia": TypologyPsychosophia(),
         "Amatoric": TypologyAmatoric(),
         "Socionics": TypologySocionics(),
+        "IQ": TypologyIQ(),
     }
     print("Available typologies:")
     for idx, typology_name in enumerate(available_typologies.keys(), start=1):

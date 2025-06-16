@@ -97,6 +97,10 @@ Conflict: a synthetic individual acts holistically without dissecting details, w
 
 Conflict: Different types struggle to "mirror" or understand the other's model of perception.
 
+### IQ Typology
+- **Gentle levels:** Aspiring, Balanced, Insightful.
+- Emphasizes how cognitive approaches influence compatibility.
+
 ## Implementation in Code
 
 ### Typology Classes
@@ -107,6 +111,7 @@ Under `app/typologies/`, each typology is implemented as a class derived from an
 - `get_comfort_score()` to determine a "comfort score" based on their relationship.
 
 These methods directly reflect the theoretical principles: induction/deduction (Temporistics), analysis/synthesis (Psychosophy), and modeling (Socionics).
+The same interface now exposes an additional `TypologyIQ` class for comparing gentle IQ levels.
 
 ### Services and Data Validation
 `services.py` contains:
