@@ -7,6 +7,7 @@ from .typologies import (
     TypologyAmatoric,
     TypologySocionics,
     TypologyIQ,
+    TypologyTemperaments,
 )
 
 
@@ -18,6 +19,7 @@ TYPOLOGY_CLASSES = {
     "Amatoric": TypologyAmatoric,
     "Socionics": TypologySocionics,
     "IQ": TypologyIQ,
+    "Temperaments": TypologyTemperaments,
 }
 
 

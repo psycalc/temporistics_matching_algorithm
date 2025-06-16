@@ -25,7 +25,7 @@
 
 ## Project Description
 
-This project integrates theoretical concepts from three typologies (Temporistics, Psychosophy, and Socionics) and implements them in a web application. Users can select their types, calculate relationships between types, and view the "comfort score" of these interactions.
+This project integrates theoretical concepts from several typologies (Temporistics, Psychosophy, Socionics, Amatoric, IQ, and Temperaments) and implements them in a web application. Users can select their types, calculate relationships between types, and view the "comfort score" of these interactions.
 
 The main goal is to demonstrate how theoretical models of perception (time, personality aspects, information) can be transformed into practical code, tested thoroughly, and presented through a web interface.
 
@@ -101,6 +101,10 @@ Conflict: Different types struggle to "mirror" or understand the other's model o
 - **Gentle levels:** Aspiring, Balanced, Insightful.
 - Emphasizes how cognitive approaches influence compatibility.
 
+### Temperament Typology
+- **Classical types:** Sanguine, Choleric, Melancholic, Phlegmatic.
+- Focuses on stable behavioral patterns and emotional responses.
+
 ## Implementation in Code
 
 ### Typology Classes
@@ -111,7 +115,7 @@ Under `app/typologies/`, each typology is implemented as a class derived from an
 - `get_comfort_score()` to determine a "comfort score" based on their relationship.
 
 These methods directly reflect the theoretical principles: induction/deduction (Temporistics), analysis/synthesis (Psychosophy), and modeling (Socionics).
-The same interface now exposes an additional `TypologyIQ` class for comparing gentle IQ levels.
+The same interface now exposes additional typologies like `TypologyIQ` for IQ levels and `TypologyTemperaments` for classical temperaments.
 
 ### Services and Data Validation
 `services.py` contains:
