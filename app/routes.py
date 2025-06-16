@@ -1,4 +1,15 @@
-from flask import (Blueprint, render_template, request, jsonify, current_app, redirect, url_for, flash, make_response, abort)
+from flask import (
+    Blueprint,
+    render_template,
+    request,
+    jsonify,
+    current_app,
+    redirect,
+    url_for,
+    flash,
+    make_response,
+    abort,
+)
 from flask_login import login_user, logout_user, login_required, current_user
 from .forms import RegistrationForm, LoginForm, ProfileForm, EditProfileForm
 from .models import User, UserType
@@ -19,7 +30,7 @@ import os
 from .routes_helper import handle_profile_image_upload, update_user_typology
 from .services import create_user_type, assign_user_type
 from .statistics_utils import load_typology_status
-import openai
+from .chat_providers import get_chat_provider
 
 main = Blueprint("main", __name__)
 
@@ -407,18 +418,11 @@ def chat_api():
     message = data.get("message", "") if data else ""
     if not message:
         return jsonify({"reply": "No message provided."}), 400
-    api_key = current_app.config.get("OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        return jsonify({"reply": "OpenAI API key not configured."})
+
+    provider = get_chat_provider()
     try:
-        openai.api_key = api_key
-        response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": message}],
-            temperature=0.7,
-        )
-        reply = response.choices[0].message.content.strip()
+        reply = provider.reply(message)
     except Exception as e:
-        current_app.logger.error(f"OpenAI error: {e}")
+        current_app.logger.error(f"Chat provider error: {e}")
         reply = "Sorry, I cannot respond right now."
     return jsonify({"reply": reply})
