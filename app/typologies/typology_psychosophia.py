@@ -107,115 +107,93 @@ class TypologyPsychosophia(Typology):
         return shortened_types
 
     def _parse_type_to_list(self, type_str):
-        """Парсить рядок типу у список аспектів"""
+        """Parse a type string into a list of aspects."""
         if not type_str:
             return []
         return type_str.split(", ")
 
     def are_types_identity_philia(self, type1: List[str], type2: List[str]) -> bool:
-        """
-        Перевіряє, чи є відносини між типами ідентичністю/філією.
-        Це відбувається, коли типи ідентичні або коли перші дві функції однакові.
-        """
+        """Check if the types are identical or share the first two aspects."""
         return type1 == type2 or type1[:2] == type2[:2]
 
     def are_types_extinguishment(self, type1: List[str], type2: List[str]) -> bool:
-        """
-        Перевіряє, чи є відносини між типами погашенням.
-        Це відбувається, коли типи мають повністю протилежний порядок функцій.
-        """
+        """Check if the types form an Extinguishment relationship."""
+        # Extinguishment occurs when the aspect order is completely reversed
         return type1 == list(reversed(type2))
 
     def are_types_full_eros(self, type1: List[str], type2: List[str]) -> bool:
-        """
-        Перевіряє, чи є відносини між типами повним еросом.
-        Це відбувається, коли перші дві функції одного типу є третьою і четвертою в іншого, І НАВПАКИ.
-        Відносини не повинні бути Extinguishment або Identity.
-        """
+        """Return True when the types have a Full Eros relationship."""
+        # Happens when the first two aspects of one type are the other's
+        # third and fourth aspects, and vice versa. Excludes Extinguishment
+        # and Identity cases.
         if self.are_types_extinguishment(type1, type2) or type1 == type2:
              return False
         
-        # Умова 1: Перші два type1 = Останні два type2
+        # Condition 1: first two of type1 match last two of type2
         cond1 = set(type1[:2]) == set(type2[2:])
-        # Умова 2: Останні два type1 = Перші два type2
+        # Condition 2: last two of type1 match first two of type2
         cond2 = set(type1[2:]) == set(type2[:2])
-        
-        # Ерос вимагає, щоб ОБИДВІ умови виконувались
+        # Both conditions must hold for Eros
         return cond1 and cond2
 
     def are_types_full_agape(self, type1: List[str], type2: List[str]) -> bool:
-        """
-        Перевіряє, чи є відносини між типами повною агапе.
-        Це відбувається, коли перші дві функції одного типу є третьою і четвертою в іншого, АЛЕ НЕ навпаки.
-        Відносини не повинні бути Extinguishment, Eros або Identity.
-        """
+        """Check for a Full Agape relationship between types."""
+        # Occurs when the first two aspects of one type are the other's third
+        # and fourth, but not vice versa. Not Extinguishment, Eros or Identity.
         if self.are_types_extinguishment(type1, type2) or type1 == type2:
             return False
             
-        # Умова 1: Перші два type1 = Останні два type2
+        # Condition 1: first two of type1 match last two of type2
         cond1 = set(type1[:2]) == set(type2[2:])
-        # Умова 2: Останні два type1 = Перші два type2
+        # Condition 2: last two of type1 match first two of type2
         cond2 = set(type1[2:]) == set(type2[:2])
         
-        # Випадок Ероса (обидві умови істинні)
+        # Special case: both conditions true means Eros
         is_eros = cond1 and cond2
         
-        # Агапе вимагає, щоб виконувалась лише одна з умов (XOR) І це не був випадок Ероса
-        # Враховуючи, що ми вже перевірили на Eros у determine_relationship_type, 
-        # достатньо перевірити, чи виконується хоча б одна умова, АЛЕ НЕ обидві.
+        # Agape requires exactly one of the conditions to hold (XOR) and it must
+        # not be the Eros case already checked in determine_relationship_type.
         return (cond1 or cond2) and not is_eros
 
     def are_types_order_full_order(self, type1: List[str], type2: List[str]) -> bool:
-        """
-        Перевіряє, чи є відносини між типами порядком/повним порядком.
-        Це відбувається, коли перша функція одного типу є другою в іншого і навпаки.
-        """
+        """Check if the types form an Order or Full Order relationship."""
+        # Occurs when the first aspect of one type is the second of the other and vice versa
         return type1[0] == type2[1] and type1[1] == type2[0]
 
     def are_types_mirage(self, type1: List[str], type2: List[str]) -> bool:
-        """
-        Перевіряє, чи є відносини між типами міражем.
-        Це відбувається, коли перша функція одного типу є третьою в іншого і навпаки.
-        """
+        """Return True if the types form a Mirage relationship."""
+        # First aspect of one type is the third of the other and vice versa
         return type1[0] == type2[2] and type1[2] == type2[0]
 
     def are_types_revision(self, type1: List[str], type2: List[str]) -> bool:
-        """
-        Перевіряє, чи є відносини між типами ревізією.
-        Це відбувається, коли перша функція одного типу є четвертою в іншого і навпаки.
-        """
+        """Check for a Revision relationship between two types."""
+        # First aspect of one type is the fourth of the other and vice versa
         return type1[0] == type2[3] and type1[3] == type2[0]
 
     def are_types_therapy_attraction(self, type1: List[str], type2: List[str]) -> bool:
-        """
-        Перевіряє, чи є відносини між типами терапією-притягненням.
-        Це відбувається, коли друга функція одного типу є третьою в іншого і навпаки.
-        """
+        """Return True for a Therapy-Attraction relationship."""
+        # Second aspect of one type is the third of the other and vice versa
         return type1[1] == type2[2] and type1[2] == type2[1]
 
     def are_types_therapy_misunderstanding(self, type1: List[str], type2: List[str]) -> bool:
-        """
-        Перевіряє, чи є відносини між типами терапією-непорозумінням.
-        Це відбувається, коли друга функція одного типу є четвертою в іншого, але не навпаки.
-        """
+        """Check for a Therapy-Misunderstanding relationship."""
+        # Second aspect of one type is the other's fourth, but not vice versa
         cond1 = type1[1] == type2[3] and type1[3] != type2[1]
         cond2 = type2[1] == type1[3] and type2[3] != type1[1]
         return cond1 or cond2 # Implicit XOR, as both true would imply Extinguishment in some cases (e.g. 1234 vs 4321)
 
     def are_types_conflict_submission_dominance(self, type1: List[str], type2: List[str]) -> bool:
-        """
-        Перевіряє, чи є відносини між типами конфліктом підкорення/домінування.
-        Це відбувається, коли перша функція одного типу є слабкістю іншого (3 або 4 позиція), але не навпаки.
-        """
-        # Видалено спеціальний випадок
+        """Return True when one type dominates and the other submits."""
+        # Occurs when the leading aspect of one type is a weakness (3rd or 4th position) of the other
+        # Special case removed
         cond1 = type1[0] in type2[2:] and type2[0] not in type1[2:]
         cond2 = type2[0] in type1[2:] and type1[0] not in type2[2:]
         return cond1 or cond2 # Implicit XOR logic
 
     def determine_relationship_type(self, user1_type: str, user2_type: str) -> str:
-        """
-        Визначає тип відносин між двома користувачами на основі їхніх типів Психософії.
-        Порядок перевірок критичний для уникнення неоднозначності.
+        """Determine the relationship between two Psychosophy types.
+
+        Checks are performed in a strict order to avoid ambiguous results.
         """
         user1_aspects = self._parse_type_to_list(user1_type)
         user2_aspects = self._parse_type_to_list(user2_type)
@@ -223,64 +201,57 @@ class TypologyPsychosophia(Typology):
         if not user1_aspects or not user2_aspects or len(user1_aspects) != 4 or len(user2_aspects) != 4:
             return "Unknown Relationship" # Basic validation
             
-        # Перевірка валідності аспектів (можна додати, якщо потрібно)
+        # Aspect validity check can be added here if needed
         # all_aspects_valid = all(aspect in self.aspects for aspect in user1_aspects + user2_aspects)
         # if not all_aspects_valid:
         #     return "Unknown Relationship"
                 
-        # 1. Ідентичність/Філія
+        # 1. Identity/Philia
         if self.are_types_identity_philia(user1_aspects, user2_aspects):
             return "Identity/Philia"
         
-        # 2. Погашення
+        # 2. Extinguishment
         if self.are_types_extinguishment(user1_aspects, user2_aspects):
             return "Psychosophia Extinguishment"
             
-        # 3. Повний Ерос
+        # 3. Full Eros
         if self.are_types_full_eros(user1_aspects, user2_aspects):
             return "Full Eros"
             
-        # 4. Повна Агапе
+        # 4. Full Agape
         if self.are_types_full_agape(user1_aspects, user2_aspects):
             return "Full Agape"
             
-        # 5. Порядок/Повний порядок
+        # 5. Order/Full Order
         if self.are_types_order_full_order(user1_aspects, user2_aspects):
             return "Order/Full Order"
             
-        # 6. Міраж
+        # 6. Mirage
         if self.are_types_mirage(user1_aspects, user2_aspects):
             return "Mirage"
             
-        # 7. Ревізія
+        # 7. Revision
         if self.are_types_revision(user1_aspects, user2_aspects):
             return "Revision"
             
-        # 8. Терапія-Притягнення
+        # 8. Therapy-Attraction
         if self.are_types_therapy_attraction(user1_aspects, user2_aspects):
             return "Therapy-Attraction"
             
-        # 9. Терапія-Непорозуміння
+        # 9. Therapy-Misunderstanding
         if self.are_types_therapy_misunderstanding(user1_aspects, user2_aspects):
             return "Therapy-Misunderstanding"
             
-        # 10. Конфлікт Підкорення/Домінування
+        # 10. Conflict Submission/Dominance
         if self.are_types_conflict_submission_dominance(user1_aspects, user2_aspects):
             return "Conflict Submission/Dominance"
             
-        # 11. Нейтралітет (якщо жодна з попередніх умов не виконалась)
+        # 11. Neutrality (when none of the above matched)
         return "Neutrality"
 
     def get_comfort_score(self, relationship_type: str) -> (int, str):
-        """
-        Повертає оцінку комфорту та опис для даного типу відносин.
-        
-        Args:
-            relationship_type (str): Тип відносин
-            
-        Returns:
-            tuple: (оцінка_комфорту, опис)
-        """
+        """Return the comfort score and description for a relationship type."""
+        # relationship_type: name of the relationship in English
         comfort_scores = {
             "Identity/Philia": (9, "Взаємодія легка, комфортна і дружня"),
             "Full Eros": (8, "Взаємодія динамічна, стимулююча і сповнена взаємного інтересу"),

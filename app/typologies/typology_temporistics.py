@@ -163,7 +163,7 @@ class TypologyTemporistics(Typology):
         0: "Strategic Conflict",
     }
 
-    # Деталізовані типи відносин у Temporistics з назвами як у Психософії
+    # Detailed relationship types in Temporistics mirroring Psychosophy names
     DETAILED_RELATIONSHIPS = {
         "Identity/Philia": "Коли всі 4 аспекти часу збігаються у тому ж порядку або перші два аспекти однакові. Повна гармонія відносин.",
         "Full Eros": "Коли перші два аспекти одного типу є третім і четвертим у іншого, і навпаки. Доповнюючі часові перспективи.",
@@ -188,30 +188,29 @@ class TypologyTemporistics(Typology):
             INTER_TYPE_RELATIONSHIPS[(aspect1, aspect2)] = "Strategic Conflict"
 
     def get_intertype_relationship(self, type1_aspects: List[str], type2_aspects: List[str]) -> str:
-        """
-        Визначає тип міжтипових відносин для двох типів на основі їх аспектів.
-        
-        Відносини визначаються тим, як різні типи сприймають і взаємодіють з часовими перспективами.
-        Важливим є порядок часових аспектів (минуле, теперішнє, майбутнє, вічність), 
-        оскільки це впливає на характер взаємодії.
+        """Return the intertype relationship for two Temporistics types.
+
+        The relationship is based on how the two types perceive and interact
+        with the temporal aspects (Past, Current, Future and Eternity). The
+        order of these aspects matters, so we check the most specific cases
+        first.
 
         Args:
-            type1_aspects (List[str]): Список аспектів для першого типу.
-            type2_aspects (List[str]): Список аспектів для другого типу.
+            type1_aspects (List[str]): Aspect list for the first type.
+            type2_aspects (List[str]): Aspect list for the second type.
 
         Returns:
-            str: Тип міжтипових відносин.
+            str: The relationship type.
 
         Raises:
-            ValueError: Якщо списки аспектів не є дійсними.
+            ValueError: If either list of aspects is empty.
         """
         if not (type1_aspects and type2_aspects):
-            raise ValueError("Списки аспектів не можуть бути порожніми.")
+            raise ValueError("Aspect lists cannot be empty")
 
-        # Порядок перевірок має значення!
-        # Спочатку перевіряємо найбільш специфічні випадки
+        # The checks are ordered by specificity. The earliest match wins.
 
-        # Identity/Philia - ідентичні типи або однакові перші два аспекти або спільний перший аспект
+        # Identity/Philia - identical types or matching first two aspects
         if type1_aspects == type2_aspects:
             return "Identity/Philia"
         if type1_aspects[:2] == type2_aspects[:2]:
@@ -219,12 +218,12 @@ class TypologyTemporistics(Typology):
         if type1_aspects[0] == type2_aspects[0]:
             return "Identity/Philia"
             
-        # Психосоphia Extinguishment - повністю протилежні послідовності часових аспектів
+        # Psychosophia Extinguishment - aspect sequence is completely reversed
         if type1_aspects == list(reversed(type2_aspects)):
             return "Psychosophia Extinguishment"
-            
-        # Chronological Conflict - перший аспект одного типу є останнім у іншого
-        # Виключаємо випадок Psychosophia Extinguishment
+
+        # Chronological Conflict - first aspect of one type is the last of the other
+        # Excludes the Psychosophia Extinguishment case
         if (type1_aspects[0] == type2_aspects[-1] or type1_aspects[-1] == type2_aspects[0]) and type1_aspects != list(reversed(type2_aspects)):
             return "Chronological Conflict"
             
@@ -232,50 +231,51 @@ class TypologyTemporistics(Typology):
         if type1_aspects[0] == type2_aspects[1] and type1_aspects[1] == type2_aspects[0]:
             return "Order/Full Order"
             
-        # Full Eros - перші дві функції одного типу є третьою і четвертою в іншого, і навпаки
+        # Full Eros - first two aspects of one type are the third and fourth of the other and vice versa
         if set(type1_aspects[:2]) == set(type2_aspects[2:]) and set(type1_aspects[2:]) == set(type2_aspects[:2]):
             return "Full Eros"
             
-        # Full Agape - перші дві функції одного типу є третьою і четвертою в іншого, але не навпаки
+        # Full Agape - first two aspects of one type are the other's third and fourth, but not vice versa
         if ((set(type1_aspects[:2]) == set(type2_aspects[2:]) and set(type1_aspects[2:]) != set(type2_aspects[:2])) or
            (set(type2_aspects[:2]) == set(type1_aspects[2:]) and set(type2_aspects[2:]) != set(type1_aspects[:2]))):
             return "Full Agape"
             
-        # Mirage - перша функція одного типу є третьою в іншого і навпаки
+        # Mirage - first aspect of one type is the third of the other and vice versa
         if type1_aspects[0] == type2_aspects[2] and type1_aspects[2] == type2_aspects[0]:
             return "Mirage"
             
-        # Revision - перша функція одного типу є четвертою в іншого і навпаки
+        # Revision - first aspect of one type is the fourth of the other and vice versa
         if type1_aspects[0] == type2_aspects[3] and type1_aspects[3] == type2_aspects[0]:
             return "Revision"
             
-        # Therapy-Attraction - друга функція одного типу є третьою в іншого і навпаки
+        # Therapy-Attraction - second aspect of one type is the other's third and vice versa
         if type1_aspects[1] == type2_aspects[2] and type1_aspects[2] == type2_aspects[1]:
             return "Therapy-Attraction"
             
-        # Therapy-Misunderstanding - друга функція одного типу є четвертою в іншого, але не навпаки
+        # Therapy-Misunderstanding - second aspect of one type is the other's fourth but not vice versa
         if ((type1_aspects[1] == type2_aspects[3] and type1_aspects[3] != type2_aspects[1]) or
             (type2_aspects[1] == type1_aspects[3] and type2_aspects[3] != type1_aspects[1])):
             return "Therapy-Misunderstanding"
             
-        # Conflict Submission/Dominance - перша функція одного типу є слабкістю іншого, але не навпаки
+        # Conflict Submission/Dominance - first aspect of one type is a weakness of the other, but not vice versa
         if ((type1_aspects[0] in type2_aspects[2:] and type2_aspects[0] not in type1_aspects[2:]) or
             (type2_aspects[0] in type1_aspects[2:] and type1_aspects[0] not in type2_aspects[2:])):
             return "Conflict Submission/Dominance"
             
-        # Neutrality - різні перші функції, немає повного конфлікту
+        # Neutrality - different leading aspects, no complete conflict
         return "Neutrality"
 
     def get_comfort_score(self, relationship_type: str) -> Tuple[int, str]:
-        """
-        Повертає оцінку комфорту та опис для даного типу відносин,
-        використовуючи нові назви відносин за аналогією з Психософією.
+        """Return comfort score and description for a relationship type.
+
+        The mapping mirrors Psychosophy naming conventions for backward
+        compatibility.
 
         Args:
-            relationship_type (str): Тип відносин.
+            relationship_type (str): Name of the relationship.
 
         Returns:
-            Tuple[int, str]: Кортеж, що містить оцінку комфорту та її опис.
+            Tuple[int, str]: Score and textual description.
         """
         comfort_scores = {
             "Identity/Philia": (95, self.DETAILED_RELATIONSHIPS["Identity/Philia"]),
@@ -290,7 +290,7 @@ class TypologyTemporistics(Typology):
             "Therapy-Attraction": (75, self.DETAILED_RELATIONSHIPS["Therapy-Attraction"]),
             "Conflict Submission/Dominance": (20, self.DETAILED_RELATIONSHIPS["Conflict Submission/Dominance"]),
             
-            # Зберігаємо старі значення для зворотної сумісності
+            # Keep legacy values for backward compatibility
             "Perfect Alignment": (95, "Повний збіг пріоритетів."),
             "Homochronous Unity": (90, "Спільний перший аспект."),
             "Temporal Compatibility": (85, "Спільні перші два аспекти."),
@@ -306,34 +306,30 @@ class TypologyTemporistics(Typology):
         return comfort_scores.get(relationship_type, (0, "Невідомий тип відносин"))
 
     def determine_relationship_type(self, user1_type: str, user2_type: str) -> str:
-        """
-        Визначає тип відносин між двома користувачами на основі їхніх часових аспектів.
-        
-        В Темпористиці, порядок часових аспектів є критичним для визначення 
-        типу взаємодії між людьми:
-        
-        - Перший аспект визначає основний фокус уваги і сприйняття часу
-        - Другий аспект підтримує перший і визначає додатковий акцент
-        - Третій і четвертий аспекти є менш свідомими, але важливими для повного розуміння типу
-        
-        Отже, збіги або відмінності в цих аспектах визначають характер взаємодії.
+        """Determine the relationship type from two Temporistics type strings.
+
+        The position of each temporal aspect is important:
+        - The first aspect shows the main time focus.
+        - The second supports the first and adds nuance.
+        - The third and fourth are less conscious but still influence behaviour.
+        Similarities or differences in these positions shape how people interact.
 
         Args:
-            user1_type (str): Розділений комами рядок часових аспектів для першого користувача.
-            user2_type (str): Розділений комами рядок часових аспектів для другого користувача.
+            user1_type (str): Comma-separated aspects for the first user.
+            user2_type (str): Comma-separated aspects for the second user.
 
         Returns:
-            str: Тип міжтипових відносин.
+            str: The intertype relationship.
         """
-        # Розділяємо рядки на списки аспектів
+        # Split the type strings into lists of aspects
         user1_aspects = user1_type.split(", ")
         user2_aspects = user2_type.split(", ")
 
-        # Перевіряємо, чи обидва користувачі мають визначені аспекти
+        # Ensure both users provide at least one aspect
         if not user1_aspects or not user2_aspects:
             raise ValueError("Типи користувачів повинні мати хоча б один аспект.")
 
-        # Визначаємо тип відносин, використовуючи метод get_intertype_relationship
+        # Determine the relationship type using get_intertype_relationship
         relationship_type = self.get_intertype_relationship(
             user1_aspects, user2_aspects
         )

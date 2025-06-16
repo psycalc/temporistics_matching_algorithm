@@ -86,8 +86,11 @@ def update_comfort_score(typology_name: str, relationship_type: str, new_score: 
 
 
 def calculate_weighted_compatibility(
-    user1_types: Dict[str, str], user2_types: Dict[str, str], weights: Dict[str, float] | None = None
+    user1_types: Dict[str, str],
+    user2_types: Dict[str, str],
+    weights: Dict[str, float] | None = None,
 ) -> float:
+    """Compute compatibility score using weights for each typology."""
     if weights is None:
         weights = load_typology_weights()
     total_weight = 0.0
