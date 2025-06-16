@@ -4,7 +4,7 @@
   <h2>{{ _("Profile of") }} {{ user.username }}</h2>
   {% if can_edit %}
     <div class="edit-profile-link">
-      <a href="{{ url_for('main.edit_profile') }}" class="btn btn-secondary">{{ _('Edit Profile') }}</a>
+      <a href="{{ url_for('profile.edit_profile') }}" class="btn btn-secondary">{{ _('Edit Profile') }}</a>
     </div>
   {% endif %}
   {% if user.profile_image %}

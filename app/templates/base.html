@@ -17,17 +17,17 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark" role="navigation" aria-label="Main navigation">
         <div class="container-fluid">
         <div class="navbar-nav">
-            <a class="nav-item nav-link" href="{{ url_for('main.index') }}">{{ _('Home') }}</a>
+            <a class="nav-item nav-link" href="{{ url_for('profile.index') }}">{{ _('Home') }}</a>
             {% if current_user.is_authenticated %}
-                <a class="nav-item nav-link" href="{{ url_for('main.logout') }}">{{ _('Logout') }}</a>
-                <a class="nav-item nav-link" href="{{ url_for('main.user_profile', username=current_user.username) }}">{{ _('Profile') }}</a>
+                <a class="nav-item nav-link" href="{{ url_for('auth.logout') }}">{{ _('Logout') }}</a>
+                <a class="nav-item nav-link" href="{{ url_for('profile.user_profile', username=current_user.username) }}">{{ _('Profile') }}</a>
               <!-- Добавляем новый пункт меню для списка совместимых пользователей поблизости -->
-        <a class="nav-item nav-link" href="{{ url_for('main.nearby_compatibles') }}">{{ _('Compatible Nearby') }}</a>
-        <a class="nav-item nav-link" href="{{ url_for('main.chat') }}">{{ _('Chat') }}</a>
+        <a class="nav-item nav-link" href="{{ url_for('profile.nearby_compatibles') }}">{{ _('Compatible Nearby') }}</a>
+        <a class="nav-item nav-link" href="{{ url_for('matching.chat') }}">{{ _('Chat') }}</a>
         <a class="nav-item nav-link" href="{{ url_for('admin.statistics') }}">Admin</a>
       {% else %}
-                <a class="nav-item nav-link" href="{{ url_for('main.register') }}">{{ _('Register') }}</a>
-                <a class="nav-item nav-link" href="{{ url_for('main.login') }}">{{ _('Login') }}</a>
+                <a class="nav-item nav-link" href="{{ url_for('auth.register') }}">{{ _('Register') }}</a>
+                <a class="nav-item nav-link" href="{{ url_for('auth.login') }}">{{ _('Login') }}</a>
             {% endif %}
         </div>
         </div>
@@ -44,7 +44,7 @@
 
     {% if form %}
         <div class="language-switcher">
-            <form id="languageForm" action="{{ url_for('main.change_language') }}" method="post">
+            <form id="languageForm" action="{{ url_for('profile.change_language') }}" method="post">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <select id="languageSelect" name="language" onchange="submitLanguageForm()">
                     <option value="en" {% if current_locale == 'en' %}selected{% endif %}>English</option>

@@ -54,9 +54,13 @@ def create_app(config_name="development"):
     csrf.init_app(app)
     
     # Регіструємо blueprint'и
-    from app.routes import main
+    from app.blueprints.auth import auth_bp
+    from app.blueprints.profile import profile_bp
+    from app.blueprints.matching import matching_bp
     from app.admin import admin_bp
-    app.register_blueprint(main)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(profile_bp)
+    app.register_blueprint(matching_bp)
     app.register_blueprint(admin_bp)
     
     # Ініціалізуємо OAuth, окрім тестового оточення. У тестах залежність

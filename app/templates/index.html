@@ -2,7 +2,7 @@
 
 {% block content %}
   <h1>Psychological Calculator</h1>
-  <form method="post" action="{{ url_for('main.calculate') }}">
+  <form method="post" action="{{ url_for('matching.calculate') }}">
     {{ form.csrf_token }}
     <label for="typology">Select Typology:</label>
     <select name="typology" id="typology" onchange="updateTypes()" required>
