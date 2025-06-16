@@ -175,7 +175,7 @@ class TypologyTemporistics(Typology):
         "Revision": "Коли перший аспект одного типу є четвертим у іншого. Ревізійні часові відносини.",
         "Therapy-Misunderstanding": "Коли другий аспект одного типу є четвертим у іншого, але не навпаки. Терапевтично-непорозумілі відносини.",
         "Therapy-Attraction": "Коли другий аспект одного типу є третім у іншого і навпаки. Терапевтично-притягальні відносини.",
-        "Conflict Submission/Dominance": "Коли перший аспект одного типу є слабкістю іншого, але не навпаки. Конфліктні часові відносини."
+        "Conflict Submission/Dominance": "Коли перший аспект одного типу є слабкістю іншого, але не навпаки. Конфліктні часові відносини.",
     }
 
     # Populating the INTER_TYPE_RELATIONSHIPS dictionary
@@ -187,7 +187,9 @@ class TypologyTemporistics(Typology):
             # For simplicity, assigning "Strategic Conflict" for differing aspects
             INTER_TYPE_RELATIONSHIPS[(aspect1, aspect2)] = "Strategic Conflict"
 
-    def get_intertype_relationship(self, type1_aspects: List[str], type2_aspects: List[str]) -> str:
+    def get_intertype_relationship(
+        self, type1_aspects: List[str], type2_aspects: List[str]
+    ) -> str:
         """Return the intertype relationship for two Temporistics types.
 
         The relationship is based on how the two types perceive and interact
@@ -217,51 +219,83 @@ class TypologyTemporistics(Typology):
             return "Identity/Philia"
         if type1_aspects[0] == type2_aspects[0]:
             return "Identity/Philia"
-            
+
         # Psychosophia Extinguishment - aspect sequence is completely reversed
         if type1_aspects == list(reversed(type2_aspects)):
             return "Psychosophia Extinguishment"
 
         # Chronological Conflict - first aspect of one type is the last of the other
         # Excludes the Psychosophia Extinguishment case
-        if (type1_aspects[0] == type2_aspects[-1] or type1_aspects[-1] == type2_aspects[0]) and type1_aspects != list(reversed(type2_aspects)):
+        if (
+            type1_aspects[0] == type2_aspects[-1]
+            or type1_aspects[-1] == type2_aspects[0]
+        ) and type1_aspects != list(reversed(type2_aspects)):
             return "Chronological Conflict"
-            
+
         # Order/Full Order - перший аспект одного типу є другим у іншого і навпаки
-        if type1_aspects[0] == type2_aspects[1] and type1_aspects[1] == type2_aspects[0]:
+        if (
+            type1_aspects[0] == type2_aspects[1]
+            and type1_aspects[1] == type2_aspects[0]
+        ):
             return "Order/Full Order"
-            
+
         # Full Eros - first two aspects of one type are the third and fourth of the other and vice versa
-        if set(type1_aspects[:2]) == set(type2_aspects[2:]) and set(type1_aspects[2:]) == set(type2_aspects[:2]):
+        if set(type1_aspects[:2]) == set(type2_aspects[2:]) and set(
+            type1_aspects[2:]
+        ) == set(type2_aspects[:2]):
             return "Full Eros"
-            
+
         # Full Agape - first two aspects of one type are the other's third and fourth, but not vice versa
-        if ((set(type1_aspects[:2]) == set(type2_aspects[2:]) and set(type1_aspects[2:]) != set(type2_aspects[:2])) or
-           (set(type2_aspects[:2]) == set(type1_aspects[2:]) and set(type2_aspects[2:]) != set(type1_aspects[:2]))):
+        if (
+            set(type1_aspects[:2]) == set(type2_aspects[2:])
+            and set(type1_aspects[2:]) != set(type2_aspects[:2])
+        ) or (
+            set(type2_aspects[:2]) == set(type1_aspects[2:])
+            and set(type2_aspects[2:]) != set(type1_aspects[:2])
+        ):
             return "Full Agape"
-            
+
         # Mirage - first aspect of one type is the third of the other and vice versa
-        if type1_aspects[0] == type2_aspects[2] and type1_aspects[2] == type2_aspects[0]:
+        if (
+            type1_aspects[0] == type2_aspects[2]
+            and type1_aspects[2] == type2_aspects[0]
+        ):
             return "Mirage"
-            
+
         # Revision - first aspect of one type is the fourth of the other and vice versa
-        if type1_aspects[0] == type2_aspects[3] and type1_aspects[3] == type2_aspects[0]:
+        if (
+            type1_aspects[0] == type2_aspects[3]
+            and type1_aspects[3] == type2_aspects[0]
+        ):
             return "Revision"
-            
+
         # Therapy-Attraction - second aspect of one type is the other's third and vice versa
-        if type1_aspects[1] == type2_aspects[2] and type1_aspects[2] == type2_aspects[1]:
+        if (
+            type1_aspects[1] == type2_aspects[2]
+            and type1_aspects[2] == type2_aspects[1]
+        ):
             return "Therapy-Attraction"
-            
+
         # Therapy-Misunderstanding - second aspect of one type is the other's fourth but not vice versa
-        if ((type1_aspects[1] == type2_aspects[3] and type1_aspects[3] != type2_aspects[1]) or
-            (type2_aspects[1] == type1_aspects[3] and type2_aspects[3] != type1_aspects[1])):
+        if (
+            type1_aspects[1] == type2_aspects[3]
+            and type1_aspects[3] != type2_aspects[1]
+        ) or (
+            type2_aspects[1] == type1_aspects[3]
+            and type2_aspects[3] != type1_aspects[1]
+        ):
             return "Therapy-Misunderstanding"
-            
+
         # Conflict Submission/Dominance - first aspect of one type is a weakness of the other, but not vice versa
-        if ((type1_aspects[0] in type2_aspects[2:] and type2_aspects[0] not in type1_aspects[2:]) or
-            (type2_aspects[0] in type1_aspects[2:] and type1_aspects[0] not in type2_aspects[2:])):
+        if (
+            type1_aspects[0] in type2_aspects[2:]
+            and type2_aspects[0] not in type1_aspects[2:]
+        ) or (
+            type2_aspects[0] in type1_aspects[2:]
+            and type1_aspects[0] not in type2_aspects[2:]
+        ):
             return "Conflict Submission/Dominance"
-            
+
         # Neutrality - different leading aspects, no complete conflict
         return "Neutrality"
 
@@ -281,15 +315,26 @@ class TypologyTemporistics(Typology):
             "Identity/Philia": (95, self.DETAILED_RELATIONSHIPS["Identity/Philia"]),
             "Full Eros": (80, self.DETAILED_RELATIONSHIPS["Full Eros"]),
             "Full Agape": (100, self.DETAILED_RELATIONSHIPS["Full Agape"]),
-            "Psychosophia Extinguishment": (30, self.DETAILED_RELATIONSHIPS["Psychosophia Extinguishment"]),
+            "Psychosophia Extinguishment": (
+                30,
+                self.DETAILED_RELATIONSHIPS["Psychosophia Extinguishment"],
+            ),
             "Neutrality": (50, self.DETAILED_RELATIONSHIPS["Neutrality"]),
             "Mirage": (70, self.DETAILED_RELATIONSHIPS["Mirage"]),
             "Order/Full Order": (90, self.DETAILED_RELATIONSHIPS["Order/Full Order"]),
             "Revision": (40, self.DETAILED_RELATIONSHIPS["Revision"]),
-            "Therapy-Misunderstanding": (60, self.DETAILED_RELATIONSHIPS["Therapy-Misunderstanding"]),
-            "Therapy-Attraction": (75, self.DETAILED_RELATIONSHIPS["Therapy-Attraction"]),
-            "Conflict Submission/Dominance": (20, self.DETAILED_RELATIONSHIPS["Conflict Submission/Dominance"]),
-            
+            "Therapy-Misunderstanding": (
+                60,
+                self.DETAILED_RELATIONSHIPS["Therapy-Misunderstanding"],
+            ),
+            "Therapy-Attraction": (
+                75,
+                self.DETAILED_RELATIONSHIPS["Therapy-Attraction"],
+            ),
+            "Conflict Submission/Dominance": (
+                20,
+                self.DETAILED_RELATIONSHIPS["Conflict Submission/Dominance"],
+            ),
             # Keep legacy values for backward compatibility
             "Perfect Alignment": (95, "Повний збіг пріоритетів."),
             "Homochronous Unity": (90, "Спільний перший аспект."),
@@ -300,7 +345,6 @@ class TypologyTemporistics(Typology):
             "Heterotemporality": (50, "Різні часові аспекти."),
             "Chronological Conflict": (30, "Часовий конфлікт."),
             "Atemporal Disconnection": (10, "Повна несумісність."),
-            
             "Unknown Relationship": (0, "Невизначений тип відносин."),
         }
         return comfort_scores.get(relationship_type, (0, "Невідомий тип відносин"))
@@ -378,7 +422,7 @@ class TypologyTemporistics(Typology):
         """
         Determines if two types are homochronous (aligned in time orientation).
 
-        Homochrony occurs when two types share the same time orientation 
+        Homochrony occurs when two types share the same time orientation
         (Past, Current, Future, or Eternity) as their primary focus.
 
         Args:
@@ -401,3 +445,9 @@ class TypologyTemporistics(Typology):
         # The primary aspect is the first one in each list
         # Types are homochronous if they share the same primary aspect
         return type1_aspects[0] == type2_aspects[0]
+
+
+# Register in the global registry so services can discover it dynamically
+from .registry import register_typology
+
+register_typology("Temporistics", TypologyTemporistics)

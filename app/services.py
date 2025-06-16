@@ -1,23 +1,12 @@
 import math
 from flask import current_app
 from .extensions import db, cache
-from .typologies import (
-    TypologyTemporistics,
-    TypologyPsychosophia,
-    TypologyAmatoric,
-    TypologySocionics,
-    TypologyIQ,
-)
+from .typologies.registry import get_typology_classes
 
 # Central registry for available typologies. This allows us to reuse the same
 # mapping across helper functions instead of redefining it in each place.
-TYPOLOGY_CLASSES = {
-    "Temporistics": TypologyTemporistics,
-    "Psychosophia": TypologyPsychosophia,
-    "Amatoric": TypologyAmatoric,
-    "Socionics": TypologySocionics,
-    "IQ": TypologyIQ,
-}
+# Central registry for available typologies loaded from the registry
+TYPOLOGY_CLASSES = get_typology_classes()
 """Compatibility layer for service functions."""
 
 from .domain_services import (
@@ -28,7 +17,6 @@ from .domain_services import (
     get_distance_if_compatible,
     get_typology_instance,
 )
-
 
 
 from .repositories.user_repository import update_user_profile
@@ -73,4 +61,3 @@ def assign_user_type(user, typology_name, type_value, commit=True):
         user.type_id = user_type.id
     if commit:
         db.session.commit()
-

@@ -1,26 +1,11 @@
 import math
 from flask import current_app
 from .extensions import cache
-from .typologies import (
-    TypologyTemporistics,
-    TypologyPsychosophia,
-    TypologyAmatoric,
-    TypologySocionics,
-    TypologyIQ,
-    TypologyTemperaments,
-)
+from .typologies.registry import get_typology_classes
 
 
-# Central registry for available typologies. This allows us to reuse the same
-# mapping across helper functions instead of redefining it in each place.
-TYPOLOGY_CLASSES = {
-    "Temporistics": TypologyTemporistics,
-    "Psychosophia": TypologyPsychosophia,
-    "Amatoric": TypologyAmatoric,
-    "Socionics": TypologySocionics,
-    "IQ": TypologyIQ,
-    "Temperaments": TypologyTemperaments,
-}
+# Central registry for available typologies loaded from the registry.
+TYPOLOGY_CLASSES = get_typology_classes()
 
 
 def get_types_by_typology(typology_name):
@@ -30,9 +15,10 @@ def get_types_by_typology(typology_name):
     if not typology_class:
         return None
 
-    if current_app.config.get("TESTING", False) or current_app.config.get(
-        "CACHE_TYPE"
-    ) == "NullCache":
+    if (
+        current_app.config.get("TESTING", False)
+        or current_app.config.get("CACHE_TYPE") == "NullCache"
+    ):
         return typology_class().get_all_types()
     else:
         return _get_types_cached(typology_name, typology_class)
@@ -63,7 +49,10 @@ def haversine_distance(lat1, lon1, lat2, lon2):
     lat2_rad, lon2_rad = math.radians(lat2), math.radians(lon2)
     dlat = lat2_rad - lat1_rad
     dlon = lon2_rad - lon1_rad
-    a = math.sin(dlat / 2) ** 2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2) ** 2
+    a = (
+        math.sin(dlat / 2) ** 2
+        + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2) ** 2
+    )
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     distance = R * c
     return distance
@@ -109,4 +98,3 @@ def get_typology_instance(typology_name):
     if typology_class is None:
         return None
     return typology_class()
-
