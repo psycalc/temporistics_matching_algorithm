@@ -30,3 +30,9 @@ class TypologyIQ(Typology):
         if relationship_type == "Complementary":
             return 60, "Balanced perspectives"
         return 40, "Distinct approaches"
+
+
+# Register in the global registry
+from .registry import register_typology
+
+register_typology("IQ", TypologyIQ)

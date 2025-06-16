@@ -1,5 +1,6 @@
 from .typology import Typology
 
+
 class TypologyTemperaments(Typology):
     """Classical four-temperament model."""
 
@@ -29,3 +30,9 @@ class TypologyTemperaments(Typology):
             "Contrast": (50, "Different dispositions"),
         }
         return scores.get(relationship_type, (0, "Unknown Relationship"))
+
+
+# Register in the global registry
+from .registry import register_typology
+
+register_typology("Temperaments", TypologyTemperaments)

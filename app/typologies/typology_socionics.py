@@ -4,10 +4,13 @@ import os
 from .typology import Typology
 from flask_babel import lazy_gettext as _l
 
+
 class TypologySocionics(Typology):
     def __init__(self, language="en"):
         self.set_language(language)
-        super().__init__(["Intuitive", "Sensory", "Ethical", "Logical", "Extratim", "Introtim"])
+        super().__init__(
+            ["Intuitive", "Sensory", "Ethical", "Logical", "Extratim", "Introtim"]
+        )
 
     def set_language(self, language):
         global _
@@ -219,12 +222,22 @@ class TypologySocionics(Typology):
         return relation_map.get(russian, "Unknown Relationship")
 
     def get_comfort_score(self, relationship_type: str) -> (int, str):
-        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+        base_dir = os.path.dirname(
+            os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        )
         path = os.path.join(base_dir, "data", "socionics_relationships.json")
         try:
             with open(path, "r") as f:
                 data = json.load(f)
         except Exception:
             data = {}
-        info = data.get(relationship_type, {"score": 0, "description": "Unknown Relationship"})
+        info = data.get(
+            relationship_type, {"score": 0, "description": "Unknown Relationship"}
+        )
         return info.get("score", 0), info.get("description", "")
+
+
+# Register in the global registry
+from .registry import register_typology
+
+register_typology("Socionics", TypologySocionics)
