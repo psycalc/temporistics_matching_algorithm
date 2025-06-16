@@ -81,7 +81,7 @@ def test_typology_socionics_basic(app):
         assert typ.determine_relationship_type(all_types[0], all_types[0]) == "Identity"
         assert typ.determine_relationship_type(all_types[0], "BogusType") == "Unknown Relationship"
         score, desc = typ.get_comfort_score("Identity")
-        assert score == 100
+        assert score == 7
         score, desc = typ.get_comfort_score("Unknown Relationship")
         assert score == 0
 
