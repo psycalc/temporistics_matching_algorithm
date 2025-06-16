@@ -204,7 +204,8 @@ A high test coverage (~93%) confirms that the theoretical ideas are correctly mi
 1. **Set up the test environment**:
    ```bash
    export PYTHONPATH="$PYTHONPATH:$(pwd)"
-   export USE_TEST_DB_URL="sqlite:///test.db"
+   export TEST_DB_URL="sqlite:///test.db"
+   export TEST_DB=sqlite
    export FLASK_CONFIG=testing
    ```
 
