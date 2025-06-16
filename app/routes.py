@@ -295,7 +295,7 @@ def user_profile(username):
 def edit_profile():
     form = EditProfileForm(obj=current_user)
     if form.validate_on_submit():
-        from .services import update_user_profile
+        from .repositories.user_repository import update_user_profile
         old_image_filename = current_user.profile_image
 
         # Update user profile data (no commit yet)
