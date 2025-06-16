@@ -31,7 +31,7 @@ def db_url():
     if env_url:
         return env_url
 
-    db_type = os.environ.get("TEST_DB", "postgresql").lower()
+    db_type = os.environ.get("TEST_DB", "sqlite").lower()
     if db_type == "sqlite":
         return "sqlite:///:memory:"
 
