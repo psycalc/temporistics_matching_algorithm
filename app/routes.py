@@ -1,4 +1,15 @@
-from flask import (Blueprint, render_template, request, jsonify, current_app, redirect, url_for, flash, make_response, abort)
+from flask import (
+    Blueprint,
+    render_template,
+    request,
+    jsonify,
+    current_app,
+    redirect,
+    url_for,
+    flash,
+    make_response,
+    abort,
+)
 from flask_login import login_user, logout_user, login_required, current_user
 from .forms import RegistrationForm, LoginForm, ProfileForm, EditProfileForm
 from .models import User, UserType
@@ -17,7 +28,9 @@ from app.services import get_distance_if_compatible
 from werkzeug.utils import secure_filename
 import os
 from .routes_helper import handle_profile_image_upload, update_user_typology
+from .services import create_user_type, assign_user_type
 from .statistics_utils import load_typology_status
+from .chat_providers import get_chat_provider
 
 main = Blueprint("main", __name__)
 
@@ -155,19 +168,24 @@ def register():
 
     if request.method == "POST":
         if form.validate_on_submit():
-            user = User(username=form.username.data, email=form.email.data,
-                        city=form.city.data, country=form.country.data)
+            user = User(
+                username=form.username.data,
+                email=form.email.data,
+                city=form.city.data,
+                country=form.country.data,
+                profession=form.profession.data,
+                profession_visible=form.show_profession.data,
+            )
             user.set_password(form.password.data)
             db.session.add(user)
 
             last_user_type = None
             for subform in form.typologies:
-                ut = UserType(
+                ut = create_user_type(
                     typology_name=subform.typology_name.data,
                     type_value=subform.type_value.data,
+                    commit=False
                 )
-                db.session.add(ut)
-                db.session.flush()  # get ID without full commit
                 last_user_type = ut
 
             if last_user_type:
@@ -207,7 +225,9 @@ def login():
             return redirect(next_page) if next_page else redirect(url_for("main.index"))
         else:
             if request.method == "POST":
-                print("Form validation failed:", form.errors)
+                current_app.logger.debug(
+                    f"Login form validation failed: {form.errors}"
+                )
             # Flash the message and render the template in the same request
             flash("Login Unsuccessful", "danger")
             return render_template(
@@ -244,6 +264,10 @@ def user_profile(username):
         if user.user_type:
             form.typology_name.data = user.user_type.typology_name
             form.type_value.data = user.user_type.type_value
+        form.city.data = user.city
+        form.country.data = user.country
+        form.profession.data = user.profession
+        form.show_profession.data = user.profession_visible
 
     if form.validate_on_submit():
         # Логування даних для діагностики
@@ -253,17 +277,17 @@ def user_profile(username):
         
         # Оновлення email
         user.email = form.email.data
+        user.city = form.city.data
+        user.country = form.country.data
+        user.profession = form.profession.data
+        user.profession_visible = form.show_profession.data
         current_app.logger.info(f"Email after update: {user.email}")
         
         # Оновлення типології
-        if not user.user_type:
-            user.user_type = UserType(
-                typology_name=form.typology_name.data,
-                type_value=form.type_value.data,
-            )
-        else:
-            user.user_type.typology_name = form.typology_name.data
-            user.user_type.type_value = form.type_value.data
+        assign_user_type(user,
+                        typology_name=form.typology_name.data,
+                        type_value=form.type_value.data,
+                        commit=False)
             
         try:
             db.session.commit()
@@ -282,7 +306,7 @@ def user_profile(username):
 def edit_profile():
     form = EditProfileForm(obj=current_user)
     if form.validate_on_submit():
-        from .services import update_user_profile
+        from .repositories.user_repository import update_user_profile
         old_image_filename = current_user.profile_image
 
         # Update user profile data (no commit yet)
@@ -296,6 +320,8 @@ def edit_profile():
             longitude=form.longitude.data,
             city=form.city.data,
             country=form.country.data,
+            profession=form.profession.data,
+            profession_visible=form.show_profession.data,
             max_distance=form.max_distance.data,
         )
 
@@ -328,7 +354,9 @@ def edit_profile():
     else:
         # Логування помилок валідації
         if form.errors:
-            print(f"Form validation failed: {form.errors}")
+            current_app.logger.debug(
+                f"Edit profile form validation failed: {form.errors}"
+            )
 
     # If not a POST or form not valid, just display the form
     return render_template("edit_profile.html", form=form)
@@ -375,3 +403,26 @@ def nearby_compatibles():
 
     # Передаем в шаблон список кортежей (пользователь, расстояние)
     return render_template("nearby_compatibles.html", compatible_list=compatible_list)
+
+
+@main.route("/chat")
+@login_required
+def chat():
+    return render_template("chat.html")
+
+
+@main.route("/chat_api", methods=["POST"])
+@login_required
+def chat_api():
+    data = request.get_json()
+    message = data.get("message", "") if data else ""
+    if not message:
+        return jsonify({"reply": "No message provided."}), 400
+
+    provider = get_chat_provider()
+    try:
+        reply = provider.reply(message)
+    except Exception as e:
+        current_app.logger.error(f"Chat provider error: {e}")
+        reply = "Sorry, I cannot respond right now."
+    return jsonify({"reply": reply})

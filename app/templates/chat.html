@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Chat{% endblock %}
+{% block content %}
+<h1>Chat with Assistant</h1>
+<div id="chat-box" class="border p-3 mb-3" style="height:300px; overflow-y:scroll;"></div>
+<div class="input-group mb-3">
+  <input id="chat-input" type="text" class="form-control" placeholder="Type a message" aria-label="Message">
+  <button id="send-btn" class="btn btn-primary">Send</button>
+  <button id="voice-btn" class="btn btn-secondary"><i class="fa fa-microphone"></i></button>
+</div>
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+{% endblock %}

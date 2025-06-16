@@ -208,6 +208,8 @@ def test_register_post_valid(client, app, test_db):
             "email": email,
             "password": "newpassword",
             "confirm_password": "newpassword",
+            "profession": "Engineer",
+            "show_profession": "y",
             "typologies-0-typology_name": "Temporistics",
             "typologies-0-type_value": "Past, Current, Future, Eternity",
             "typologies-1-typology_name": "Psychosophia",
@@ -227,6 +229,8 @@ def test_register_post_valid(client, app, test_db):
 
         new_user = User.query.filter_by(username=username).first()
         assert new_user is not None
+        assert new_user.profession == "Engineer"
+        assert new_user.profession_visible is True
 
 def test_register_post_invalid(client, app, test_db):
     with app.app_context():
@@ -823,3 +827,47 @@ def test_filter_nearby_by_max_distance(client, app, test_db):
         # Тепер обидва користувачі повинні бути на сторінці
         assert username2.encode('utf-8') in response.data
         assert username3.encode('utf-8') in response.data
+
+
+def test_profession_visibility_in_nearby(client, app, test_db):
+    """Users can hide their profession from others"""
+    with app.app_context():
+        # user1 will see user2 in nearby list
+        username1 = unique_username("viewer")
+        email1 = unique_email("viewer")
+        user1 = User(username=username1, email=email1, latitude=50.45, longitude=30.52)
+        user1.set_password("pass1")
+        user1_type = UserType(typology_name="Temporistics", type_value="Past, Current, Future, Eternity")
+        user1.user_type = user1_type
+
+        username2 = unique_username("hidden")
+        email2 = unique_email("hidden")
+        user2 = User(username=username2, email=email2, latitude=50.452, longitude=30.53,
+                     profession="Doctor", profession_visible=False)
+        user2.set_password("pass2")
+        user2_type = UserType(typology_name="Temporistics", type_value="Past, Current, Future, Eternity")
+        user2.user_type = user2_type
+
+        db.session.add_all([user1, user1_type, user2, user2_type])
+        db.session.commit()
+
+        client.post("/login", data={"email": email1, "password": "pass1"}, follow_redirects=True)
+
+        response = client.get("/nearby_compatibles", follow_redirects=True)
+        assert response.status_code == 200
+        assert username2.encode() in response.data
+        assert b"Doctor" not in response.data
+
+
+def test_chat_route(client, app, test_db):
+    with app.app_context():
+        username = unique_username("chat")
+        email = unique_email("chat")
+        user = User(username=username, email=email)
+        user.set_password("chatpass")
+        db.session.add(user)
+        db.session.commit()
+
+        client.post("/login", data={"email": email, "password": "chatpass"}, follow_redirects=True)
+        response = client.get("/chat", follow_redirects=True)
+        assert response.status_code == 200

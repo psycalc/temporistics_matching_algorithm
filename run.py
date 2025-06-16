@@ -1,7 +1,7 @@
 import os
 import logging
-from flask import Flask, request
-from app import create_app, db
+from app import create_app
+from app.extensions import db
 from flask_migrate import Migrate
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
