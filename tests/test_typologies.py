@@ -3,6 +3,7 @@ from app.typologies.typology_temporistics import TypologyTemporistics
 from app.typologies.typology_psychosophia import TypologyPsychosophia
 from app.typologies.typology_amatoric import TypologyAmatoric
 from app.typologies.typology_socionics import TypologySocionics
+from app.typologies.typology_temperaments import TypologyTemperaments
 
 @pytest.fixture
 def typology(app):
@@ -205,3 +206,14 @@ def test_typology_iq_basic():
     assert typ.determine_relationship_type("Aspiring", "Insightful") == "Contrast"
     shortened = typ.shorten_type(all_types)
     assert shortened == ["A", "B", "I"]
+
+
+def test_typology_temperaments_basic():
+    typ = TypologyTemperaments()
+    all_types = typ.get_all_types()
+    assert all_types == ["Sanguine", "Choleric", "Melancholic", "Phlegmatic"]
+    assert typ.determine_relationship_type("Sanguine", "Sanguine") == "Identity"
+    assert typ.determine_relationship_type("Sanguine", "Phlegmatic") == "Complementary"
+    assert typ.determine_relationship_type("Sanguine", "Choleric") == "Contrast"
+    shortened = typ.shorten_type(all_types)
+    assert shortened == ["S", "C", "M", "P"]

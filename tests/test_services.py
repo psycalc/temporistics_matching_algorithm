@@ -44,6 +44,22 @@ def test_get_types_iq(app, test_db):
         assert types is not None
         assert len(types) == 3
 
+def test_get_types_temperaments(app, test_db):
+    with app.app_context():
+        types = get_types_by_typology("Temperaments")
+        assert types is not None
+        assert "Sanguine" in types
+
+def test_calculate_relationship_temperaments(app, test_db):
+    with app.app_context():
+        relationship, score = calculate_relationship(
+            "Sanguine",
+            "Phlegmatic",
+            "Temperaments",
+        )
+        assert relationship == "Complementary"
+        assert score > 0
+
 def test_calculate_relationship_invalid_typology(app, test_db):
     with app.app_context():
         with pytest.raises(ValueError):
