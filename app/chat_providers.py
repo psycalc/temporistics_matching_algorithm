@@ -5,6 +5,7 @@ import requests
 import google.generativeai as genai
 import anthropic
 from flask import current_app
+from typing import Optional
 
 class ChatProvider:
     """Abstract provider for chat models."""
@@ -25,7 +26,7 @@ class OpenAIProvider(ChatProvider):
         return response.choices[0].message.content.strip()
 
 class HuggingFaceProvider(ChatProvider):
-    def __init__(self, model: str, api_token: str | None = None):
+    def __init__(self, model: str, api_token: Optional[str] = None):
         self.model = model
         self.api_url = f"https://api-inference.huggingface.co/models/{model}"
         self.headers = {"Authorization": f"Bearer {api_token}"} if api_token else {}
@@ -70,6 +71,20 @@ class AnthropicProvider(ChatProvider):
                 return part.text
         return str(content)
 
+class LocalHFProvider(ChatProvider):
+    """Run open-source models locally via transformers."""
+
+    def __init__(self, model_path: str):
+        from transformers import pipeline
+
+        self.pipeline = pipeline("text-generation", model=model_path, tokenizer=model_path)
+
+    def reply(self, message: str) -> str:
+        outputs = self.pipeline(message, max_new_tokens=128)
+        if outputs:
+            return outputs[0]["generated_text"]
+        return ""
+
 def get_chat_provider() -> ChatProvider:
     provider = current_app.config.get("CHAT_PROVIDER", "openai")
     if provider == "huggingface":
@@ -84,6 +99,9 @@ def get_chat_provider() -> ChatProvider:
         model = current_app.config.get("ANTHROPIC_MODEL", "claude-3-haiku-20240307")
         api_key = current_app.config.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_API_KEY")
         return AnthropicProvider(model, api_key)
+    if provider == "localhf":
+        model_path = current_app.config.get("LOCAL_MODEL_PATH", "./model")
+        return LocalHFProvider(model_path)
     model = current_app.config.get("OPENAI_MODEL", "gpt-3.5-turbo")
     api_key = current_app.config.get("OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY")
     return OpenAIProvider(model, api_key)

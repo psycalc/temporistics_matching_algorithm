@@ -27,6 +27,7 @@ class Config:
     GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
     ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-3-haiku-20240307")
     ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
+    LOCAL_MODEL_PATH = os.environ.get("LOCAL_MODEL_PATH")
 
 class DevelopmentConfig(Config):
     DEBUG = True
