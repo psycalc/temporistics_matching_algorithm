@@ -116,9 +116,10 @@ These methods directly reflect the theoretical principles: induction/deduction (
 `models.py` holds `User` and `UserType` models. User types are validated before insertion, ensuring no invalid type values are saved. This enforces theoretical constraints at the database level.
 
 ### Routes and Forms
-`routes.py` ties logic to the web interface:
-- `/calculate`: users submit two types and a typology to get a result.
-- `/register`: users choose their types from dynamically loaded lists of available typologies.
+Dedicated blueprint modules tie the logic to the web interface:
+ - `auth.py` handles authentication routes like `/login` and `/register`.
+ - `profile.py` manages the main pages, user profiles and language selection.
+ - `matching.py` provides calculation and chat endpoints such as `/calculate`.
 
 `forms.py` manages forms for registration, login, and profile editing. The form fields and validations are driven by the theoretical concepts implemented in the classes.
 
