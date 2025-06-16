@@ -16,9 +16,9 @@
     - [Routes and Forms](#routes-and-forms)
 5. [Testing](#testing)
 6. [Installation and Run](#installation-and-run)
-    - [Локальний запуск](#локальний-запуск)
-    - [Запуск у Docker](#запуск-у-docker)
-    - [Запуск тестів](#запуск-тестів)
+    - [Local Run](#local-run)
+    - [Running with Docker](#running-with-docker)
+    - [Running Tests](#running-tests)
 7. [Additional Information](#additional-information)
 
 ---
@@ -130,134 +130,125 @@ A high test coverage (~93%) confirms that the theoretical ideas are correctly mi
 
 ## Installation and Run
 
-### Локальний запуск
+### Local Run
 
-1. **Підготовка**:
-   - Переконайтеся, що у вас встановлено Python 3.10 або новіше
-   - Встановіть залежності:
+1. **Preparation**:
+   - Ensure Python 3.10 or newer is installed
+   - Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **Налаштування середовища**:
-   - Створіть файл `.env` у корені проекту (якщо його ще немає)
-   - Налаштуйте необхідні змінні середовища (приклад):
+2. **Environment setup**:
+   - Create a `.env` file in the project root if it does not exist
+   - Configure the necessary environment variables, for example:
    ```
    FLASK_CONFIG=development
    SECRET_KEY=your-secret-key
-   DATABASE_URL=sqlite:///site.db  # Для розробки можна використовувати SQLite
-   BABEL_DEFAULT_LOCALE=uk
+   DATABASE_URL=sqlite:///site.db  # SQLite is fine for local usage
+   BABEL_DEFAULT_LOCALE=en
    BABEL_DEFAULT_TIMEZONE=Europe/Kiev
    LANGUAGES=en,fr,es,uk
    ```
 
-3. **Запуск сервера розробки**:
-   
-   Спосіб 1: Використання скрипта `run_local.sh` (рекомендовано):
+3. **Run the development server**:
+
+   Recommended approach using `run_local.sh`:
    ```bash
-   chmod +x run_local.sh  # надання прав на виконання (лише один раз)
+   chmod +x run_local.sh  # grant execute permission once
    ./run_local.sh
    ```
-   
-   Скрипт автоматично:
-   - Налаштовує середовище для роботи з SQLite (база даних буде створена в корені проекту)
-   - Створює необхідні директорії
-   - Перевіряє наявність прав на запис файлу бази даних
-   - Ініціалізує базу даних, якщо вона не існує
-   - Запускає додаток на порту 5001 (щоб уникнути конфліктів) 
-   
-   Спосіб 2: Прямий запуск:
+
+   The script automatically:
+   - Sets up the environment for SQLite (database created in the project root)
+   - Creates required directories
+   - Checks write permissions for the database file
+   - Initializes the database if it does not exist
+   - Starts the app on port 5001 to avoid conflicts
+
+   Alternative direct run:
    ```bash
    python run.py
    ```
-   
-   Додаток буде доступний за адресою http://localhost:5001 (якщо використовується скрипт) або http://localhost:5000 (при прямому запуску).
-   
-   > **Можливі проблеми та їх вирішення**:
-   > 
-   > 1. **Помилка про підключення до PostgreSQL**: Якщо ви бачите помилку про неможливість підключення до хоста "db", використовуйте скрипт `run_local.sh` або встановіть змінну середовища `DATABASE_URL` на SQLite.
-   > 
-   > 2. **Помилка "Порт вже використовується"**: Для вирішення можна:
-   >    - Змінити порт у скрипті `run_local.sh` (змінна `FLASK_RUN_PORT`)
-   >    - Знайти і зупинити процес, що використовує порт: `sudo lsof -i :5000` та `sudo kill <PID>`
+
+   The application will be available at http://localhost:5001 when using the script or http://localhost:5000 when started directly.
+
+   > **Possible issues and solutions**:
    >
-   > 3. **Помилка SQLite "unable to open database file"**:
-   >    - Перевірте права доступу до директорії проекту: `ls -la`
-   >    - Запустіть скрипт з актуальної версії, яка створює базу даних у корені проекту
-   >    - Спробуйте запустити з підвищеними привілеями: `sudo ./run_local.sh`
+   > 1. **PostgreSQL connection error** – if you cannot connect to host `db`, use `run_local.sh` or set `DATABASE_URL` to SQLite.
+   > 2. **Port already in use** – either change `FLASK_RUN_PORT` in `run_local.sh` or stop the process using `sudo lsof -i :5000` and `sudo kill <PID>`.
+   > 3. **SQLite "unable to open database file"** – check directory permissions (`ls -la`), run the latest script to create the DB, or try running with elevated privileges `sudo ./run_local.sh`.
 
-### Запуск у Docker
+### Running with Docker
 
-1. **Використання Docker Compose**:
+1. **Using Docker Compose**:
    ```bash
    docker-compose up
    ```
-   Цей команда запустить базу даних PostgreSQL та веб-додаток.
+   This command starts PostgreSQL and the web application.
 
-2. **Запуск тільки веб-додатку**:
+2. **Run only the web application**:
    ```bash
    docker-compose up web
    ```
 
-### Запуск тестів
+### Running Tests
 
-#### Основні команди для запуску тестів
+#### Common commands
 
-1. **Налаштування середовища для тестів**:
+1. **Set up the test environment**:
    ```bash
    export PYTHONPATH="$PYTHONPATH:$(pwd)"
-   export USE_TEST_DB_URL="sqlite:///test.db" 
+   export USE_TEST_DB_URL="sqlite:///test.db"
    export FLASK_CONFIG=testing
    ```
 
-2. **Запуск усіх тестів**:
+2. **Run all tests**:
    ```bash
    python -m pytest
    ```
 
-3. **Запуск конкретного тесту**:
+3. **Run a specific test**:
    ```bash
    python -m pytest tests/test_localization.py::test_language_affects_content
    ```
 
-4. **Запуск тестів із певного файлу**:
+4. **Run tests from a particular file**:
    ```bash
    python -m pytest tests/test_models.py
    ```
 
-5. **Запуск тестів із більш детальним виводом**:
+5. **Run tests with verbose output**:
    ```bash
    python -m pytest -xvs tests/test_localization.py
    ```
 
-6. **Запуск Selenium тестів**:
+6. **Run Selenium tests**:
    ```bash
    python -m pytest -m selenium
    ```
-   
-   Для запуску Selenium тестів переконайтеся, що у вас встановлено:
-   - Chrome браузер
-   - ChromeDriver (відповідної версії)
 
-#### Альтернативний запуск тестів через скрипт
+   Make sure you have Chrome and a matching ChromeDriver installed for Selenium tests.
 
-Для тестів Selenium можна використовувати скрипт:
+#### Alternative Selenium script
+
+You can also run Selenium tests with:
 ```bash
 bash run_selenium_tests.sh
 ```
 
-#### Запуск тестів у Docker
+#### Running tests in Docker
 
 ```bash
 docker-compose up test
 ```
 
-#### Примітки щодо тестування
+#### Testing notes
 
-- Для тестів використовується SQLite замість PostgreSQL, щоб уникнути залежності від зовнішньої бази даних.
-- Під час запуску тестів створюються тимчасові таблиці, які видаляються після виконання тестів.
-- Якщо ви змінюєте структуру бази даних, переконайтеся, що ви також оновили відповідні тести.
-- Високий рівень покриття тестами (~93%) підтверджує, що теоретичні ідеї проекту коректно реалізовані у коді.
+- SQLite is used instead of PostgreSQL during tests to avoid external dependencies.
+- Temporary tables are created and removed during test runs.
+- If you change the database structure, update the tests accordingly.
+- High coverage (~93%) confirms the theoretical ideas are well reflected in code.
 
 ## Additional Information
 
