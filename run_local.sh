@@ -1,111 +1,111 @@
 #!/bin/bash
 
-# Скрипт для запуску додатку і тестів локально
-# Підтримує запуск всіх тестів із зупинкою на першому поломаному тесті
-# Використання: ./run_local.sh [опції]
+# Local helper script to run the application and tests.
+# Supports running all tests with optional early exit on first failure.
+# Usage: ./run_local.sh [options]
 #
-# Приклади:
-#   ./run_local.sh                     - запуск додатку і базових тестів
-#   ./run_local.sh --tests-only        - запуск тільки базових тестів
-#   ./run_local.sh --all-tests         - запуск всіх тестів, включаючи selenium
-#   ./run_local.sh --all-tests-exit-first - запуск всіх тестів з зупинкою на першому поломаному
-#   ./run_local.sh --exit-first        - запуск базових тестів з зупинкою на першому поломаному
+# Examples:
+#   ./run_local.sh                     - start the app and basic tests
+#   ./run_local.sh --tests-only        - run only the basic tests
+#   ./run_local.sh --all-tests         - run all tests including selenium
+#   ./run_local.sh --all-tests-exit-first - run all tests and stop on first failure
+#   ./run_local.sh --exit-first        - run basic tests and stop on first failure
 
-# Функція для перевірки чи запущено процес на певному порту
+# Check if a process is already listening on the given port
 check_port() {
     local port=$1
     local process_count=$(lsof -i :$port | grep -v "COMMAND" | wc -l)
     if [ $process_count -gt 0 ]; then
-        return 0 # Порт зайнятий
+        return 0 # Port in use
     else
-        return 1 # Порт вільний
+        return 1 # Port available
     fi
 }
 
-# Функція для перевірки чи запущено Docker контейнер з базою даних
+# Check whether the PostgreSQL Docker container is running
 check_db_container() {
     local container_count=$(docker ps | grep "postgres" | wc -l)
     if [ $container_count -gt 0 ]; then
-        return 0 # Контейнер запущено
+        return 0 # Container running
     else
-        return 1 # Контейнер не запущено
+        return 1 # Container not running
     fi
 }
 
-# Функція для перевірки з'єднання з PostgreSQL
+# Attempt to connect to PostgreSQL
 check_postgres_connection() {
-    # Спроба підключитися локально
+    # Try local connection first
     if psql -h localhost -U testuser -d testdb -c "SELECT 1" > /dev/null 2>&1; then
-        echo "Підключення до PostgreSQL через localhost успішне."
+        echo "Successfully connected to PostgreSQL via localhost."
         export DATABASE_URL="postgresql://testuser:password@localhost:5432/testdb"
         return 0
-    # Спроба підключитися через ім'я сервісу "db"
+    # Then try using the service name "db"
     elif [ -n "$DOCKER_NETWORK" ] && psql -h db -U testuser -d testdb -c "SELECT 1" > /dev/null 2>&1; then
-        echo "Підключення до PostgreSQL через контейнер db успішне."
+        echo "Successfully connected to PostgreSQL via container 'db'."
         export DATABASE_URL="postgresql://testuser:password@db:5432/testdb"
         return 0
     else
-        echo "Не вдалося підключитися до PostgreSQL. Перевірте, чи запущений контейнер."
+        echo "Failed to connect to PostgreSQL. Is the container running?"
         return 1
     fi
 }
 
-# Функція для запуску тестів
+# Run the test suite
 run_tests() {
-    echo "=== Запуск тестів ==="
+    echo "=== Running tests ==="
     
-    # Отримуємо IP адресу контейнера PostgreSQL
+    # Obtain the PostgreSQL container IP
     local POSTGRES_HOST=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' temporistics_matching_algorithm-db-1)
-    echo "IP-адреса контейнера PostgreSQL: $POSTGRES_HOST"
+    echo "PostgreSQL container IP: $POSTGRES_HOST"
     
-    # Налаштування тестового середовища
+    # Configure the testing environment
     export PYTHONPATH="$PYTHONPATH:$(pwd)"
     
-    # Використовуємо PostgreSQL для тестів
+    # Use PostgreSQL for tests
     export USE_TEST_DB_URL="postgresql://testuser:password@localhost:5432/testdb"
     
     export FLASK_CONFIG=testing
     
-    # Додаткові змінні середовища для локалізації та Selenium-тестів
-    export BABEL_DEFAULT_LOCALE=uk
+    # Extra environment variables for localization and Selenium tests
+    export BABEL_DEFAULT_LOCALE=en
     export BABEL_DEFAULT_TIMEZONE=Europe/Kiev
     export LANGUAGES=en,fr,es,uk
     export BABEL_TRANSLATION_DIRECTORIES="translations;locales"
     
-    # Параметри запуску тестів
-    PYTEST_ARGS="-v -s"  # детальний вивід (-v) і вивід print statements (-s)
+    # Test run parameters
+    PYTEST_ARGS="-v -s"  # verbose output (-v) and show print statements (-s)
     
-    # Додаємо параметр зупинки на першій помилці, якщо потрібно
+    # Add early-exit parameter if requested
     if [ "$EXIT_FIRST" = true ]; then
         PYTEST_ARGS="$PYTEST_ARGS -x"
     fi
     
     if [ "$ALL_TESTS" = true ]; then
-        echo "Запускаємо всі можливі тести (включаючи selenium)..."
+        echo "Running all tests (including selenium)..."
         python -m pytest $PYTEST_ARGS tests/
     else
-        echo "Запускаємо стандартні тести..."
-        # Виключаємо selenium-тести за замовчуванням
+        echo "Running default tests..."
+        # Exclude selenium tests by default
         python -m pytest $PYTEST_ARGS -k "not selenium"
     fi
     
     TEST_EXIT_CODE=$?
     if [ $TEST_EXIT_CODE -eq 0 ]; then
-        echo "✅ Всі тести успішно пройдені!"
+        echo "✅ All tests passed!"
     else
-        echo "❌ Деякі тести не пройшли. Перевірте лог вище для деталей."
+        echo "❌ Some tests failed. Check the log above for details."
     fi
     
     return $TEST_EXIT_CODE
 }
 
-# Парсинг аргументів
-# Доступні опції:
-# --no-tests         - запустити тільки додаток без тестів
-# --tests-only       - запустити тільки тести без додатку
-# --exit-first       - зупинитися на першому поломаному тесті
-# --all-tests        - запустити всі тести, включаючи selenium-тести
-# --all-tests-exit-first - запустити всі тести і зупинитися на першому поломаному
+# Parse command line arguments
+# Available options:
+# --no-tests         - start only the app without tests
+# --tests-only       - run tests without starting the app
+# --exit-first       - stop on first failing test
+# --all-tests        - run all tests including selenium
+# --all-tests-exit-first - run all tests and stop on first failure
 
 RUN_TESTS=true
 RUN_APP=true
@@ -139,44 +139,44 @@ for arg in "$@"; do
     esac
 done
 
-# Налаштовуємо змінні середовища для локальної розробки
+# Set environment variables for local development
 export FLASK_CONFIG=development
 
-# Локалізаційні налаштування
-export BABEL_DEFAULT_LOCALE=uk
+# Localization settings
+export BABEL_DEFAULT_LOCALE=en
 export BABEL_DEFAULT_TIMEZONE=Europe/Kiev
 export LANGUAGES=en,fr,es,uk
 export BABEL_TRANSLATION_DIRECTORIES="translations;locales"
 
-# Вказуємо порт (за замовчуванням 5000, але можна змінити)
+# Specify the port (default 5000 but can be changed)
 export FLASK_RUN_PORT=5001
 
-# Перевіряємо чи додаток вже запущено
+# Check if the app is already running
 if check_port $FLASK_RUN_PORT; then
-    echo "УВАГА: Додаток вже запущено на порту $FLASK_RUN_PORT!"
-    echo "Щоб зупинити, знайдіть PID процесу: lsof -i :$FLASK_RUN_PORT"
-    echo "Потім виконайте: kill <PID>"
+    echo "WARNING: The app is already running on port $FLASK_RUN_PORT!"
+    echo "To stop it, find the PID: lsof -i :$FLASK_RUN_PORT"
+    echo "Then run: kill <PID>"
     app_running=true
 else
     app_running=false
 fi
 
-# Перевіряємо чи база даних вже запущена
+# Check if the database container is running
 if check_db_container; then
-    echo "Контейнер з PostgreSQL запущено. Перевіряємо підключення..."
+    echo "PostgreSQL container is running. Checking connection..."
     db_running=true
 else
-    echo "Контейнер з PostgreSQL не запущено. Запускаємо..."
+    echo "PostgreSQL container not running. Starting..."
     db_running=false
 fi
 
-# Якщо база даних не запущена, обов'язково запускаємо її
+# Start the database container if not running
 if [ "$db_running" = false ]; then
-    echo "Запускаємо контейнер з PostgreSQL..."
+    echo "Starting PostgreSQL container..."
     docker-compose up -d db
     
-    # Чекаємо поки база даних повністю запуститься
-    echo "Очікування підключення до бази даних..."
+    # Wait until the database is ready
+    echo "Waiting for database connection..."
     sleep 5
     attempts=0
     max_attempts=10
@@ -184,86 +184,86 @@ if [ "$db_running" = false ]; then
     while ! docker-compose exec db psql -U testuser -d testdb -c "SELECT 1" > /dev/null 2>&1; do
         attempts=$((attempts + 1))
         if [ $attempts -ge $max_attempts ]; then
-            echo "Не вдалося підключитися до бази даних після $max_attempts спроб."
-            echo "Перевірте налаштування Docker і PostgreSQL."
+            echo "Failed to connect to the database after $max_attempts attempts."
+            echo "Check your Docker and PostgreSQL settings."
             exit 1
         fi
-        echo "Спроба $attempts з $max_attempts. Очікуємо ще 2 секунди..."
+        echo "Attempt $attempts of $max_attempts. Waiting 2 seconds..."
         sleep 2
     done
     
-    echo "База даних PostgreSQL успішно запущена та готова до роботи!"
+    echo "PostgreSQL database is up and ready!"
 fi
 
-# Отримуємо IP адресу контейнера PostgreSQL для локального підключення
+# Get the PostgreSQL container IP for local connection
 POSTGRES_HOST=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' temporistics_matching_algorithm-db-1)
 if [ -n "$POSTGRES_HOST" ]; then
-    echo "IP-адреса контейнера PostgreSQL: $POSTGRES_HOST"
-    # Налаштовуємо змінну DATABASE_URL для підключення до PostgreSQL
+    echo "PostgreSQL container IP: $POSTGRES_HOST"
+    # Set DATABASE_URL to connect to PostgreSQL
     export DATABASE_URL="postgresql://testuser:password@$POSTGRES_HOST:5432/testdb"
 else
-    echo "УВАГА: Не вдалося отримати IP-адресу контейнера PostgreSQL!"
-    echo "Використовуємо локальний URL для бази даних."
+    echo "WARNING: Could not obtain PostgreSQL container IP!"
+    echo "Using local database URL instead."
     export DATABASE_URL="postgresql://testuser:password@localhost:5432/testdb"
 fi
 
-# Запускаємо тести, якщо потрібно і ми не запускаємо додаток або додаток не запущено
+# Run tests if requested and the app is not already running
 if [ "$RUN_TESTS" = true ] && { [ "$RUN_APP" = false ] || [ "$app_running" = false ]; }; then
     run_tests
     tests_result=$?
     
-    # Якщо ми запускаємо тільки тести - виходимо
+    # Exit here when running only tests
     if [ "$RUN_APP" = false ]; then
         exit $tests_result
     fi
 fi
 
-# Якщо додаток не запущено і нам потрібно його запустити - запускаємо
+# Start the application if it is not already running
 if [ "$app_running" = false ] && [ "$RUN_APP" = true ]; then
-    # Перевіряємо наявність каталогів для статичних файлів
+    # Ensure directories for static files exist
     mkdir -p app/static/uploads
     mkdir -p instance
     
-    # Запускаємо головний скрипт
-    echo "Запускаємо додаток з PostgreSQL базою даних на порту $FLASK_RUN_PORT..."
+    # Start the main script
+    echo "Starting the app with PostgreSQL on port $FLASK_RUN_PORT..."
     
-    # Якщо тести вже запущені і нам потрібно запустити додаток після них
+    # If tests were run first, simply start the app
     if [ "$RUN_TESTS" = true ]; then
         python run.py
     else
-        # Запускаємо додаток і тести, якщо потрібно
+        # Start the app in background and run tests if requested
         python run.py &
         APP_PID=$!
         
-        # Даємо додатку час на запуск
-        echo "Очікуємо, поки додаток запуститься..."
+        # Give the app time to start
+        echo "Waiting for the app to start..."
         sleep 5
         
-        # Запускаємо тести, якщо потрібно
+        # Run tests if requested
         if [ "$RUN_TESTS" = true ]; then
             run_tests
             tests_result=$?
             
-            # Зупиняємо додаток, якщо тести провалилися
+            # Stop the app if tests failed
             if [ $tests_result -ne 0 ]; then
-                echo "Тести провалились, зупиняємо додаток..."
+                echo "Tests failed, stopping the app..."
                 kill $APP_PID
                 exit $tests_result
             fi
         fi
         
-        # Чекаємо, поки додаток працює
+        # Wait while the app is running
         wait $APP_PID
     fi
 else
-    echo "Додаток вже запущено. Якщо хочете перезапустити:"
-    echo "1. Зупиніть поточний процес"
-    echo "2. Запустіть скрипт знову"
+    echo "The app is already running. To restart it:"
+    echo "1. Stop the current process"
+    echo "2. Run this script again"
     
-    # Запускаємо тести, якщо потрібно і ми ще не запустили їх
+    # Run tests if requested and they have not been executed yet
     if [ "$RUN_TESTS" = true ]; then
         run_tests
     fi
 fi
 
-echo "Скрипт завершено!" 
+echo "Script finished!"
