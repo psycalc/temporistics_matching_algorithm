@@ -2,7 +2,7 @@ from .extensions import db
 from flask_login import UserMixin
 from passlib.hash import bcrypt
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, Integer, String, ForeignKey, Float
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean
 from sqlalchemy import event
 from app.services import get_typology_instance
 
@@ -23,6 +23,10 @@ class User(UserMixin, db.Model):
     longitude = Column(Float, nullable=True)
     city = Column(String(100), nullable=True)
     country = Column(String(100), nullable=True)
+
+    # Profession info
+    profession = Column(String(120), nullable=True)
+    profession_visible = Column(Boolean, default=True)
     
     # Додаємо поле для зберігання максимальної прийнятної відстані (в км)
     max_distance = Column(Float, nullable=True, default=50.0)
