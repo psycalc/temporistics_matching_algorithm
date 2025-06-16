@@ -214,7 +214,9 @@ def login():
             return redirect(next_page) if next_page else redirect(url_for("main.index"))
         else:
             if request.method == "POST":
-                print("Form validation failed:", form.errors)
+                current_app.logger.debug(
+                    f"Login form validation failed: {form.errors}"
+                )
             # Flash the message and render the template in the same request
             flash("Login Unsuccessful", "danger")
             return render_template(
@@ -345,7 +347,9 @@ def edit_profile():
     else:
         # Логування помилок валідації
         if form.errors:
-            print(f"Form validation failed: {form.errors}")
+            current_app.logger.debug(
+                f"Edit profile form validation failed: {form.errors}"
+            )
 
     # If not a POST or form not valid, just display the form
     return render_template("edit_profile.html", form=form)
