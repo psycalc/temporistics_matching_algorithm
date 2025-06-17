@@ -1,13 +1,17 @@
-import pytest
-from app.extensions import db
-from app.models import User, UserType
-from flask_login import current_user
-from tests.test_helpers import unique_username, unique_email
-from io import BytesIO
-import uuid
+import logging
 import os
 import tempfile
+import uuid
+from io import BytesIO
+
+import pytest
 from PIL import Image
+from flask_login import current_user
+from app.extensions import db
+from app.models import User, UserType
+from tests.test_helpers import unique_username, unique_email
+
+logger = logging.getLogger(__name__)
 
 
 def test_index_route(client):
@@ -45,7 +49,7 @@ def test_login_wrong_password(client, app, test_db):
             "password": "wrongpassword",
             "submit": "Login"
         }, follow_redirects=True)
-        print(response.data)
+        logger.debug(response.data)
         assert response.status_code == 200
         assert b"Login Unsuccessful" in response.data
 
@@ -430,8 +434,9 @@ def test_upload_invalid_image_format(client, app, test_db):
                 # Перевірка, що ми залишились на сторінці редагування
                 assert b"Edit Profile" in response.data
                 # Виведення повного HTML для діагностики
-                print("Form validation failed:", form.errors) if 'form' in locals() else None
-                print(response.data)
+                if 'form' in locals():
+                    logger.debug("Form validation failed: %s", form.errors)
+                logger.debug(response.data)
                 
                 # Шукаємо повідомлення про помилку від валідатора FileAllowed
                 # У вихідному коді з помилкою було видно, що форма містить помилку l'Images only!'
@@ -539,14 +544,14 @@ def test_full_integration_cycle(client, app, test_db):
         }
         
         # Виводимо дані для діагностики
-        print(f"Editing profile for user ID: {user.id}, username: {username}")
+        logger.debug("Editing profile for user ID: %s, username: %s", user.id, username)
         
         # Відправляємо запит на редагування профілю
         edit_response = client.post("/edit_profile", data=edit_data, follow_redirects=True)
         
         # Виводимо вміст відповіді для діагностики
-        print(f"Edit response status: {edit_response.status_code}")
-        print(f"Edit response data: {edit_response.data[:300]}...")
+        logger.debug("Edit response status: %s", edit_response.status_code)
+        logger.debug("Edit response data: %s...", edit_response.data[:300])
         
         assert edit_response.status_code == 200
         assert b"Profile updated successfully" in edit_response.data
