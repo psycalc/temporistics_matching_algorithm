@@ -1,9 +1,9 @@
 # app/typologies/registry.py
 """Registry and plugin loader for typology classes."""
 from __future__ import annotations
-import os
 import importlib
 from typing import Dict, Type
+from stevedore import extension
 
 _typology_registry: Dict[str, Type] = {}
 
@@ -19,10 +19,18 @@ def get_typology_classes() -> Dict[str, Type]:
 
 
 def load_plugins() -> None:
-    """Import extra typology modules listed in ``TYPOLOGY_PLUGINS`` env var."""
-    plugins = os.environ.get("TYPOLOGY_PLUGINS", "")
-    for module_name in [m.strip() for m in plugins.split(",") if m.strip()]:
-        importlib.import_module(module_name)
+    """Load typology plugins registered via ``stevedore`` entry points.
+
+    Packages can expose entry points under the ``temporistics.typology``
+    namespace. Each plugin module should call :func:`register_typology` to
+    register its classes when imported.
+    """
+    manager = extension.ExtensionManager(
+        namespace="temporistics.typology",
+        invoke_on_load=False,
+    )
+    for ext in manager:
+        importlib.import_module(ext.entry_point.module_name)
 
 
 # Automatically load any plugins when the registry module is imported

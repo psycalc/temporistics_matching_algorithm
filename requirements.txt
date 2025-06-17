@@ -26,6 +26,9 @@ anthropic==0.54.0
 transformers==4.41.1
 dynaconf==3.2.11
 
+# Plugin management
+stevedore>=5.0.0
+
 # Security headers
 Flask-Talisman==1.1.0
 
