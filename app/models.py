@@ -1,6 +1,6 @@
 from .extensions import db
-from flask_login import UserMixin
-from passlib.hash import bcrypt
+from flask import current_app
+from flask_user import UserMixin
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean
 from sqlalchemy import event
@@ -13,6 +13,7 @@ class User(UserMixin, db.Model):
     id = Column(Integer, primary_key=True)
     username = Column(String(80), unique=True, nullable=False)
     email = Column(String(120), unique=True, nullable=False)
+    active = Column(Boolean(), nullable=False, default=True)
     password_hash = Column(String(128), nullable=True)  # Змінюємо на nullable=True, бо при OAuth пароль може бути не потрібен
     type_id = Column(Integer, ForeignKey("user_type.id"))
     user_type = db.relationship("UserType", backref="users")
@@ -38,12 +39,12 @@ class User(UserMixin, db.Model):
     avatar_url = Column(String(512), nullable=True)
 
     def set_password(self, password):
-        self.password_hash = bcrypt.hash(password)
+        self.password_hash = current_app.user_manager.hash_password(password)
 
     def check_password(self, password):
         if not self.password_hash:
             return False
-        return bcrypt.verify(password, self.password_hash)
+        return current_app.user_manager.verify_password(password, self.password_hash)
 
 
 class UserType(db.Model):
