@@ -204,11 +204,11 @@ This updates the corresponding JSON file with the provided score.
    ```
 
    The script automatically:
-   - Sets up the environment for SQLite (database created in the project root)
-   - Creates required directories
-   - Checks write permissions for the database file
-   - Initializes the database if it does not exist
-   - Starts the app on port 5001 to avoid conflicts
+   - Ensures the PostgreSQL container is running
+   - Exports DATABASE_URL with the container address
+   - Runs the test suite before launch (unless --no-tests is used)
+   - Starts the app on port 5001
+
 
    Alternative direct run:
    ```bash
