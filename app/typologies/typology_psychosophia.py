@@ -138,6 +138,11 @@ class TypologyPsychosophia(Typology):
 
     def are_types_full_agape(self, type1: List[str], type2: List[str]) -> bool:
         """Check for a Full Agape relationship between types."""
+        # New rule: a complete mirror match (1<->4 and 2<->3) counts as
+        # Full Agape. This needs to be evaluated before Extinguishment.
+        if type1 == list(reversed(type2)):
+            return True
+
         # Occurs when the first two aspects of one type are the other's third
         # and fourth, but not vice versa. Not Extinguishment, Eros or Identity.
         if self.are_types_extinguishment(type1, type2) or type1 == type2:
@@ -221,17 +226,17 @@ class TypologyPsychosophia(Typology):
         if self.are_types_identity_philia(user1_aspects, user2_aspects):
             return "Identity/Philia"
 
-        # 2. Extinguishment
+        # 2. Full Agape (including mirror cases)
+        if self.are_types_full_agape(user1_aspects, user2_aspects):
+            return "Full Agape"
+
+        # 3. Extinguishment
         if self.are_types_extinguishment(user1_aspects, user2_aspects):
             return "Psychosophia Extinguishment"
 
-        # 3. Full Eros
+        # 4. Full Eros
         if self.are_types_full_eros(user1_aspects, user2_aspects):
             return "Full Eros"
-
-        # 4. Full Agape
-        if self.are_types_full_agape(user1_aspects, user2_aspects):
-            return "Full Agape"
 
         # 5. Order/Full Order
         if self.are_types_order_full_order(user1_aspects, user2_aspects):

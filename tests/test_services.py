@@ -143,11 +143,11 @@ def test_calculate_detailed_relationships(app, test_db):
         relationship, comfort_score = calculate_relationship(type1, type2, typology_name)
         assert relationship == "Identity/Philia"
 
-        # 2. Psychosophia Extinguishment
+        # 2. Full Agape - дзеркальне відображення
         type1 = "Emotion, Logic, Will, Physics"
         type2 = "Physics, Will, Logic, Emotion"
         relationship, comfort_score = calculate_relationship(type1, type2, typology_name)
-        assert relationship == "Psychosophia Extinguishment"
+        assert relationship == "Full Agape"
 
         # 3. Full Eros
         type1 = "Emotion, Logic, Physics, Will"
@@ -299,7 +299,29 @@ def test_calculate_detailed_relationships(app, test_db):
         relationship, comfort_score = calculate_relationship(type1, type2, typology_name)
         # Змінено на точну перевірку, так як ми уточнили логіку
         assert relationship == "Psychosophia Extinguishment"
-        
+
         # Додати тести для інших типів відносин у Темпористиці...
+
+
+def test_full_agape_relationship(app, test_db):
+    """Перевіряє дзеркальний приклад Full Agape (ФЛВЭ і ЭВЛФ)."""
+    with app.app_context():
+        typology_name = "Psychosophia"
+        type1 = "Physics, Logic, Will, Emotion"
+        type2 = "Emotion, Will, Logic, Physics"
+        relationship, comfort_score = calculate_relationship(type1, type2, typology_name)
+        assert relationship == "Full Agape"
+        assert comfort_score == 10
+
+
+def test_neutrality_relationship(app, test_db):
+    """Перевіряє нейтральний сценарій з усіма різними позиціями."""
+    with app.app_context():
+        typology_name = "Psychosophia"
+        type1 = "Emotion, Logic, Will, Physics"
+        type2 = "Emotion, Physics, Will, Logic"
+        relationship, comfort_score = calculate_relationship(type1, type2, typology_name)
+        assert relationship == "Neutrality"
+        assert comfort_score == 0
 
 
