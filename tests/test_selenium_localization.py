@@ -1,6 +1,8 @@
-import pytest
+import logging
 import os
 import time
+
+import pytest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -9,6 +11,8 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException
+
+logger = logging.getLogger(__name__)
 
 if not os.environ.get("RUN_SELENIUM"):
     pytest.skip("Skipping selenium tests; RUN_SELENIUM not set", allow_module_level=True)
@@ -38,10 +42,10 @@ def driver():
         service = Service('/usr/bin/chromedriver')
         driver = webdriver.Chrome(service=service, options=chrome_options)
     except WebDriverException as e:
-        print(f"Помилка при ініціалізації ChromeDriver: {e}")
+        logger.error("\u041f\u043e\u043c\u0438\u043b\u043a\u0430 \u043f\u0440\u0438 \u0456\u043d\u0456\u0446\u0456\u0430\u043b\u0456\u0437\u0430\u0446\u0456\u0457 ChromeDriver: %s", e)
         raise
-    
-    print("ChromeDriver успішно ініціалізовано")
+
+    logger.info("ChromeDriver \u0443\u0441\u043f\u0456\u0448\u043d\u043e \u0456\u043d\u0456\u0446\u0456\u0430\u043b\u0456\u0437\u043e\u0432\u0430\u043d\u043e")
     
     # Встановлюємо неявне очікування
     driver.implicitly_wait(10)
@@ -49,7 +53,7 @@ def driver():
     yield driver
     
     # Закриваємо браузер після тесту
-    print("Закриваємо драйвер після тесту")
+    logger.info("\u0417\u0430\u043a\u0440\u0438\u0432\u0430\u0454\u043c\u043e \u0434\u0440\u0430\u0439\u0432\u0435\u0440 \u043f\u0456\u0441\u043b\u044f \u0442\u0435\u0441\u0442\u0443")
     driver.quit()
 
 @pytest.mark.selenium
@@ -65,32 +69,32 @@ def test_language_switcher_works(driver, app, live_server):
     """
     # Запускаємо тестовий сервер
     live_server_url = live_server.url
-    print(f"URL тестового сервера: {live_server_url}")
+    logger.debug(f"URL тестового сервера: {live_server_url}")
     
     # Діагностика конфігурації додатка
     with app.app_context():
-        print(f"BABEL_TRANSLATION_DIRECTORIES: {app.config.get('BABEL_TRANSLATION_DIRECTORIES')}")
-        print(f"LANGUAGES: {app.config.get('LANGUAGES')}")
-        print(f"BABEL_DEFAULT_LOCALE: {app.config.get('BABEL_DEFAULT_LOCALE')}")
+        logger.debug(f"BABEL_TRANSLATION_DIRECTORIES: {app.config.get('BABEL_TRANSLATION_DIRECTORIES')}")
+        logger.debug(f"LANGUAGES: {app.config.get('LANGUAGES')}")
+        logger.debug(f"BABEL_DEFAULT_LOCALE: {app.config.get('BABEL_DEFAULT_LOCALE')}")
     
     # Відвідуємо головну сторінку
     driver.get(live_server_url)
     
     # Відображаємо всю структуру сторінки для діагностики
     page_source = driver.page_source
-    print(f"HTML структура сторінки: {page_source[:500]}...")
+    logger.debug(f"HTML структура сторінки: {page_source[:500]}...")
     
     # Додаємо перевірку, щоб побачити всі елементи на сторінці
-    print("Знаходимо всі текстові елементи на сторінці:")
+    logger.debug("Знаходимо всі текстові елементи на сторінці:")
     text_elements = driver.find_elements(By.XPATH, "//*[text()]")
     for element in text_elements[:10]:  # Показуємо тільки перші 10 для стислості
-        print(f"Текст: {element.text}")
+        logger.debug(f"Текст: {element.text}")
     
     # Друк поточних cookies
     cookies = driver.get_cookies()
-    print("Поточні cookies перед зміною мови:")
+    logger.debug("Поточні cookies перед зміною мови:")
     for cookie in cookies:
-        print(f"  {cookie['name']}: {cookie['value']}")
+        logger.debug(f"  {cookie['name']}: {cookie['value']}")
     
     # Для кожної підтримуваної мови
     with app.app_context():
@@ -99,33 +103,33 @@ def test_language_switcher_works(driver, app, live_server):
             languages = languages.split(',')
             
         for lang in languages:
-            print(f"Тестуємо мову: {lang}")
+            logger.debug(f"Тестуємо мову: {lang}")
             
             # Знаходимо і клікаємо на селектор мови
             try:
                 # Перевіряємо, чи існує елемент languageSelect
                 elements = driver.find_elements(By.ID, "languageSelect")
                 if not elements:
-                    print("Елемент languageSelect не знайдено, шукаємо інші елементи...")
+                    logger.debug("Елемент languageSelect не знайдено, шукаємо інші елементи...")
                     body_text = driver.find_element(By.TAG_NAME, "body").text
-                    print(f"Текст тіла сторінки: {body_text[:500]}...")
+                    logger.debug(f"Текст тіла сторінки: {body_text[:500]}...")
                     
                     # Шукаємо всі select елементи
                     selects = driver.find_elements(By.TAG_NAME, "select")
-                    print(f"Знайдено {len(selects)} елементів select")
+                    logger.debug(f"Знайдено {len(selects)} елементів select")
                     
                     # Спробуємо шукати за класом або іншими атрибутами
                     language_elements = driver.find_elements(By.CSS_SELECTOR, "[name='language']")
-                    print(f"Знайдено {len(language_elements)} елементів з name='language'")
+                    logger.debug(f"Знайдено {len(language_elements)} елементів з name='language'")
                     
                     if language_elements:
                         language_select = language_elements[0]
                     else:
-                        print("Не вдалося знайти елемент перемикання мови")
+                        logger.debug("Не вдалося знайти елемент перемикання мови")
                         continue
                 else:
                     language_select = elements[0]
-                    print("Знайдено елемент languageSelect")
+                    logger.debug("Знайдено елемент languageSelect")
                 
                 # Вибираємо опцію за значенням мови
                 driver.execute_script(f"document.getElementById('languageSelect').value = '{lang}';")
@@ -136,9 +140,9 @@ def test_language_switcher_works(driver, app, live_server):
                 
                 # Перевіряємо cookies після зміни мови
                 cookies = driver.get_cookies()
-                print(f"Cookies після зміни мови на {lang}:")
+                logger.debug(f"Cookies після зміни мови на {lang}:")
                 for cookie in cookies:
-                    print(f"  {cookie['name']}: {cookie['value']}")
+                    logger.debug(f"  {cookie['name']}: {cookie['value']}")
                 
                 # Перевіряємо, що cookie "locale" встановлено
                 locale_cookie = next((cookie for cookie in cookies if cookie["name"] == "locale"), None)
@@ -148,28 +152,28 @@ def test_language_switcher_works(driver, app, live_server):
                 # Перевіряємо наявність HTTP заголовків, що можуть впливати на переклади
                 for request in driver.requests:
                     if 'login' in request.url:
-                        print(f"Request headers для login: {request.headers}")
+                        logger.debug(f"Request headers для login: {request.headers}")
                 
                 # Виведемо всі елементи після зміни мови
-                print(f"Елементи після зміни мови на {lang}:")
+                logger.debug(f"Елементи після зміни мови на {lang}:")
                 text_elements = driver.find_elements(By.XPATH, "//*[text()]")
                 for element in text_elements[:10]:
-                    print(f"Текст: {element.text}")
+                    logger.debug(f"Текст: {element.text}")
                 
                 # Для тесту ми перевіряємо наявність будь-яких елементів інтерфейсу, які 
                 # майже точно присутні на сторінці, незалежно від того, перекладені вони чи ні
                 page_source = driver.page_source
-                print(f"HTML після зміни мови на {lang}: {page_source[:500]}...")
+                logger.debug(f"HTML після зміни мови на {lang}: {page_source[:500]}...")
                 
                 # Перевіряємо наявність атрибуту lang у HTML документі
                 html_lang = driver.execute_script("return document.documentElement.lang;")
-                print(f"HTML lang атрибут: {html_lang}")
+                logger.debug(f"HTML lang атрибут: {html_lang}")
                 
                 # Маркувати тест як пройдений для будь-якої мови, якщо cookie встановлено правильно
-                print(f"✓ Мова {lang} перемикається коректно (cookie встановлено)")
+                logger.debug(f"✓ Мова {lang} перемикається коректно (cookie встановлено)")
                 
             except Exception as e:
-                print(f"Помилка при тестуванні мови {lang}: {e}")
+                logger.debug(f"Помилка при тестуванні мови {lang}: {e}")
                 # Продовжуємо тестування з наступною мовою
                 continue
 
@@ -212,19 +216,19 @@ def test_language_persistence(driver, app, live_server):
             
             # Виводимо повний вміст сторінки для діагностики
             page_source = driver.page_source
-            print(f"HTML сторінки логіну: {page_source[:500]}...")
+            logger.debug(f"HTML сторінки логіну: {page_source[:500]}...")
             
             # Виведемо всі текстові елементи на сторінці логіну
-            print("Елементи на сторінці логіну:")
+            logger.debug("Елементи на сторінці логіну:")
             text_elements = driver.find_elements(By.XPATH, "//*[text()]")
             for element in text_elements[:10]:
-                print(f"Текст: {element.text}")
+                logger.debug(f"Текст: {element.text}")
             
             # Тест вважається успішним, якщо cookie збережено
-            print("✓ Cookie збережено при навігації")
+            logger.debug("✓ Cookie збережено при навігації")
             
         except Exception as e:
-            print(f"Помилка при тестуванні збереження мови: {e}")
+            logger.debug(f"Помилка при тестуванні збереження мови: {e}")
 
 @pytest.mark.selenium
 def test_login_form_in_different_languages(driver, app, live_server):
@@ -265,10 +269,10 @@ def test_login_form_in_different_languages(driver, app, live_server):
                 time.sleep(2)
                 
                 # Виведемо всі елементи після зміни мови
-                print(f"Елементи на сторінці логіну після зміни мови на {lang}:")
+                logger.debug(f"Елементи на сторінці логіну після зміни мови на {lang}:")
                 text_elements = driver.find_elements(By.XPATH, "//*[text()]")
                 for element in text_elements[:10]:
-                    print(f"Текст: {element.text}")
+                    logger.debug(f"Текст: {element.text}")
                 
                 # Перевіряємо, що хоча б один очікуваний текст присутній на сторінці
                 page_source = driver.page_source
@@ -276,11 +280,11 @@ def test_login_form_in_different_languages(driver, app, live_server):
                 for expected_text in login_texts[lang]:
                     if expected_text in page_source:
                         found_any = True
-                        print(f"Знайдено текст '{expected_text}' на сторінці для мови {lang}")
+                        logger.debug(f"Знайдено текст '{expected_text}' на сторінці для мови {lang}")
                         break
                 
                 assert found_any, f"Жоден з очікуваних текстів не знайдено для мови {lang}"
-                print(f"✓ Форма логіну працює з мовою {lang}")
+                logger.debug(f"✓ Форма логіну працює з мовою {lang}")
                 
             except Exception as e:
-                print(f"Помилка при тестуванні форми входу для мови {lang}: {e}") 
+                logger.debug(f"Помилка при тестуванні форми входу для мови {lang}: {e}") 

@@ -1,15 +1,18 @@
 # tests/conftest.py
-import pytest
+import logging
 import os
-import sys
-import tempfile
+import pytest
 import random
 import string
+import sys
+import tempfile
 from datetime import datetime
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
-from sqlalchemy import MetaData, Table, Column, Integer, String, ForeignKey, Float, Boolean
+from sqlalchemy import (Boolean, Column, Float, ForeignKey, Integer, MetaData,
+                        String, Table, create_engine)
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import scoped_session, sessionmaker
+
+logger = logging.getLogger(__name__)
 
 from app import create_app
 from app.extensions import db
@@ -113,7 +116,7 @@ def live_server(app):
     """Запускає тестовий сервер у окремому потоці та ініціалізує базу даних."""
     # Ініціалізуємо базу даних перед запуском сервера
     with app.app_context():
-        print("Creating tables for LiveServer test...")
+        logger.info("Creating tables for LiveServer test...")
         db.create_all()  # Створюємо всі таблиці перед тестом
         
         # Перевіряємо, який тип бази даних використовується
@@ -131,7 +134,7 @@ def live_server(app):
                 raise ValueError(f"Unsupported database dialect: {dialect}")
 
             tables = [row[0] for row in result]
-            print(f"Tables in LiveServer database ({dialect}): {tables}")
+            logger.info("Tables in LiveServer database (%s): %s", dialect, tables)
 
     # Запускаємо сервер
     port = get_free_port()
@@ -143,16 +146,16 @@ def live_server(app):
     with app.app_context():
         db.session.remove()
         db.drop_all()  # Видаляємо таблиці після тесту
-        print("LiveServer tables dropped...")
+        logger.info("LiveServer tables dropped...")
     
     server.stop()
 
 @pytest.fixture(scope="function")
 def test_db(app):
     with app.app_context():
-        print("Creating tables for test...")
+        logger.info("Creating tables for test...")
         db.create_all()  # Створюємо всі таблиці перед тестом
-        print("Tables created...")
+        logger.info("Tables created...")
         
         # Перевіряємо, який тип бази даних використовується
         engine = db.engine
@@ -169,12 +172,12 @@ def test_db(app):
                 raise ValueError(f"Unsupported database dialect: {dialect}")
 
             tables = [row[0] for row in result]
-            print(f"Tables in database ({dialect}): {tables}")
+            logger.info("Tables in database (%s): %s", dialect, tables)
             
         yield db
         db.session.remove()
         db.drop_all()  # Видаляємо таблиці після тесту
-        print("Tables dropped...")
+        logger.info("Tables dropped...")
 
 @pytest.fixture(scope="function")
 def client(app):

@@ -1,8 +1,10 @@
-import pytest
+import logging
+import io
 import os
 import time
 import uuid
-import io
+
+import pytest
 from PIL import Image
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -12,6 +14,8 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException, TimeoutException
+
+logger = logging.getLogger(__name__)
 
 if not os.environ.get("RUN_SELENIUM"):
     pytest.skip("Skipping selenium tests; RUN_SELENIUM not set", allow_module_level=True)
@@ -32,10 +36,10 @@ def driver():
         service = Service('/usr/bin/chromedriver')
         driver = webdriver.Chrome(service=service, options=chrome_options)
     except WebDriverException as e:
-        print(f"Помилка при ініціалізації Chrome: {e}")
+        logger.error("\u041f\u043e\u043c\u0438\u043b\u043a\u0430 \u043f\u0440\u0438 \u0456\u043d\u0456\u0446\u0456\u0430\u043b\u0456\u0437\u0430\u0446\u0456\u0457 Chrome: %s", e)
         raise
-    
-    print("ChromeDriver успішно ініціалізовано")
+
+    logger.info("ChromeDriver \u0443\u0441\u043f\u0456\u0448\u043d\u043e \u0456\u043d\u0456\u0446\u0456\u0430\u043b\u0456\u0437\u043e\u0432\u0430\u043d\u043e")
     
     # Встановлюємо неявне очікування
     driver.implicitly_wait(10)
@@ -43,7 +47,7 @@ def driver():
     yield driver
     
     # Закриваємо браузер після тесту
-    print("Закриваємо драйвер після тесту")
+    logger.info("\u0417\u0430\u043a\u0440\u0438\u0432\u0430\u0454\u043c\u043e \u0434\u0440\u0430\u0439\u0432\u0435\u0440 \u043f\u0456\u0441\u043b\u044f \u0442\u0435\u0441\u0442\u0443")
     driver.quit()
 
 def create_test_image():
@@ -66,7 +70,7 @@ def test_user_registration(driver, app, live_server):
     3. Відправляє форму і перевіряє успішність реєстрації
     """
     live_server_url = live_server.url
-    print(f"URL тестового сервера: {live_server_url}")
+    logger.debug("URL \u0442\u0435\u0441\u0442\u043e\u0432\u043e\u0433\u043e \u0441\u0435\u0440\u0432\u0435\u0440\u0430: %s", live_server_url)
     
     # Генеруємо унікальні дані для тесту
     test_username = unique_username("selenium_test")
@@ -105,10 +109,10 @@ def test_user_registration(driver, app, live_server):
         flash_messages = driver.find_elements(By.CLASS_NAME, "alert-success")
         assert any("account has been created" in msg.text for msg in flash_messages), "Повідомлення про успішну реєстрацію не знайдено"
         
-        print(f"✓ Реєстрація користувача {test_username} пройшла успішно")
+        logger.info("\u2713 \u0420\u0435\u0454\u0441\u0442\u0440\u0430\u0446\u0456\u044f \u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0430 %s \u043f\u0440\u043e\u0439\u0448\u043b\u0430 \u0443\u0441\u043f\u0456\u0448\u043d\u043e", test_username)
         
     except Exception as e:
-        print(f"Помилка при реєстрації користувача: {e}")
+        logger.error("\u041f\u043e\u043c\u0438\u043b\u043a\u0430 \u043f\u0440\u0438 \u0440\u0435\u0454\u0441\u0442\u0440\u0430\u0446\u0456\u0457 \u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0430: %s", e)
         # Знімок екрану для діагностики
         driver.save_screenshot("registration_error.png")
         raise
@@ -158,7 +162,7 @@ def test_user_login_logout(driver, app, live_server, test_db):
         logout_link = driver.find_element(By.XPATH, "//a[contains(@href, '/logout')]")
         assert logout_link.is_displayed(), "Посилання для виходу не знайдено після входу"
         
-        print(f"✓ Вхід користувача {test_username} пройшов успішно")
+        logger.info("\u2713 \u0412\u0445\u0456\u0434 \u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0430 %s \u043f\u0440\u043e\u0439\u0448\u043e\u0432 \u0443\u0441\u043f\u0456\u0448\u043d\u043e", test_username)
         
         # Тепер тестуємо вихід
         logout_link.click()
@@ -172,10 +176,10 @@ def test_user_login_logout(driver, app, live_server, test_db):
         login_link = driver.find_element(By.XPATH, "//a[contains(@href, '/login')]")
         assert login_link.is_displayed(), "Посилання для входу не знайдено після виходу"
         
-        print(f"✓ Вихід користувача пройшов успішно")
+        logger.info("\u2713 \u0412\u0438\u0445\u0456\u0434 \u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0430 \u043f\u0440\u043e\u0439\u0448\u043e\u0432 \u0443\u0441\u043f\u0456\u0448\u043d\u043e")
         
     except Exception as e:
-        print(f"Помилка при тестуванні входу/виходу: {e}")
+        logger.error("\u041f\u043e\u043c\u0438\u043b\u043a\u0430 \u043f\u0440\u0438 \u0442\u0435\u0441\u0442\u0443\u0432\u0430\u043d\u043d\u0456 \u0432\u0445\u043e\u0434\u0443/\u0432\u0438\u0445\u043e\u0434\u0443: %s", e)
         driver.save_screenshot("login_logout_error.png")
         raise
 
@@ -279,10 +283,10 @@ def test_edit_profile(driver, app, live_server, test_db):
         # Перевіряємо, що ми на сторінці профілю (містить ім'я користувача)
         assert test_username in driver.page_source, "Ім'я користувача не знайдено на сторінці"
         
-        print(f"✓ Редагування профілю користувача {test_username} пройшло успішно")
+        logger.info("\u2713 \u0420\u0435\u0434\u0430\u0433\u0443\u0432\u0430\u043d\u043d\u044f \u043f\u0440\u043e\u0444\u0456\u043b\u044e \u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0430 %s \u043f\u0440\u043e\u0439\u0448\u043b\u043e \u0443\u0441\u043f\u0456\u0448\u043d\u043e", test_username)
         
     except Exception as e:
-        print(f"Помилка при редагуванні профілю: {e}")
+        logger.error("\u041f\u043e\u043c\u0438\u043b\u043a\u0430 \u043f\u0440\u0438 \u0440\u0435\u0434\u0430\u0433\u0443\u0432\u0430\u043d\u043d\u0456 \u043f\u0440\u043e\u0444\u0456\u043b\u044e: %s", e)
         driver.save_screenshot("edit_profile_error.png")
         raise
 
@@ -355,10 +359,10 @@ def test_calculate_relationship(driver, app, live_server):
         result_text = driver.find_element(By.CSS_SELECTOR, ".result").text
         assert "Relationship Type:" in result_text or "Тип відносин:" in result_text
         
-        print(f"✓ Розрахунок відносин між типами пройшов успішно")
+        logger.info("\u2713 \u0420\u043e\u0437\u0440\u0430\u0445\u0443\u043d\u043e\u043a \u0432\u0456\u0434\u043d\u043e\u0441\u0438\u043d \u043c\u0456\u0436 \u0442\u0438\u043f\u0430\u043c\u0438 \u043f\u0440\u043e\u0439\u0448\u043e\u0432 \u0443\u0441\u043f\u0456\u0448\u043d\u043e")
         
     except Exception as e:
-        print(f"Помилка при розрахунку відносин: {e}")
+        logger.error("\u041f\u043e\u043c\u0438\u043b\u043a\u0430 \u043f\u0440\u0438 \u0440\u043e\u0437\u0440\u0430\u0445\u0443\u043d\u043a\u0443 \u0432\u0456\u0434\u043d\u043e\u0441\u0438\u043d: %s", e)
         driver.save_screenshot("calculate_relationship_error.png")
         raise
 
@@ -483,10 +487,10 @@ def test_nearby_compatibles(driver, app, live_server, test_db):
         assert compatible1_username in page_text, f"Сумісний користувач 1 ({compatible1_username}) не знайдений на сторінці"
         assert compatible2_username in page_text, f"Сумісний користувач 2 ({compatible2_username}) не знайдений на сторінці"
         
-        print(f"✓ Функція пошуку сумісних користувачів поблизу працює коректно")
+        logger.info("\u2713 \u0424\u0443\u043d\u043a\u0446\u0456\u044f \u043f\u043e\u0448\u0443\u043a\u0443 \u0441\u0443\u043c\u0456\u0441\u043d\u0438\u0445 \u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0456\u0432 \u043f\u043e\u0431\u043b\u0438\u0437\u0443 \u043f\u0440\u0430\u0446\u044e\u0454 \u043a\u043e\u0440\u0435\u043a\u0442\u043d\u043e")
         
     except Exception as e:
-        print(f"Помилка при тестуванні пошуку сумісних користувачів: {e}")
+        logger.error("\u041f\u043e\u043c\u0438\u043b\u043a\u0430 \u043f\u0440\u0438 \u0442\u0435\u0441\u0442\u0443\u0432\u0430\u043d\u043d\u0456 \u043f\u043e\u0448\u0443\u043a\u0443 \u0441\u0443\u043c\u0456\u0441\u043d\u0438\u0445 \u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0456\u0432: %s", e)
         driver.save_screenshot("nearby_compatibles_error.png")
         raise
 
@@ -585,7 +589,7 @@ def test_profile_image_upload(driver, app, live_server, test_db):
                 page_source = driver.page_source
                 assert "Profile updated successfully" in page_source, "Повідомлення про успішне оновлення не відображається"
 
-                print(f"✓ Завантаження зображення профілю пройшло успішно")
+                logger.info("\u2713 \u0417\u0430\u0432\u0430\u043d\u0442\u0430\u0436\u0435\u043d\u043d\u044f \u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u043d\u044f \u043f\u0440\u043e\u0444\u0456\u043b\u044e \u043f\u0440\u043e\u0439\u0448\u043b\u043e \u0443\u0441\u043f\u0456\u0448\u043d\u043e")
 
             finally:
                 # Видаляємо тимчасове зображення
@@ -593,6 +597,6 @@ def test_profile_image_upload(driver, app, live_server, test_db):
                     os.remove(test_image.name)
 
     except Exception as e:
-        print(f"Помилка при завантаженні зображення профілю: {e}")
+        logger.error("\u041f\u043e\u043c\u0438\u043b\u043a\u0430 \u043f\u0440\u0438 \u0437\u0430\u0432\u0430\u043d\u0442\u0430\u0436\u0435\u043d\u043d\u0456 \u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u043d\u044f \u043f\u0440\u043e\u0444\u0456\u043b\u044e: %s", e)
         driver.save_screenshot("image_upload_error.png")
         raise 
