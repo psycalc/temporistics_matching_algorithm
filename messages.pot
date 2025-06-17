@@ -1,0 +1,161 @@
+# Translations template for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-06-17 07:54+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: app/templates/base.html:6
+msgid "Psychological Calculator"
+msgstr ""
+
+#: app/templates/base.html:20
+msgid "Home"
+msgstr ""
+
+#: app/templates/base.html:22
+msgid "Logout"
+msgstr ""
+
+#: app/templates/base.html:23
+msgid "Profile"
+msgstr ""
+
+#: app/templates/base.html:25
+msgid "Compatible Nearby"
+msgstr ""
+
+#: app/templates/base.html:26
+msgid "Chat"
+msgstr ""
+
+#: app/templates/base.html:29
+msgid "Register"
+msgstr ""
+
+#: app/templates/base.html:30 app/templates/login.html:10
+#: app/templates/login.html:11
+msgid "Login"
+msgstr ""
+
+#: app/templates/check_distance_form.html:3
+msgid "Check Distance to Another Compatible User"
+msgstr ""
+
+#: app/templates/check_distance_form.html:7
+msgid "Other User Username"
+msgstr ""
+
+#: app/templates/check_distance_form.html:10
+msgid "Check Distance"
+msgstr ""
+
+#: app/templates/index.html:7
+msgid "Select Typology:"
+msgstr ""
+
+#: app/templates/index.html:15
+msgid "User 1 Type:"
+msgstr ""
+
+#: app/templates/index.html:20
+msgid "User 2 Type:"
+msgstr ""
+
+#: app/templates/index.html:25
+msgid "Calculate"
+msgstr ""
+
+#: app/templates/login.html:12 app/templates/login.html:13
+#: app/templates/profile.html:19
+msgid "Email"
+msgstr ""
+
+#: app/templates/login.html:14 app/templates/login.html:15
+msgid "Password"
+msgstr ""
+
+#: app/templates/login.html:26
+msgid "Log In"
+msgstr ""
+
+#: app/templates/login.html:43
+msgid "Remember Me"
+msgstr ""
+
+#: app/templates/login.html:53
+msgid "Or sign in with:"
+msgstr ""
+
+#: app/templates/login.html:70
+msgid "Need an account?"
+msgstr ""
+
+#: app/templates/login.html:71
+msgid "Sign Up"
+msgstr ""
+
+#: app/templates/profile.html:4
+msgid "Profile of"
+msgstr ""
+
+#: app/templates/profile.html:7
+msgid "Edit Profile"
+msgstr ""
+
+#: app/templates/profile.html:11
+msgid "Profile Image"
+msgstr ""
+
+#: app/templates/profile.html:13
+msgid "Default Profile Image"
+msgstr ""
+
+#: app/templates/profile.html:24
+msgid "Typology Name"
+msgstr ""
+
+#: app/templates/profile.html:29
+msgid "Type Value"
+msgstr ""
+
+#: app/templates/profile.html:34
+msgid "City"
+msgstr ""
+
+#: app/templates/profile.html:39
+msgid "Country"
+msgstr ""
+
+#: app/templates/profile.html:44
+msgid "Profession"
+msgstr ""
+
+#: app/templates/register.html:14
+msgid "Join Today"
+msgstr ""
+
+#: app/templates/register.html:37
+msgid "Typology"
+msgstr ""
+
+#: app/templates/register.html:72
+msgid "Already have an account?"
+msgstr ""
+
+#: app/templates/register.html:72
+msgid "Sign In"
+msgstr ""
+

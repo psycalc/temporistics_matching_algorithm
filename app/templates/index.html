@@ -4,7 +4,7 @@
   <h1>Psychological Calculator</h1>
   <form method="post" action="{{ url_for('main.calculate') }}">
     {{ form.csrf_token }}
-    <label for="typology">Select Typology:</label>
+    <label for="typology">{{ _('Select Typology:') }}</label>
     <select name="typology" id="typology" onchange="updateTypes()" required>
       <option value="Temporistics">1. Temporistics</option>
       <option value="Psychosophia">2. Psychosophia</option>
@@ -12,17 +12,17 @@
       <option value="Socionics">4. Socionics</option>
     </select>
     <br>
-    <label for="user1">User 1 Type:</label>
+    <label for="user1">{{ _('User 1 Type:') }}</label>
     <select name="user1" id="user1" required>
       <!-- Options will be populated by JavaScript -->
     </select>
     <br>
-    <label for="user2">User 2 Type:</label>
+    <label for="user2">{{ _('User 2 Type:') }}</label>
     <select name="user2" id="user2" required>
       <!-- Options will be populated by JavaScript -->
     </select>
     <br>
-    <input type="submit" value="Calculate">
+    <input type="submit" value="{{ _('Calculate') }}">
   </form>
 
   <script type="text/javascript">
