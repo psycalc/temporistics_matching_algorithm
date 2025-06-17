@@ -215,13 +215,24 @@ This updates the corresponding JSON file with the provided score.
    python run.py
    ```
 
-   The application will be available at http://localhost:5001 when using the script or http://localhost:5000 when started directly.
+The application will be available at http://localhost:5001 when using the script or http://localhost:5000 when started directly.
 
-   > **Possible issues and solutions**:
+> **Possible issues and solutions**:
    >
    > 1. **PostgreSQL connection error** – if you cannot connect to host `db`, use `run_local.sh` or set `DATABASE_URL` to SQLite.
    > 2. **Port already in use** – either change `FLASK_RUN_PORT` in `run_local.sh` or stop the process using `sudo lsof -i :5000` and `sudo kill <PID>`.
    > 3. **SQLite "unable to open database file"** – check directory permissions (`ls -la`), run the latest script to create the DB, or try running with elevated privileges `sudo ./run_local.sh`.
+
+
+### Updating translations
+
+Run `make translations` whenever you change text in the templates or Python files:
+
+```bash
+make translations
+```
+
+This extracts messages with Babel, updates the `.po` catalogs in `translations/`, and compiles the binary files.
 
 ### Running with Docker
 
