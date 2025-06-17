@@ -9,6 +9,7 @@ from flask_caching import Cache
 from flask_wtf.csrf import CSRFProtect
 from flask_talisman import Talisman
 from app.context_processors import inject_translation
+from flask_user import SQLAlchemyAdapter, UserManager
 
 # Змінні оточення вже завантажує Dynaconf у config.py
 cache = Cache()
@@ -56,6 +57,10 @@ def create_app(config_name="development"):
         content_security_policy=app.config.get("CONTENT_SECURITY_POLICY"),
         force_https=app.config.get("TALISMAN_FORCE_HTTPS", False),
     )
+
+    # Set up Flask-User
+    from app.models import User
+    user_manager = UserManager(SQLAlchemyAdapter(db, User), app)
     
     # Регіструємо blueprint'и
     from app.routes import main

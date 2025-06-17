@@ -217,7 +217,7 @@ def login():
     github_enabled = 'github' in current_app.blueprints
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and user.check_password(form.password.data):
+        if user and current_app.user_manager.verify_password(form.password.data, user.password_hash):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get("next")
             if not is_safe_url(next_page):
