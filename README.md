@@ -308,6 +308,6 @@ set `TALISMAN_FORCE_HTTPS=false` in your environment.
 
 ## Additional Information
 
-This project is developed by [Your Name] and is licensed under the [License Name].
+This project is developed by [Your Name] and is licensed under the MIT License.
 
 For more information, please visit the project repository on [GitHub](https://github.com/yourusername/psychological-calculator) or contact the developer at [your.email@example.com].
