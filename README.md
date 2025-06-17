@@ -124,6 +124,14 @@ Under `app/typologies/`, each typology is implemented as a class derived from an
 These methods directly reflect the theoretical principles: induction/deduction (Temporistics), analysis/synthesis (Psychosophy), and modeling (Socionics).
 The same interface now exposes additional typologies like `TypologyIQ` for IQ levels and `TypologyTemperaments` for classical temperaments.
 
+### Typology Plugins
+External packages can provide new typology implementations. The application uses
+`stevedore` to discover modules that expose an entry point in the
+`temporistics.typology` namespace. Each plugin module should import
+`register_typology` from `app.typologies.registry` and call it during import to
+register its classes. Once such a package is installed, its typologies become
+available automatically at startup.
+
 ### Services and Data Validation
 `services.py` contains:
 - `get_types_by_typology()`: returns type lists according to the chosen typology class.
