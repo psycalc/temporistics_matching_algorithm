@@ -8,6 +8,7 @@ from flask_babel import Babel, _
 from flask_caching import Cache
 from flask_wtf.csrf import CSRFProtect
 from flask_talisman import Talisman
+from app.context_processors import inject_translation
 
 # Змінні оточення вже завантажує Dynaconf у config.py
 cache = Cache()
@@ -47,6 +48,7 @@ def create_app(config_name="development"):
     
     cache.init_app(app)
     babel.init_app(app)
+    app.context_processor(inject_translation)
     login_manager.init_app(app)
     csrf.init_app(app)
     talisman.init_app(
