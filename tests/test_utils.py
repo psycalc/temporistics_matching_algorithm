@@ -1,10 +1,11 @@
 import pytest
-from app.services import haversine_distance, get_users_distance, get_typology_instance
+from haversine import haversine
+from app.services import get_users_distance, get_typology_instance
 from app.models import User, UserType
 from app.extensions import db
 
 def test_haversine_distance():
-    """Тестує функцію haversine_distance, яка обчислює відстань між двома точками на Землі."""
+    """Тестує функцію ``haversine`` з бібліотеки, яка обчислює відстань між двома точками на Землі."""
     # Координати Києва
     kyiv_lat, kyiv_lon = 50.4501, 30.5234
     
@@ -14,25 +15,25 @@ def test_haversine_distance():
     # Очікувана відстань між Києвом та Львовом (приблизно 470 км)
     expected_distance = 470
     
-    # Обчислюємо відстань за допомогою функції
-    distance = haversine_distance(kyiv_lat, kyiv_lon, lviv_lat, lviv_lon)
+    # Обчислюємо відстань за допомогою бібліотеки
+    distance = haversine((kyiv_lat, kyiv_lon), (lviv_lat, lviv_lon))
     
     # Перевіряємо, що відстань приблизно відповідає очікуваній (з похибкою 10 км)
     assert abs(distance - expected_distance) <= 10, f"Розрахована відстань {distance} занадто відрізняється від очікуваної {expected_distance}"
 
 def test_haversine_distance_same_point():
-    """Тестує функцію haversine_distance для випадку однакових координат."""
+    """Тестує ``haversine`` для випадку однакових координат."""
     # Координати точки
     lat, lon = 50.4501, 30.5234
     
     # Відстань між точкою та нею самою повинна бути 0
-    distance = haversine_distance(lat, lon, lat, lon)
+    distance = haversine((lat, lon), (lat, lon))
     
     # Перевіряємо, що відстань дорівнює 0
     assert distance == 0, f"Відстань між однаковими точками повинна бути 0, але отримано {distance}"
 
 def test_haversine_distance_antipodes():
-    """Тестує функцію haversine_distance для антиподів (протилежних точок на Землі)."""
+    """Тестує ``haversine`` для антиподів (протилежних точок на Землі)."""
     # Координати точки та її антипода (приблизно)
     lat1, lon1 = 50.0, 30.0
     lat2, lon2 = -50.0, -150.0  # Протилежна точка
@@ -41,14 +42,14 @@ def test_haversine_distance_antipodes():
     earth_circumference = 40075  # км
     expected_distance = earth_circumference / 2
     
-    # Обчислюємо відстань за допомогою функції
-    distance = haversine_distance(lat1, lon1, lat2, lon2)
+    # Обчислюємо відстань за допомогою бібліотеки
+    distance = haversine((lat1, lon1), (lat2, lon2))
     
     # Перевіряємо, що відстань приблизно відповідає половині довжини екватора
     assert abs(distance - expected_distance) <= 100, f"Розрахована відстань {distance} занадто відрізняється від очікуваної {expected_distance}"
 
 def test_haversine_distance_equator():
-    """Тестує функцію haversine_distance для точок на екваторі."""
+    """Тестує ``haversine`` для точок на екваторі."""
     # Координати двох точок на екваторі, розділених 90 градусами довготи
     lat1, lon1 = 0.0, 0.0
     lat2, lon2 = 0.0, 90.0
@@ -57,8 +58,8 @@ def test_haversine_distance_equator():
     earth_circumference = 40075  # км
     expected_distance = earth_circumference / 4
     
-    # Обчислюємо відстань за допомогою функції
-    distance = haversine_distance(lat1, lon1, lat2, lon2)
+    # Обчислюємо відстань за допомогою бібліотеки
+    distance = haversine((lat1, lon1), (lat2, lon2))
     
     # Перевіряємо, що відстань приблизно відповідає чверті довжини екватора
     assert abs(distance - expected_distance) <= 50, f"Розрахована відстань {distance} занадто відрізняється від очікуваної {expected_distance}"

@@ -1,4 +1,4 @@
-import math
+from haversine import haversine, Unit
 from flask import current_app
 from .extensions import cache
 from .typologies.registry import get_typology_classes
@@ -42,22 +42,6 @@ def calculate_relationship(user1, user2, typology):
     return relationship_type, comfort_score
 
 
-def haversine_distance(lat1, lon1, lat2, lon2):
-    """Return the distance in kilometers between two geographic coordinates."""
-    R = 6371.0
-    lat1_rad, lon1_rad = math.radians(lat1), math.radians(lon1)
-    lat2_rad, lon2_rad = math.radians(lat2), math.radians(lon2)
-    dlat = lat2_rad - lat1_rad
-    dlon = lon2_rad - lon1_rad
-    a = (
-        math.sin(dlat / 2) ** 2
-        + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2) ** 2
-    )
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    distance = R * c
-    return distance
-
-
 def get_users_distance(user1, user2):
     """Return the distance between two users based on their coordinates."""
     if (
@@ -67,8 +51,10 @@ def get_users_distance(user1, user2):
         or user2.longitude is None
     ):
         raise ValueError("Both users must have coordinates set")
-    return haversine_distance(
-        user1.latitude, user1.longitude, user2.latitude, user2.longitude
+    return haversine(
+        (user1.latitude, user1.longitude),
+        (user2.latitude, user2.longitude),
+        unit=Unit.KILOMETERS,
     )
 
 
