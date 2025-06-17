@@ -1,4 +1,3 @@
-import math
 from flask import current_app
 from .extensions import db, cache
 from .typologies.registry import get_typology_classes
@@ -12,7 +11,6 @@ TYPOLOGY_CLASSES = get_typology_classes()
 from .domain_services import (
     get_types_by_typology,
     calculate_relationship,
-    haversine_distance,
     get_users_distance,
     get_distance_if_compatible,
     get_typology_instance,
@@ -24,7 +22,6 @@ from .repositories.user_repository import update_user_profile
 __all__ = [
     "get_types_by_typology",
     "calculate_relationship",
-    "haversine_distance",
     "get_users_distance",
     "get_distance_if_compatible",
     "get_typology_instance",
