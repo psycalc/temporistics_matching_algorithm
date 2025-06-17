@@ -107,11 +107,12 @@ def create_app(config_name="development"):
     def load_user(user_id):
         return User.query.get(int(user_id))
     
-    # Додаємо тестовий маршрут для перевірки помилки 500
-    @app.route("/cause_500")
-    def cause_500():
-        # Спеціально створюємо помилку для тестування обробки 500 помилок
-        raise RuntimeError("Test 500 error")
+    # Додаємо тестовий маршрут для перевірки помилки 500 лише у тестовому середовищі
+    if config_name == 'testing':
+        @app.route("/cause_500")
+        def cause_500():
+            # Спеціально створюємо помилку для тестування обробки 500 помилок
+            raise RuntimeError("Test 500 error")
     
     # Імпортуємо і реєструємо обробники помилок
     from app.errors import register_error_handlers
