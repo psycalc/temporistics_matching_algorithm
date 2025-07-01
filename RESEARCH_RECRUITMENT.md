@@ -1,6 +1,6 @@
 # Plan for Engaging Researchers
 
-The project uses many experimental values (for example, compatibility scores). To increase scientific validity and foster further development, we need to attract researchers and people with analytical mindsets. Below is a list of steps that can help interest scientists and get them involved.
+Our overarching mission is to solve the problem of human compatibility through open collaboration and data sharing. The project currently uses many experimental values (for example, compatibility scores). To increase scientific validity and foster further development, we need to attract researchers and people with analytical mindsets. Below is a list of steps that can help interest scientists and get them involved.
 
 ## 1. Prepare Scientific Documentation
 

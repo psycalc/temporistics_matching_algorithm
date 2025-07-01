@@ -28,7 +28,7 @@
 
 This project integrates theoretical concepts from several typologies (Temporistics, Psychosophy, Socionics, Amatoric, IQ, and Temperaments) and implements them in a web application. Users can select their types, calculate relationships between types, and view the "comfort score" of these interactions.
 
-The main goal is to demonstrate how theoretical models of perception (time, personality aspects, information) can be transformed into practical code, tested thoroughly, and presented through a web interface.
+The ultimate goal of this project is to help solve the question of human compatibility in a broad scientific sense. We strive to provide all possible tools and data so researchers can study, refine, and verify these models. At the same time, the repository shows how theoretical concepts (time, personality aspects, information) can be translated into working code and thoroughly tested in a web application.
 
 > **Note for newcomers:** The typologies used in this project are exploratory models rather than a definitive scientific solution for human compatibility. They provide a framework for experiments and may be extended with new typologies in the future. If you're new to these concepts, see [HowThisIsWorkTogetherEN.md](HowThisIsWorkTogetherEN.md) for a beginner-friendly overview of each typology and where conflicts between them often arise.
 
